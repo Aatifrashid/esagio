@@ -49,4 +49,9 @@ class VideoConsultationSession extends Model
     {
         return $this->belongsTo(User::class, 'conducted_by');
     }
+
+    public function conductedByUser(): BelongsTo
+    {
+        return $this->conductedBy();
+    }
 }

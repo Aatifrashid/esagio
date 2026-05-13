@@ -66,4 +66,9 @@ class Patient extends Model
     {
         return $this->hasMany(CrmTask::class);
     }
+
+    public function treatmentPlans(): HasMany
+    {
+        return $this->hasMany(TreatmentPlan::class);
+    }
 }

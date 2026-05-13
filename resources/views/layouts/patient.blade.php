@@ -19,7 +19,11 @@
     @stack('head')
 </head>
 <body class="font-sans antialiased bg-white">
-    {{ $slot }}
+    @isset($slot)
+        {{ $slot }}
+    @else
+        @yield('content')
+    @endisset
     @stack('scripts')
 </body>
 </html>

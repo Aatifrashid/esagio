@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Clinic extends Model
 {
@@ -35,6 +36,16 @@ class Clinic extends Model
         ];
     }
 
+    public function branding(): HasOne
+    {
+        return $this->hasOne(ClinicBranding::class);
+    }
+
+    public function teamMembers(): HasMany
+    {
+        return $this->hasMany(ClinicTeamMember::class)->orderBy('sort_order');
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
@@ -58,6 +69,16 @@ class Clinic extends Model
     public function referrals(): HasMany
     {
         return $this->hasMany(Clinic::class, 'referred_by_clinic_id');
+    }
+
+    public function patients(): HasMany
+    {
+        return $this->hasMany(Patient::class);
+    }
+
+    public function treatmentPlans(): HasMany
+    {
+        return $this->hasMany(TreatmentPlan::class);
     }
 
     public function isOnTrial(): bool
