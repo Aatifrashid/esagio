@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         // 1. Tooth chart conditions (system-wide lookup data)
         // -------------------------------------------------------------------
         $this->call(ToothChartConditionSeeder::class);
+        $this->call(CurrencySeeder::class);
 
         // -------------------------------------------------------------------
         // 2. Shared (clinic-agnostic) reference data

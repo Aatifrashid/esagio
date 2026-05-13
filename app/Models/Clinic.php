@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Laravel\Cashier\Billable;
 
 class Clinic extends Model
 {
-    use HasFactory;
+    use Billable, HasFactory;
 
     protected $fillable = [
         'name', 'slug', 'email', 'phone', 'country', 'timezone',

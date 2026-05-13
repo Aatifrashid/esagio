@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\BillingController;
+use App\Http\Controllers\Marketing\PageController;
 use App\Http\Controllers\Patient\PlanViewController;
+use App\Livewire\Crm\PipelineKanban;
 use App\Livewire\PlanBuilder\Builder;
 use Illuminate\Support\Facades\Route;
 
@@ -16,8 +19,6 @@ Route::prefix('p/{token}')->name('patient.plan.')->group(function () {
     Route::get('/pdf', [PlanViewController::class, 'downloadPdf'])->name('pdf');
 });
 
-Route::view('/', 'welcome');
-
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -28,7 +29,29 @@ Route::view('profile', 'profile')
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/plans/{plan}/builder', Builder::class)->name('plan.builder');
-    Route::get('/dashboard/crm/pipeline/{pipeline}', \App\Livewire\Crm\PipelineKanban::class)->name('crm.pipeline');
+    Route::get('/dashboard/crm/pipeline/{pipeline}', PipelineKanban::class)->name('crm.pipeline');
 });
+
+// Billing routes
+Route::middleware('auth')->prefix('billing')->name('billing.')->group(function () {
+    Route::get('/portal', [BillingController::class, 'portal'])->name('portal');
+    Route::post('/subscribe/{tier}', [BillingController::class, 'subscribe'])->name('subscribe');
+    Route::get('/upgrade', fn () => view('dashboard.billing.upgrade'))->name('upgrade');
+    Route::get('/suspended', fn () => view('dashboard.billing.suspended'))->name('suspended');
+});
+
+Route::post('/stripe/webhook', [BillingController::class, 'webhook'])->name('stripe.webhook');
+
+// Marketing website routes
+Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/features', [PageController::class, 'features'])->name('features');
+Route::get('/pricing', [PageController::class, 'pricing'])->name('pricing');
+Route::get('/vs-brightplans', [PageController::class, 'vsBrightplans'])->name('vs-brightplans');
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
+Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+Route::get('/blog', [PageController::class, 'blog'])->name('blog');
+Route::get('/blog/{slug}', [PageController::class, 'blogPost'])->name('blog.post');
 
 require __DIR__.'/auth.php';

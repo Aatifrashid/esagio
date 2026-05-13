@@ -1,13 +1,10 @@
 <?php
 
 use App\Models\Clinic;
-use App\Models\ClinicBranding;
 use App\Models\Patient;
 use App\Models\TreatmentPlan;
 use App\Models\TreatmentPlanComment;
 use App\Models\TreatmentPlanEvent;
-use App\Models\TreatmentPlanItem;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 beforeEach(function () {
@@ -15,22 +12,22 @@ beforeEach(function () {
     $this->patient = Patient::factory()->create(['clinic_id' => $this->clinic->id]);
 
     $this->plan = TreatmentPlan::withoutGlobalScopes()->create([
-        'clinic_id'       => $this->clinic->id,
-        'patient_id'      => $this->patient->id,
+        'clinic_id' => $this->clinic->id,
+        'patient_id' => $this->patient->id,
         'reference_number' => 'TP-2026-00001',
-        'title'           => 'Smile Makeover',
-        'status'          => 'sent',
-        'currency'        => 'GBP',
-        'language'        => 'en',
-        'public_token'    => Str::uuid(),
+        'title' => 'Smile Makeover',
+        'status' => 'sent',
+        'currency' => 'GBP',
+        'language' => 'en',
+        'public_token' => Str::uuid(),
         'public_password' => null,
-        'total_amount'    => 3000.00,
-        'deposit_amount'  => 500.00,
-        'viewed_count'    => 0,
-        'version'         => 1,
-        'is_template'     => false,
-        'sent_at'         => now()->subDays(2),
-        'valid_until'     => now()->addDays(30),
+        'total_amount' => 3000.00,
+        'deposit_amount' => 500.00,
+        'viewed_count' => 0,
+        'version' => 1,
+        'is_template' => false,
+        'sent_at' => now()->subDays(2),
+        'valid_until' => now()->addDays(30),
     ]);
 });
 
@@ -87,7 +84,7 @@ test('accept records signature and changes status to accepted', function () {
 
     $this->post(route('patient.plan.accept', ['token' => $this->plan->public_token]), [
         'signature' => 'data:image/png;base64,iVBORw0KGgo=',
-        'full_name' => $this->patient->first_name . ' ' . $this->patient->last_name,
+        'full_name' => $this->patient->first_name.' '.$this->patient->last_name,
     ])->assertRedirect(route('patient.plan.show', ['token' => $this->plan->public_token]));
 
     $fresh = $this->plan->fresh();
@@ -216,7 +213,7 @@ test('password gate shows password form', function () {
 });
 
 test('correct password grants access', function () {
-    $this->plan->update(['public_password' => 'secret123']);
+    $this->plan->update(['public_password' => bcrypt('secret123')]);
 
     $this->post(route('patient.plan.password.submit', ['token' => $this->plan->public_token]), [
         'password' => 'secret123',
@@ -224,7 +221,7 @@ test('correct password grants access', function () {
 });
 
 test('incorrect password rejects access', function () {
-    $this->plan->update(['public_password' => 'secret123']);
+    $this->plan->update(['public_password' => bcrypt('secret123')]);
 
     $this->post(route('patient.plan.password.submit', ['token' => $this->plan->public_token]), [
         'password' => 'wrongpassword',
