@@ -55,6 +55,21 @@ class TreatmentPlan extends Model
         'template_name',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (TreatmentPlan $plan) {
+            if (empty($plan->reference_number)) {
+                $plan->reference_number = 'TP-' . strtoupper(Str::random(8));
+            }
+            if (empty($plan->public_token)) {
+                $plan->public_token = Str::uuid();
+            }
+            if (empty($plan->created_by)) {
+                $plan->created_by = auth()->id();
+            }
+        });
+    }
+
     protected $casts = [
         'valid_until' => 'date',
         'sent_at' => 'datetime',
