@@ -3,6 +3,8 @@
     showToast: false,
     toastMsg: '',
     ctxMenu: { show: false, x: 0, y: 0, tooth: null },
+    fdiToUni: {18:1,17:2,16:3,15:4,14:5,13:6,12:7,11:8,21:9,22:10,23:11,24:12,25:13,26:14,27:15,28:16,38:17,37:18,36:19,35:20,34:21,33:22,32:23,31:24,41:25,42:26,43:27,44:28,45:29,46:30,47:31,48:32},
+    toothLabel(fdi) { return this.fdiToUni[fdi] || fdi; },
     flash(msg) { this.toastMsg = msg; this.showToast = true; setTimeout(() => this.showToast = false, 2000); },
     openCtx(e, tooth) {
         e.preventDefault();
@@ -13,7 +15,7 @@
         if (this.ctxMenu.tooth) {
             $wire.toggleTooth(this.ctxMenu.tooth);
             $wire.applyConditionToTeeth(code);
-            this.flash('Applied to tooth ' + this.ctxMenu.tooth);
+            this.flash('Applied to tooth ' + this.toothLabel(this.ctxMenu.tooth));
         }
         this.ctxMenu.show = false;
     }
@@ -101,7 +103,7 @@
                          class="absolute z-50 w-52 bg-white border border-gray-200 rounded-xl shadow-xl py-1.5 max-h-72 overflow-y-auto"
                          :style="'left: ' + ctxMenu.x + 'px; top: ' + ctxMenu.y + 'px'"
                          x-on:click.outside="ctxMenu.show = false">
-                        <div class="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider" x-text="'Tooth ' + ctxMenu.tooth"></div>
+                        <div class="px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider" x-text="'Tooth ' + toothLabel(ctxMenu.tooth)"></div>
                         <div class="border-t border-gray-100 my-1"></div>
                         @foreach($availableConditions as $condition)
                             <button x-on:click="applyCtx('{{ $condition['code'] }}')"
