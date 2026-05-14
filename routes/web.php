@@ -65,12 +65,10 @@ Route::get('/onboarding-test', function () {
     return 'Route works! Auth: ' . (auth()->check() ? 'yes (user: ' . auth()->user()->email . ')' : 'no');
 });
 Route::middleware('auth')->get('/onboarding-simple', function () {
-    try {
-        $component = new \App\Livewire\Onboarding\OnboardingWizard();
-        return 'Component instantiated OK. Class: ' . get_class($component);
-    } catch (\Throwable $e) {
-        return 'Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
-    }
+    $user = auth()->user();
+    $clinicId = $user->clinic_id ?? 'NULL';
+    $clinic = $user->clinic ?? null;
+    return "User: {$user->email}, clinic_id: {$clinicId}, clinic relation: " . ($clinic ? $clinic->name : 'NULL');
 });
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding', OnboardingWizard::class)->name('onboarding');
