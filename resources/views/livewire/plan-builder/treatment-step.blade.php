@@ -330,7 +330,7 @@
                     @endphp
 
                     <div class="relative w-full" style="max-width: 550px; margin: 0 auto;">
-                        <img src="{{ asset('images/dental-chart.png') }}" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
+                        <img src="{{ asset('images/dental-chart.png') }}?v=2" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
 
                         @foreach($toothHotspots as $tooth => $pos)
                             @php
