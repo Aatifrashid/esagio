@@ -34,10 +34,10 @@ echo "\n\n";
 
 $commands = [
     'php artisan package:discover --ansi',
+    'php artisan config:clear',
     'php artisan storage:link',
     'php artisan migrate --force',
     'php artisan db:seed --force',
-    'php artisan config:clear',
     'php artisan config:cache',
     'php artisan view:cache',
 ];
