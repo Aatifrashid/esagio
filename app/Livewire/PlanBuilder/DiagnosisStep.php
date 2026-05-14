@@ -107,7 +107,10 @@ class DiagnosisStep extends Component
 
     public function render()
     {
-        $availableConditions = ToothChartCondition::all(['code', 'label', 'colour'])->toArray();
+        $availableConditions = ToothChartCondition::orderBy('sort_order')
+            ->get(['code', 'name', 'colour'])
+            ->map(fn ($c) => ['code' => $c->code, 'label' => $c->name, 'colour' => $c->colour])
+            ->toArray();
 
         return view('livewire.plan-builder.diagnosis-step', [
             'availableConditions' => $availableConditions,
