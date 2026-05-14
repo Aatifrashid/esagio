@@ -18,10 +18,10 @@ class ReviewStep extends Component
     public function mount(TreatmentPlan $plan): void
     {
         $this->plan = $plan->load(['patient', 'items', 'sections', 'videoConsultation']);
-        $this->validate();
+        $this->runChecks();
     }
 
-    public function validate(array $rules = [], array $messages = [], array $attributes = []): array
+    public function runChecks(): void
     {
         $errors = [];
 
@@ -52,13 +52,11 @@ class ReviewStep extends Component
         }
 
         $this->validationErrors = $errors;
-
-        return [];
     }
 
     public function send(): void
     {
-        $this->validate();
+        $this->runChecks();
 
         if (! empty($this->validationErrors)) {
             return;
@@ -87,7 +85,7 @@ class ReviewStep extends Component
             $this->plan->refresh();
         }
 
-        $link = route('plan.public', $this->plan->public_token);
+        $link = route('patient.plan.show', ['token' => $this->plan->public_token]);
 
         $this->dispatch('copy-to-clipboard', text: $link);
     }
