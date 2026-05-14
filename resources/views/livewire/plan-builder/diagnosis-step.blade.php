@@ -43,27 +43,50 @@
                  ">
 
                 @php
-                    $upperRight = ['18','17','16','15','14','13','12','11'];
-                    $upperLeft  = ['21','22','23','24','25','26','27','28'];
-                    $lowerRight = ['48','47','46','45','44','43','42','41'];
-                    $lowerLeft  = ['31','32','33','34','35','36','37','38'];
-
-                    $toothTypes = [
-                        '11' => 'central', '12' => 'lateral', '13' => 'canine', '14' => 'premolar1', '15' => 'premolar2', '16' => 'molar1', '17' => 'molar2', '18' => 'molar3',
-                        '21' => 'central', '22' => 'lateral', '23' => 'canine', '24' => 'premolar1', '25' => 'premolar2', '26' => 'molar1', '27' => 'molar2', '28' => 'molar3',
-                        '31' => 'central', '32' => 'lateral', '33' => 'canine', '34' => 'premolar1', '35' => 'premolar2', '36' => 'molar1', '37' => 'molar2', '38' => 'molar3',
-                        '41' => 'central', '42' => 'lateral', '43' => 'canine', '44' => 'premolar1', '45' => 'premolar2', '46' => 'molar1', '47' => 'molar2', '48' => 'molar3',
+                    $toothHotspots = [
+                        '18' => ['left' => '3.93%', 'top' => '9.92%', 'width' => '5.71%', 'height' => '39.67%'],
+                        '17' => ['left' => '10.0%', 'top' => '7.44%', 'width' => '5.36%', 'height' => '41.32%'],
+                        '16' => ['left' => '16.43%', 'top' => '4.96%', 'width' => '6.43%', 'height' => '43.8%'],
+                        '15' => ['left' => '23.57%', 'top' => '9.09%', 'width' => '4.64%', 'height' => '39.67%'],
+                        '14' => ['left' => '28.21%', 'top' => '6.61%', 'width' => '4.29%', 'height' => '41.32%'],
+                        '13' => ['left' => '32.86%', 'top' => '4.13%', 'width' => '3.57%', 'height' => '44.63%'],
+                        '12' => ['left' => '36.43%', 'top' => '6.61%', 'width' => '3.43%', 'height' => '42.15%'],
+                        '11' => ['left' => '39.86%', 'top' => '4.96%', 'width' => '4.14%', 'height' => '43.8%'],
+                        '21' => ['left' => '44.29%', 'top' => '4.96%', 'width' => '4.14%', 'height' => '43.8%'],
+                        '22' => ['left' => '48.57%', 'top' => '6.61%', 'width' => '3.57%', 'height' => '42.15%'],
+                        '23' => ['left' => '52.29%', 'top' => '4.13%', 'width' => '3.93%', 'height' => '44.63%'],
+                        '24' => ['left' => '56.43%', 'top' => '6.61%', 'width' => '5.0%', 'height' => '41.32%'],
+                        '25' => ['left' => '61.79%', 'top' => '9.09%', 'width' => '4.64%', 'height' => '39.67%'],
+                        '26' => ['left' => '67.14%', 'top' => '4.96%', 'width' => '7.14%', 'height' => '43.8%'],
+                        '27' => ['left' => '75.0%', 'top' => '7.44%', 'width' => '7.14%', 'height' => '41.32%'],
+                        '28' => ['left' => '82.86%', 'top' => '9.09%', 'width' => '8.93%', 'height' => '40.5%'],
+                        '48' => ['left' => '3.93%', 'top' => '57.02%', 'width' => '6.07%', 'height' => '39.67%'],
+                        '47' => ['left' => '10.36%', 'top' => '56.2%', 'width' => '5.71%', 'height' => '39.67%'],
+                        '46' => ['left' => '16.43%', 'top' => '56.2%', 'width' => '6.07%', 'height' => '40.5%'],
+                        '45' => ['left' => '23.21%', 'top' => '57.02%', 'width' => '4.64%', 'height' => '38.84%'],
+                        '44' => ['left' => '28.0%', 'top' => '57.02%', 'width' => '3.93%', 'height' => '38.84%'],
+                        '43' => ['left' => '32.0%', 'top' => '56.2%', 'width' => '3.71%', 'height' => '40.5%'],
+                        '42' => ['left' => '35.86%', 'top' => '57.02%', 'width' => '3.0%', 'height' => '38.84%'],
+                        '41' => ['left' => '38.93%', 'top' => '57.02%', 'width' => '3.21%', 'height' => '38.84%'],
+                        '31' => ['left' => '42.29%', 'top' => '57.02%', 'width' => '3.21%', 'height' => '38.84%'],
+                        '32' => ['left' => '45.71%', 'top' => '57.02%', 'width' => '3.43%', 'height' => '38.84%'],
+                        '33' => ['left' => '49.29%', 'top' => '56.2%', 'width' => '3.93%', 'height' => '40.5%'],
+                        '34' => ['left' => '53.43%', 'top' => '57.02%', 'width' => '5.0%', 'height' => '38.84%'],
+                        '35' => ['left' => '58.71%', 'top' => '57.02%', 'width' => '5.14%', 'height' => '38.84%'],
+                        '36' => ['left' => '64.29%', 'top' => '56.2%', 'width' => '7.5%', 'height' => '40.5%'],
+                        '37' => ['left' => '72.14%', 'top' => '56.2%', 'width' => '7.5%', 'height' => '39.67%'],
+                        '38' => ['left' => '80.0%', 'top' => '57.02%', 'width' => '8.93%', 'height' => '38.84%'],
                     ];
                 @endphp
 
-                {{-- Upper teeth --}}
-                <div class="flex justify-center items-end gap-[2px] mb-1">
-                    @foreach(array_merge($upperRight, $upperLeft) as $i => $tooth)
+                <div class="relative w-full" style="max-width: 700px; margin: 0 auto;">
+                    <img src="{{ asset('images/dental-chart.png') }}" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
+
+                    @foreach($toothHotspots as $tooth => $pos)
                         @php
                             $conditions = $toothChartData[$tooth]['conditions'] ?? [];
                             $hasConditions = count($conditions) > 0;
                             $isSelected = in_array($tooth, $selectedTeeth);
-                            $type = $toothTypes[$tooth] ?? 'central';
                             $isMissing = in_array('MISSING', $conditions);
                             $condColour = null;
                             if ($hasConditions && !$isMissing) {
@@ -72,86 +95,34 @@
                                 }
                             }
                         @endphp
-                        <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
-                            <button
-                                wire:click="toggleTooth('{{ $tooth }}')"
-                                x-on:dragover.prevent
-                                x-on:drop.prevent.stop="
-                                    if (dragging) {
-                                        $wire.toggleTooth('{{ $tooth }}');
-                                        $wire.applyConditionToTeeth(dragging);
-                                        flash('Applied to tooth {{ $tooth }}');
-                                        dragging = null;
-                                    }
-                                "
-                                class="relative transition-all duration-150 {{ $isSelected ? 'scale-110 z-10' : 'hover:scale-105' }}"
-                            >
-                                @if($isMissing)
-                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px] opacity-30">
-                                        <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                        <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                    </svg>
-                                @else
-                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px]">
-                                        @include('livewire.plan-builder.partials.tooth-svg-upper', ['type' => $type, 'isSelected' => $isSelected, 'hasConditions' => $hasConditions, 'condColour' => $condColour, 'conditions' => $conditions, 'availableConditions' => $availableConditions])
-                                    </svg>
-                                @endif
-
-                            </button>
-                            <span class="text-[9px] font-bold mt-0.5 {{ $isSelected ? 'text-clinical' : ($hasConditions ? 'text-gray-700' : 'text-gray-400') }}">{{ $tooth }}</span>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- Gum line --}}
-                <div class="relative my-2">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t-2 border-pink-200/50"></div></div>
-                </div>
-
-                {{-- Lower teeth --}}
-                <div class="flex justify-center items-start gap-[2px] mt-1">
-                    @foreach(array_merge($lowerRight, $lowerLeft) as $i => $tooth)
-                        @php
-                            $conditions = $toothChartData[$tooth]['conditions'] ?? [];
-                            $hasConditions = count($conditions) > 0;
-                            $isSelected = in_array($tooth, $selectedTeeth);
-                            $type = $toothTypes[$tooth] ?? 'central';
-                            $isMissing = in_array('MISSING', $conditions);
-                            $condColour = null;
-                            if ($hasConditions && !$isMissing) {
-                                foreach ($availableConditions as $ac) {
-                                    if ($ac['code'] === $conditions[0]) { $condColour = $ac['colour']; break; }
+                        <button
+                            wire:click="toggleTooth('{{ $tooth }}')"
+                            x-on:dragover.prevent
+                            x-on:drop.prevent.stop="
+                                if (dragging) {
+                                    $wire.toggleTooth('{{ $tooth }}');
+                                    $wire.applyConditionToTeeth(dragging);
+                                    flash('Applied to tooth {{ $tooth }}');
+                                    dragging = null;
                                 }
-                            }
-                        @endphp
-                        <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
-                            <span class="text-[9px] font-bold mb-0.5 {{ $isSelected ? 'text-clinical' : ($hasConditions ? 'text-gray-700' : 'text-gray-400') }}">{{ $tooth }}</span>
-                            <button
-                                wire:click="toggleTooth('{{ $tooth }}')"
-                                x-on:dragover.prevent
-                                x-on:drop.prevent.stop="
-                                    if (dragging) {
-                                        $wire.toggleTooth('{{ $tooth }}');
-                                        $wire.applyConditionToTeeth(dragging);
-                                        flash('Applied to tooth {{ $tooth }}');
-                                        dragging = null;
-                                    }
-                                "
-                                class="relative transition-all duration-150 {{ $isSelected ? 'scale-110 z-10' : 'hover:scale-105' }}"
-                            >
-                                @if($isMissing)
-                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px] opacity-30">
-                                        <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                        <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                    </svg>
-                                @else
-                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px]">
-                                        @include('livewire.plan-builder.partials.tooth-svg-lower', ['type' => $type, 'isSelected' => $isSelected, 'hasConditions' => $hasConditions, 'condColour' => $condColour, 'conditions' => $conditions, 'availableConditions' => $availableConditions])
-                                    </svg>
-                                @endif
+                            "
+                            class="absolute rounded-md transition-all duration-150 group"
+                            style="left: {{ $pos['left'] }}; top: {{ $pos['top'] }}; width: {{ $pos['width'] }}; height: {{ $pos['height'] }};"
+                        >
+                            @if($isMissing)
+                                <div class="absolute inset-0 bg-white/70 rounded-md flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </div>
+                            @elseif($hasConditions && $condColour)
+                                <div class="absolute inset-0 rounded-md opacity-30" style="background-color: {{ $condColour }};"></div>
+                            @endif
 
-                            </button>
-                        </div>
+                            @if($isSelected)
+                                <div class="absolute inset-0 rounded-md ring-2 ring-indigo-500 ring-offset-1 bg-indigo-500/10"></div>
+                            @else
+                                <div class="absolute inset-0 rounded-md opacity-0 group-hover:opacity-100 bg-clinical/5 ring-1 ring-clinical/20 transition"></div>
+                            @endif
+                        </button>
                     @endforeach
                 </div>
             </div>

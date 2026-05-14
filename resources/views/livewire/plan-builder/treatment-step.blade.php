@@ -291,98 +291,66 @@
                     <p class="text-xs text-gray-400 mb-4">Click teeth to see which treatments apply. Teeth with diagnosed conditions are highlighted.</p>
 
                     @php
-                        $upperRight = ['18','17','16','15','14','13','12','11'];
-                        $upperLeft  = ['21','22','23','24','25','26','27','28'];
-                        $lowerRight = ['48','47','46','45','44','43','42','41'];
-                        $lowerLeft  = ['31','32','33','34','35','36','37','38'];
-
-                        $toothTypes = [
-                            '11' => 'central', '12' => 'lateral', '13' => 'canine', '14' => 'premolar1', '15' => 'premolar2', '16' => 'molar1', '17' => 'molar2', '18' => 'molar3',
-                            '21' => 'central', '22' => 'lateral', '23' => 'canine', '24' => 'premolar1', '25' => 'premolar2', '26' => 'molar1', '27' => 'molar2', '28' => 'molar3',
-                            '31' => 'central', '32' => 'lateral', '33' => 'canine', '34' => 'premolar1', '35' => 'premolar2', '36' => 'molar1', '37' => 'molar2', '38' => 'molar3',
-                            '41' => 'central', '42' => 'lateral', '43' => 'canine', '44' => 'premolar1', '45' => 'premolar2', '46' => 'molar1', '47' => 'molar2', '48' => 'molar3',
-                        ];
-
                         $treatedTeeth = $items->flatMap(fn($i) => $i->tooth_positions ?? [])->unique()->values()->toArray();
+
+                        $toothHotspots = [
+                            '18' => ['left' => '3.93%', 'top' => '9.92%', 'width' => '5.71%', 'height' => '39.67%'],
+                            '17' => ['left' => '10.0%', 'top' => '7.44%', 'width' => '5.36%', 'height' => '41.32%'],
+                            '16' => ['left' => '16.43%', 'top' => '4.96%', 'width' => '6.43%', 'height' => '43.8%'],
+                            '15' => ['left' => '23.57%', 'top' => '9.09%', 'width' => '4.64%', 'height' => '39.67%'],
+                            '14' => ['left' => '28.21%', 'top' => '6.61%', 'width' => '4.29%', 'height' => '41.32%'],
+                            '13' => ['left' => '32.86%', 'top' => '4.13%', 'width' => '3.57%', 'height' => '44.63%'],
+                            '12' => ['left' => '36.43%', 'top' => '6.61%', 'width' => '3.43%', 'height' => '42.15%'],
+                            '11' => ['left' => '39.86%', 'top' => '4.96%', 'width' => '4.14%', 'height' => '43.8%'],
+                            '21' => ['left' => '44.29%', 'top' => '4.96%', 'width' => '4.14%', 'height' => '43.8%'],
+                            '22' => ['left' => '48.57%', 'top' => '6.61%', 'width' => '3.57%', 'height' => '42.15%'],
+                            '23' => ['left' => '52.29%', 'top' => '4.13%', 'width' => '3.93%', 'height' => '44.63%'],
+                            '24' => ['left' => '56.43%', 'top' => '6.61%', 'width' => '5.0%', 'height' => '41.32%'],
+                            '25' => ['left' => '61.79%', 'top' => '9.09%', 'width' => '4.64%', 'height' => '39.67%'],
+                            '26' => ['left' => '67.14%', 'top' => '4.96%', 'width' => '7.14%', 'height' => '43.8%'],
+                            '27' => ['left' => '75.0%', 'top' => '7.44%', 'width' => '7.14%', 'height' => '41.32%'],
+                            '28' => ['left' => '82.86%', 'top' => '9.09%', 'width' => '8.93%', 'height' => '40.5%'],
+                            '48' => ['left' => '3.93%', 'top' => '57.02%', 'width' => '6.07%', 'height' => '39.67%'],
+                            '47' => ['left' => '10.36%', 'top' => '56.2%', 'width' => '5.71%', 'height' => '39.67%'],
+                            '46' => ['left' => '16.43%', 'top' => '56.2%', 'width' => '6.07%', 'height' => '40.5%'],
+                            '45' => ['left' => '23.21%', 'top' => '57.02%', 'width' => '4.64%', 'height' => '38.84%'],
+                            '44' => ['left' => '28.0%', 'top' => '57.02%', 'width' => '3.93%', 'height' => '38.84%'],
+                            '43' => ['left' => '32.0%', 'top' => '56.2%', 'width' => '3.71%', 'height' => '40.5%'],
+                            '42' => ['left' => '35.86%', 'top' => '57.02%', 'width' => '3.0%', 'height' => '38.84%'],
+                            '41' => ['left' => '38.93%', 'top' => '57.02%', 'width' => '3.21%', 'height' => '38.84%'],
+                            '31' => ['left' => '42.29%', 'top' => '57.02%', 'width' => '3.21%', 'height' => '38.84%'],
+                            '32' => ['left' => '45.71%', 'top' => '57.02%', 'width' => '3.43%', 'height' => '38.84%'],
+                            '33' => ['left' => '49.29%', 'top' => '56.2%', 'width' => '3.93%', 'height' => '40.5%'],
+                            '34' => ['left' => '53.43%', 'top' => '57.02%', 'width' => '5.0%', 'height' => '38.84%'],
+                            '35' => ['left' => '58.71%', 'top' => '57.02%', 'width' => '5.14%', 'height' => '38.84%'],
+                            '36' => ['left' => '64.29%', 'top' => '56.2%', 'width' => '7.5%', 'height' => '40.5%'],
+                            '37' => ['left' => '72.14%', 'top' => '56.2%', 'width' => '7.5%', 'height' => '39.67%'],
+                            '38' => ['left' => '80.0%', 'top' => '57.02%', 'width' => '8.93%', 'height' => '38.84%'],
+                        ];
                     @endphp
 
-                    {{-- Upper teeth --}}
-                    <div class="flex justify-center items-end gap-[2px] mb-1">
-                        @foreach(array_merge($upperRight, $upperLeft) as $i => $tooth)
+                    <div class="relative w-full" style="max-width: 550px; margin: 0 auto;">
+                        <img src="{{ asset('images/dental-chart.png') }}" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
+
+                        @foreach($toothHotspots as $tooth => $pos)
                             @php
                                 $diagConditions = $toothChartData[$tooth]['conditions'] ?? [];
                                 $hasDiag = count($diagConditions) > 0;
                                 $isTreated = in_array($tooth, $treatedTeeth);
-                                $type = $toothTypes[$tooth] ?? 'central';
                                 $isMissing = in_array('MISSING', $diagConditions);
                             @endphp
-                            <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
-                                <div class="relative">
-                                    @if($isMissing)
-                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px] opacity-30">
-                                            <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                            <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                        </svg>
-                                    @else
-                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px]">
-                                            @include('livewire.plan-builder.partials.tooth-svg-upper', [
-                                                'type' => $type,
-                                                'isSelected' => false,
-                                                'hasConditions' => $isTreated,
-                                                'condColour' => $isTreated ? '#22c55e' : null,
-                                                'conditions' => $diagConditions,
-                                                'availableConditions' => [],
-                                            ])
-                                        </svg>
-                                    @endif
-                                    @if($hasDiag && !$isMissing && !$isTreated)
-                                        <div class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1 ring-white"></div>
-                                    @endif
-                                </div>
-                                <span class="text-[8px] font-bold mt-0.5 {{ $isTreated ? 'text-green-600' : ($hasDiag ? 'text-amber-500' : 'text-gray-400') }}">{{ $tooth }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    {{-- Gum line --}}
-                    <div class="relative my-1.5">
-                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-pink-200/40"></div></div>
-                    </div>
-
-                    {{-- Lower teeth --}}
-                    <div class="flex justify-center items-start gap-[2px] mt-1">
-                        @foreach(array_merge($lowerRight, $lowerLeft) as $i => $tooth)
-                            @php
-                                $diagConditions = $toothChartData[$tooth]['conditions'] ?? [];
-                                $hasDiag = count($diagConditions) > 0;
-                                $isTreated = in_array($tooth, $treatedTeeth);
-                                $type = $toothTypes[$tooth] ?? 'central';
-                                $isMissing = in_array('MISSING', $diagConditions);
-                            @endphp
-                            <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
-                                <span class="text-[8px] font-bold mb-0.5 {{ $isTreated ? 'text-green-600' : ($hasDiag ? 'text-amber-500' : 'text-gray-400') }}">{{ $tooth }}</span>
-                                <div class="relative">
-                                    @if($isMissing)
-                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px] opacity-30">
-                                            <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                            <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
-                                        </svg>
-                                    @else
-                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px]">
-                                            @include('livewire.plan-builder.partials.tooth-svg-lower', [
-                                                'type' => $type,
-                                                'isSelected' => false,
-                                                'hasConditions' => $isTreated,
-                                                'condColour' => $isTreated ? '#22c55e' : null,
-                                                'conditions' => $diagConditions,
-                                                'availableConditions' => [],
-                                            ])
-                                        </svg>
-                                    @endif
-                                    @if($hasDiag && !$isMissing && !$isTreated)
-                                        <div class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1 ring-white"></div>
-                                    @endif
-                                </div>
+                            <div
+                                class="absolute rounded-md"
+                                style="left: {{ $pos['left'] }}; top: {{ $pos['top'] }}; width: {{ $pos['width'] }}; height: {{ $pos['height'] }};"
+                            >
+                                @if($isMissing)
+                                    <div class="absolute inset-0 bg-white/70 rounded-md"></div>
+                                @elseif($isTreated)
+                                    <div class="absolute inset-0 rounded-md bg-green-500/25"></div>
+                                @endif
+                                @if($hasDiag && !$isMissing && !$isTreated)
+                                    <div class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1 ring-white"></div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
