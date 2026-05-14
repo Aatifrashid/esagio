@@ -29,10 +29,11 @@ if (!file_exists($baseDir . '/composer.phar')) {
 
 echo "Running composer install...\n";
 echo str_repeat('-', 60) . "\n";
-echo runCommand('cd ' . $baseDir . ' && HOME=' . $baseDir . ' COMPOSER_HOME=' . $baseDir . '/.composer php composer.phar install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs');
+echo runCommand('cd ' . $baseDir . ' && HOME=' . $baseDir . ' COMPOSER_HOME=' . $baseDir . '/.composer php composer.phar install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs --no-scripts');
 echo "\n\n";
 
 $commands = [
+    'php artisan package:discover --ansi',
     'php artisan storage:link',
     'php artisan migrate --force',
     'php artisan db:seed --force',
