@@ -113,10 +113,7 @@ class OnboardingWizard extends Component
             $this->fontChoice = $clinic->branding->font_family ?? 'Inter';
         }
 
-        $this->systemTemplates = TreatmentTemplate::query()
-            ->where('is_system', true)
-            ->pluck('name', 'id')
-            ->toArray();
+        $this->systemTemplates = [];
     }
 
     public function getClinic(): Clinic
