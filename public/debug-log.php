@@ -1,25 +1,18 @@
 <?php
 header('Content-Type: text/plain');
 
-// Show routes
 require __DIR__.'/../vendor/autoload.php';
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make('Illuminate\Contracts\Http\Kernel');
 $kernel->handle(Illuminate\Http\Request::capture());
 
-$router = app('router');
-$routes = collect($router->getRoutes())->map(function ($route) {
-    return $route->methods()[0] . ' ' . $route->uri() . ' => ' . ($route->getName() ?: 'N/A');
-})->filter(function ($r) {
-    return str_contains($r, 'plan') || str_contains($r, 'builder') || str_contains($r, 'pipeline');
-});
+// Check if plan ID 1 exists
+$plan = \App\Models\TreatmentPlan::find(1);
+echo "Plan #1 exists: " . ($plan ? 'YES - ' . $plan->title : 'NO') . "\n";
 
-echo "=== Routes matching plan/builder/pipeline ===\n";
-echo $routes->implode("\n");
+// List all plan IDs
+$planIds = \App\Models\TreatmentPlan::pluck('id')->toArray();
+echo "All plan IDs: " . implode(', ', $planIds) . "\n";
 
-echo "\n\n=== Last 30 log lines ===\n";
-$logFile = __DIR__.'/../storage/logs/laravel.log';
-if (file_exists($logFile)) {
-    $lines = file($logFile);
-    echo implode('', array_slice($lines, -30));
-}
+// Check auth
+echo "Current user: " . (auth()->user() ? auth()->user()->email : 'NOT LOGGED IN') . "\n";
