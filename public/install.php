@@ -29,7 +29,7 @@ if (!file_exists($baseDir . '/composer.phar')) {
 
 echo "Running composer install...\n";
 echo str_repeat('-', 60) . "\n";
-echo runCommand('cd ' . $baseDir . ' && php composer.phar install --no-dev --optimize-autoloader --no-interaction');
+echo runCommand('cd ' . $baseDir . ' && HOME=' . $baseDir . ' COMPOSER_HOME=' . $baseDir . '/.composer php composer.phar install --no-dev --optimize-autoloader --no-interaction');
 echo "\n\n";
 
 $commands = [
