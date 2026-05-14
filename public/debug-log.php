@@ -1,4 +1,16 @@
 <?php
+if (isset($_GET['clear'])) {
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        echo 'opcache cleared<br>';
+    }
+    // Clear compiled views
+    $viewPath = __DIR__ . '/../storage/framework/views';
+    foreach (glob($viewPath . '/*.php') as $f) { unlink($f); }
+    echo 'compiled views cleared<br>';
+    exit;
+}
+
 $logFile = __DIR__ . '/../storage/logs/laravel.log';
 if (file_exists($logFile)) {
     $content = file_get_contents($logFile);
