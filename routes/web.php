@@ -61,6 +61,9 @@ Route::get('/blog/{slug}', [PageController::class, 'blogPost'])->name('blog.post
 Route::get('/demo', [DemoController::class, 'show'])->name('demo.show');
 
 // Onboarding
+Route::get('/onboarding-test', function () {
+    return 'Route works! Auth: ' . (auth()->check() ? 'yes (user: ' . auth()->user()->email . ')' : 'no');
+});
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding', OnboardingWizard::class)->name('onboarding');
 });
