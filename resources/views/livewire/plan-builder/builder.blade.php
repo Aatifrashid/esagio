@@ -72,7 +72,7 @@
 
         @if($plan->patient_id)
             <a
-                href="{{ route('plan.public', $plan->public_token ?? '#') }}"
+                href="{{ route('patient.plan.show', ['token' => $plan->public_token ?? '#']) }}"
                 target="_blank"
                 class="hidden lg:flex items-center gap-1.5 text-xs text-white/70 hover:text-white border border-white/20 hover:border-white/40 rounded px-2.5 py-1 transition"
             >
