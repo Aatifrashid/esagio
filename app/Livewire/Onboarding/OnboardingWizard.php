@@ -317,8 +317,11 @@ class OnboardingWizard extends Component
 
         $clinic = $this->getClinic();
 
+        $refCode = 'P-' . strtoupper(\Str::random(6));
+
         Patient::withoutGlobalScopes()->create([
             'clinic_id' => $clinic->id,
+            'reference_code' => $refCode,
             'first_name' => $this->patientFirstName,
             'last_name' => $this->patientLastName,
             'email' => $this->patientEmail ?: null,
