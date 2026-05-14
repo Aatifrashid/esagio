@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\DemoController;
+use App\Http\Controllers\GdprController;
 use App\Http\Controllers\Marketing\PageController;
 use App\Http\Controllers\Patient\PlanViewController;
 use App\Livewire\Crm\PipelineKanban;
+use App\Livewire\Onboarding\OnboardingWizard;
 use App\Livewire\PlanBuilder\Builder;
 use Illuminate\Support\Facades\Route;
 
@@ -53,5 +56,19 @@ Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');
 Route::get('/blog/{slug}', [PageController::class, 'blogPost'])->name('blog.post');
+
+// Demo route
+Route::get('/demo', [DemoController::class, 'show'])->name('demo.show');
+
+// Onboarding
+Route::middleware('auth')->group(function () {
+    Route::get('/onboarding', OnboardingWizard::class)->name('onboarding');
+});
+
+// GDPR
+Route::middleware('auth')->prefix('gdpr')->name('gdpr.')->group(function () {
+    Route::get('/patient/{patient}/export', [GdprController::class, 'export'])->name('export');
+    Route::delete('/patient/{patient}', [GdprController::class, 'delete'])->name('delete');
+});
 
 require __DIR__.'/auth.php';

@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Patient extends Model
 {
-    use BelongsToClinic, HasFactory, SoftDeletes;
+    use BelongsToClinic, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'reference_code', 'first_name', 'last_name', 'email', 'phone',
@@ -70,5 +71,15 @@ class Patient extends Model
     public function treatmentPlans(): HasMany
     {
         return $this->hasMany(TreatmentPlan::class);
+    }
+
+    public function videoConsultations(): HasMany
+    {
+        return $this->hasMany(VideoConsultationSession::class);
+    }
+
+    public function crmActivities(): HasMany
+    {
+        return $this->hasMany(CrmActivity::class);
     }
 }
