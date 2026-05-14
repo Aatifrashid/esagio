@@ -1,10 +1,10 @@
 <?php
-require __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
-Artisan::call('view:clear');
-Artisan::call('cache:clear');
-Artisan::call('config:clear');
-Artisan::call('route:clear');
-echo 'All caches cleared at ' . now();
+// Clear compiled Blade views
+$viewPath = __DIR__ . '/../storage/framework/views';
+$files = glob($viewPath . '/*');
+$count = 0;
+foreach ($files as $file) {
+    if (is_file($file)) { unlink($file); $count++; }
+}
+if (function_exists('opcache_reset')) { opcache_reset(); }
+echo "Cleared {$count} compiled views. OPcache reset.";
