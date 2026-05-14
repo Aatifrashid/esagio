@@ -48,7 +48,7 @@ if (!file_exists($link)) {
 $commands = [
     'php artisan package:discover --ansi',
     'php artisan config:clear',
-    'php artisan migrate --force',
+    'php artisan migrate:fresh --force',
     'php artisan db:seed --force',
     'php artisan config:cache',
     'php artisan view:cache',
