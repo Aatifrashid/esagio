@@ -26,6 +26,7 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/plans/{plan}/builder', Builder::class)->name('plan.builder');
     Route::get('/dashboard/crm/pipeline/{pipeline}', PipelineKanban::class)->name('crm.pipeline');
