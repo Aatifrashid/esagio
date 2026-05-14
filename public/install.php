@@ -32,10 +32,22 @@ echo str_repeat('-', 60) . "\n";
 echo runCommand('cd ' . $baseDir . ' && HOME=' . $baseDir . ' COMPOSER_HOME=' . $baseDir . '/.composer php composer.phar install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs --no-scripts');
 echo "\n\n";
 
+// Create storage symlink manually (exec() disabled on this host)
+$link = $baseDir . '/public/storage';
+$target = $baseDir . '/storage/app/public';
+if (!file_exists($link)) {
+    if (symlink($target, $link)) {
+        echo "Storage symlink created.\n\n";
+    } else {
+        echo "WARNING: Could not create storage symlink.\n\n";
+    }
+} else {
+    echo "Storage symlink already exists.\n\n";
+}
+
 $commands = [
     'php artisan package:discover --ansi',
     'php artisan config:clear',
-    'php artisan storage:link',
     'php artisan migrate --force',
     'php artisan db:seed --force',
     'php artisan config:cache',
