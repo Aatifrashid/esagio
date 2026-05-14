@@ -22,10 +22,6 @@ Route::prefix('p/{token}')->name('patient.plan.')->group(function () {
     Route::get('/pdf', [PlanViewController::class, 'downloadPdf'])->name('pdf');
 });
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');

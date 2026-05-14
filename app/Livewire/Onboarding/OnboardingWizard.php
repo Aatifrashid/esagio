@@ -201,7 +201,7 @@ class OnboardingWizard extends Component
         $settings['onboarding_step'] = $this->totalSteps;
         $clinic->update(['settings' => $settings]);
 
-        $this->redirect(route('dashboard'));
+        $this->redirect('/dashboard');
     }
 
     protected function saveCurrentStep(): void
