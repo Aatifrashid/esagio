@@ -200,10 +200,10 @@
                                     $fdiToUni = [18=>1,17=>2,16=>3,15=>4,14=>5,13=>6,12=>7,11=>8,21=>9,22=>10,23=>11,24=>12,25=>13,26=>14,27=>15,28=>16,38=>17,37=>18,36=>19,35=>20,34=>21,33=>22,32=>23,31=>24,41=>25,42=>26,43=>27,44=>28,45=>29,46=>30,47=>31,48=>32];
                                     $uniNum = $fdiToUni[(int)$sc['tooth']] ?? $sc['tooth'];
                                 @endphp
-                                <span class="inline-flex items-center gap-px text-[4px] font-semibold pl-0.5 pr-0.5 py-px rounded-full text-white leading-none" style="background-color: {{ $condColour }}">
+                                <span class="inline-flex items-center gap-px text-[10px] font-semibold px-1.5 py-0.5 rounded-full text-white leading-none origin-left" style="background-color: {{ $condColour }}; transform: scale(0.55);">
                                     <span class="opacity-60">#{{ $uniNum }}</span> {{ Str::limit($condLabel, 6) }}
                                     <button wire:click="removeConditionFromTooth('{{ $sc['tooth'] }}', '{{ $sc['code'] }}')" class="hover:bg-white/20 rounded-full p-px transition ml-px">
-                                        <svg class="h-1 w-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <svg class="h-2 w-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </button>
                                 </span>
                             @endforeach
