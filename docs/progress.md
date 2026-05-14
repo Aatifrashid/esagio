@@ -18,4 +18,4 @@ All 22 phases complete. See docs/delivery-checklist.md for full details.
 - 6 notifications with mail templates
 - 5 languages (en, tr, de, es, fr)
 - 6 currencies
-- Tests: 145+ passing
+- Tests: 165 passing (326 assertions)
