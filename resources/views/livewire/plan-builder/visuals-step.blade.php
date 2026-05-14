@@ -31,8 +31,8 @@
                         >
                             {{-- Thumbnail --}}
                             <div class="aspect-video bg-gray-100 flex items-center justify-center">
-                                @if($clip->thumbnail_url)
-                                    <img src="{{ $clip->thumbnail_url }}" alt="{{ $clip->title }}" class="w-full h-full object-cover"/>
+                                @if($clip->thumbnail_path)
+                                    <img src="{{ Storage::url($clip->thumbnail_path) }}" alt="{{ $clip->name }}" class="w-full h-full object-cover"/>
                                 @else
                                     <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
@@ -43,7 +43,7 @@
 
                             {{-- Info --}}
                             <div class="p-3">
-                                <p class="text-xs font-medium text-gray-800 truncate">{{ $clip->title }}</p>
+                                <p class="text-xs font-medium text-gray-800 truncate">{{ $clip->name }}</p>
                                 @if($clip->duration_seconds)
                                     <p class="text-xs text-gray-400 mt-0.5">{{ gmdate('i:s', $clip->duration_seconds) }}</p>
                                 @endif
@@ -98,8 +98,8 @@
                             {{-- Before/after images --}}
                             <div class="grid grid-cols-2 gap-0.5 bg-gray-200">
                                 <div class="aspect-square bg-gray-100 overflow-hidden relative">
-                                    @if($case->before_image_url)
-                                        <img src="{{ $case->before_image_url }}" alt="Before" class="w-full h-full object-cover"/>
+                                    @if($case->before_image_path)
+                                        <img src="{{ Storage::url($case->before_image_path) }}" alt="Before" class="w-full h-full object-cover"/>
                                     @else
                                         <div class="w-full h-full flex items-center justify-center">
                                             <svg class="h-6 w-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,8 +110,8 @@
                                     <span class="absolute bottom-1 left-1 text-xs bg-black/50 text-white px-1 rounded">Before</span>
                                 </div>
                                 <div class="aspect-square bg-gray-100 overflow-hidden relative">
-                                    @if($case->after_image_url)
-                                        <img src="{{ $case->after_image_url }}" alt="After" class="w-full h-full object-cover"/>
+                                    @if($case->after_image_path)
+                                        <img src="{{ Storage::url($case->after_image_path) }}" alt="After" class="w-full h-full object-cover"/>
                                     @else
                                         <div class="w-full h-full flex items-center justify-center">
                                             <svg class="h-6 w-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,9 +125,6 @@
 
                             <div class="p-3">
                                 <p class="text-xs font-medium text-gray-800 truncate">{{ $case->title }}</p>
-                                @if($case->treatment_name)
-                                    <p class="text-xs text-gray-400 mt-0.5 truncate">{{ $case->treatment_name }}</p>
-                                @endif
                             </div>
 
                             <button
