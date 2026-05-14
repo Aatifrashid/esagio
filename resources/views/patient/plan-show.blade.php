@@ -527,31 +527,136 @@
                 $materials = $plan->items->map(fn($i) => $i->material)->filter()->unique('id');
             @endphp
             @if($materials->count())
-            <section class="py-16 reveal" id="materials">
+            <section class="py-16 reveal" id="materials" x-data="{ compareOpen: false }">
                 <p class="text-xs uppercase tracking-widest text-clinic-accent font-semibold mb-3">Quality Assurance</p>
-                <h2 class="font-display text-3xl text-clinic-primary font-semibold mb-8">Materials &amp; Brands</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <h2 class="font-display text-3xl text-clinic-primary font-semibold mb-4">Materials &amp; Brands</h2>
+                <p class="text-slate-500 text-sm mb-8 max-w-2xl">We use premium, clinically proven materials for every procedure. Compare the specifications below.</p>
+
+                {{-- Material cards --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     @foreach($materials as $material)
-                    <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm text-center">
-                        @if($material->image_path)
-                            <img src="{{ Storage::url($material->image_path) }}" alt="{{ $material->name }}" loading="lazy" class="h-10 object-contain mx-auto mb-3" />
-                        @else
-                            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
-                                </svg>
+                    <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        {{-- Header with image --}}
+                        <div class="bg-gradient-to-br from-slate-50 to-white p-6 flex items-center gap-4 border-b border-slate-50">
+                            @if($material->image_path)
+                                <img src="{{ Storage::url($material->image_path) }}" alt="{{ $material->name }}" loading="lazy" class="h-14 w-14 object-contain rounded-xl bg-white p-1 shadow-sm" />
+                            @else
+                                <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-none">
+                                    <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                                    </svg>
+                                </div>
+                            @endif
+                            <div>
+                                <p class="font-semibold text-clinic-primary text-sm">{{ $material->name }}</p>
+                                @if($material->brand)
+                                    <p class="text-xs text-slate-400 mt-0.5">by {{ $material->brand }}</p>
+                                @endif
+                                @if($material->is_premium)
+                                    <span class="inline-flex items-center gap-1 mt-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd"/></svg>
+                                        Premium
+                                    </span>
+                                @endif
                             </div>
-                        @endif
-                        <p class="font-semibold text-clinic-primary text-sm">{{ $material->name }}</p>
-                        @if($material->brand)
-                            <p class="text-xs text-slate-400 mt-0.5">{{ $material->brand }}</p>
-                        @endif
-                        @if($material->warranty_years)
-                            <p class="text-xs text-green-600 mt-1 font-medium">{{ $material->warranty_years }}-year warranty</p>
-                        @endif
+                        </div>
+
+                        {{-- Specs --}}
+                        <div class="p-5 space-y-3">
+                            @if($material->category)
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Category</span>
+                                <span class="font-medium text-slate-700">{{ $material->category }}</span>
+                            </div>
+                            @endif
+                            @if($material->country_of_origin)
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Origin</span>
+                                <span class="font-medium text-slate-700">{{ $material->country_of_origin }}</span>
+                            </div>
+                            @endif
+                            @if($material->warranty_years)
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Warranty</span>
+                                <span class="font-semibold text-green-600">{{ $material->warranty_years }} {{ Str::plural('year', $material->warranty_years) }}</span>
+                            </div>
+                            @endif
+                            @if($material->description)
+                            <p class="text-xs text-slate-500 leading-relaxed pt-2 border-t border-slate-50">{{ Str::limit($material->description, 120) }}</p>
+                            @endif
+                        </div>
                     </div>
                     @endforeach
                 </div>
+
+                {{-- Compare table (toggle) --}}
+                @if($materials->count() > 1)
+                <div class="mt-6">
+                    <button @click="compareOpen = !compareOpen" class="inline-flex items-center gap-2 text-sm font-medium text-clinic-accent hover:text-clinic-primary transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <span x-text="compareOpen ? 'Hide comparison' : 'Compare all materials'"></span>
+                        <svg class="w-4 h-4 transition-transform" :class="compareOpen && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+
+                    <div x-show="compareOpen" x-collapse x-cloak class="mt-4">
+                        <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="bg-slate-50">
+                                        <th class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Specification</th>
+                                        @foreach($materials as $material)
+                                        <th class="text-center text-xs font-semibold text-clinic-primary px-5 py-3">{{ $material->name }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50">
+                                    <tr>
+                                        <td class="px-5 py-3 text-slate-500 text-xs font-medium">Brand</td>
+                                        @foreach($materials as $material)
+                                        <td class="px-5 py-3 text-center text-xs text-slate-700 font-medium">{{ $material->brand ?? '—' }}</td>
+                                        @endforeach
+                                    </tr>
+                                    <tr class="bg-slate-50/50">
+                                        <td class="px-5 py-3 text-slate-500 text-xs font-medium">Category</td>
+                                        @foreach($materials as $material)
+                                        <td class="px-5 py-3 text-center text-xs text-slate-700">{{ $material->category ?? '—' }}</td>
+                                        @endforeach
+                                    </tr>
+                                    <tr>
+                                        <td class="px-5 py-3 text-slate-500 text-xs font-medium">Origin</td>
+                                        @foreach($materials as $material)
+                                        <td class="px-5 py-3 text-center text-xs text-slate-700">{{ $material->country_of_origin ?? '—' }}</td>
+                                        @endforeach
+                                    </tr>
+                                    <tr class="bg-slate-50/50">
+                                        <td class="px-5 py-3 text-slate-500 text-xs font-medium">Warranty</td>
+                                        @foreach($materials as $material)
+                                        <td class="px-5 py-3 text-center text-xs {{ $material->warranty_years ? 'text-green-600 font-semibold' : 'text-slate-400' }}">
+                                            {{ $material->warranty_years ? $material->warranty_years . ' ' . Str::plural('year', $material->warranty_years) : '—' }}
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    <tr>
+                                        <td class="px-5 py-3 text-slate-500 text-xs font-medium">Grade</td>
+                                        @foreach($materials as $material)
+                                        <td class="px-5 py-3 text-center">
+                                            @if($material->is_premium)
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd"/></svg>
+                                                    Premium
+                                                </span>
+                                            @else
+                                                <span class="text-xs text-slate-500">Standard</span>
+                                            @endif
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </section>
             <hr class="border-slate-100" />
             @endif

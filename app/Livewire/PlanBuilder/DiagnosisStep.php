@@ -17,7 +17,9 @@ class DiagnosisStep extends Component
 
     public array $toothChartData = [];
 
-    public ?string $activeTooth = null;
+    public array $selectedTeeth = [];
+
+    public ?string $activeCondition = null;
 
     public function mount(TreatmentPlan $plan): void
     {
@@ -33,19 +35,46 @@ class DiagnosisStep extends Component
             ])
             ->toArray();
 
-        $this->conditionTags = collect($this->toothChartData)
-            ->flatMap(fn ($t) => $t['conditions'])
-            ->unique()
-            ->values()
-            ->toArray();
+        $this->refreshConditionTags();
     }
 
-    public function selectTooth(string $toothNumber): void
+    public function toggleTooth(string $toothNumber): void
     {
-        $this->activeTooth = ($this->activeTooth === $toothNumber) ? null : $toothNumber;
+        if (in_array($toothNumber, $this->selectedTeeth, true)) {
+            $this->selectedTeeth = array_values(array_filter($this->selectedTeeth, fn ($t) => $t !== $toothNumber));
+        } else {
+            $this->selectedTeeth[] = $toothNumber;
+        }
+
+        if ($this->activeCondition && in_array($toothNumber, $this->selectedTeeth, true)) {
+            $this->applyConditionToTooth($toothNumber, $this->activeCondition);
+        }
     }
 
-    public function addCondition(string $toothNumber, string $conditionCode): void
+    public function selectCondition(string $conditionCode): void
+    {
+        if ($this->activeCondition === $conditionCode) {
+            $this->activeCondition = null;
+
+            return;
+        }
+
+        $this->activeCondition = $conditionCode;
+
+        foreach ($this->selectedTeeth as $tooth) {
+            $this->applyConditionToTooth($tooth, $conditionCode);
+        }
+    }
+
+    public function applyConditionToTeeth(string $conditionCode): void
+    {
+        foreach ($this->selectedTeeth as $tooth) {
+            $this->applyConditionToTooth($tooth, $conditionCode);
+        }
+        $this->refreshConditionTags();
+    }
+
+    private function applyConditionToTooth(string $toothNumber, string $conditionCode): void
     {
         if (! isset($this->toothChartData[$toothNumber])) {
             $this->toothChartData[$toothNumber] = [
@@ -62,7 +91,7 @@ class DiagnosisStep extends Component
         $this->refreshConditionTags();
     }
 
-    public function removeCondition(string $toothNumber, string $conditionCode): void
+    public function removeConditionFromTooth(string $toothNumber, string $conditionCode): void
     {
         if (isset($this->toothChartData[$toothNumber])) {
             $this->toothChartData[$toothNumber]['conditions'] = array_values(
@@ -71,9 +100,37 @@ class DiagnosisStep extends Component
                     fn ($c) => $c !== $conditionCode
                 )
             );
+
+            if (empty($this->toothChartData[$toothNumber]['conditions']) && empty($this->toothChartData[$toothNumber]['notes'])) {
+                unset($this->toothChartData[$toothNumber]);
+            }
         }
 
         $this->refreshConditionTags();
+    }
+
+    public function clearSelectedTeeth(): void
+    {
+        $this->selectedTeeth = [];
+        $this->activeCondition = null;
+    }
+
+    public function selectAllUpper(): void
+    {
+        $upper = ['18','17','16','15','14','13','12','11','21','22','23','24','25','26','27','28'];
+        $this->selectedTeeth = array_values(array_unique(array_merge($this->selectedTeeth, $upper)));
+    }
+
+    public function selectAllLower(): void
+    {
+        $lower = ['48','47','46','45','44','43','42','41','31','32','33','34','35','36','37','38'];
+        $this->selectedTeeth = array_values(array_unique(array_merge($this->selectedTeeth, $lower)));
+    }
+
+    public function selectAll(): void
+    {
+        $this->selectAllUpper();
+        $this->selectAllLower();
     }
 
     private function refreshConditionTags(): void
@@ -102,7 +159,12 @@ class DiagnosisStep extends Component
             );
         }
 
-        $this->dispatch('plan-updated', $this->toothChartData);
+        TreatmentPlanToothChart::where('treatment_plan_id', $this->plan->id)
+            ->whereNotIn('tooth_number', array_keys($this->toothChartData))
+            ->delete();
+
+        $this->dispatch('plan-updated')->to(Builder::class);
+        $this->dispatch('diagnosis-saved');
     }
 
     public function render()
