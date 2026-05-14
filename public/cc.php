@@ -1,10 +1,10 @@
 <?php
-// Clear compiled Blade views
-$viewPath = __DIR__ . '/../storage/framework/views';
-$files = glob($viewPath . '/*');
+$dir = dirname(__DIR__) . '/storage/framework/views';
+$files = glob($dir . '/*.php');
 $count = 0;
-foreach ($files as $file) {
-    if (is_file($file)) { unlink($file); $count++; }
+foreach ($files as $f) {
+    if (unlink($f)) $count++;
 }
-if (function_exists('opcache_reset')) { opcache_reset(); }
-echo "Cleared {$count} compiled views. OPcache reset.";
+if (function_exists('opcache_reset')) opcache_reset();
+header('Content-Type: text/plain');
+echo "Deleted $count compiled views";
