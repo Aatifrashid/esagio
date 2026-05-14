@@ -64,6 +64,14 @@ Route::get('/demo', [DemoController::class, 'show'])->name('demo.show');
 Route::get('/onboarding-test', function () {
     return 'Route works! Auth: ' . (auth()->check() ? 'yes (user: ' . auth()->user()->email . ')' : 'no');
 });
+Route::middleware('auth')->get('/onboarding-simple', function () {
+    try {
+        $component = new \App\Livewire\Onboarding\OnboardingWizard();
+        return 'Component instantiated OK. Class: ' . get_class($component);
+    } catch (\Throwable $e) {
+        return 'Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
+    }
+});
 Route::middleware('auth')->group(function () {
     Route::get('/onboarding', OnboardingWizard::class)->name('onboarding');
 });
