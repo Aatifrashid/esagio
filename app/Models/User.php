@@ -4,12 +4,14 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use BelongsToClinic, HasFactory, Notifiable, TwoFactorAuthenticatable;
@@ -62,6 +64,15 @@ class User extends Authenticatable
     public function isClinicAdmin(): bool
     {
         return in_array($this->role, [self::ROLE_CLINIC_OWNER, self::ROLE_CLINIC_ADMIN]);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return match ($panel->getId()) {
+            'super' => $this->isSuperAdmin(),
+            'admin' => $this->isSuperAdmin() || $this->isClinicAdmin(),
+            default => true,
+        };
     }
 
     protected static function bootBelongsToClinic(): void {}
