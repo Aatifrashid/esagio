@@ -3,12 +3,7 @@ header('Content-Type: text/plain');
 $baseDir = dirname(__DIR__);
 
 $commands = [
-    'php artisan route:clear',
-    'php artisan config:clear',
-    'php artisan view:clear',
-    'php artisan route:cache',
-    'php artisan config:cache',
-    'php artisan view:cache',
+    'php artisan route:list --path=onboarding 2>&1',
 ];
 
 foreach ($commands as $cmd) {
