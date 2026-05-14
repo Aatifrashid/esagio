@@ -77,7 +77,7 @@ class VisualsStep extends Component
             ]);
         }
 
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function render()

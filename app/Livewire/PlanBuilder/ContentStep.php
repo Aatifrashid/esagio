@@ -56,7 +56,7 @@ class ContentStep extends Component
             ->delete();
 
         $this->sections = $this->plan->sections()->orderBy('sort_order')->get();
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function updateSection(int $id, array $data): void
@@ -68,7 +68,7 @@ class ContentStep extends Component
             ->update(array_intersect_key($data, array_flip($allowed)));
 
         $this->sections = $this->plan->sections()->orderBy('sort_order')->get();
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function toggleSectionVisibility(int $id): void
@@ -93,7 +93,7 @@ class ContentStep extends Component
             );
         }
 
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function render()

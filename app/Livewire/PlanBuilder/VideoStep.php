@@ -63,7 +63,7 @@ class VideoStep extends Component
             $this->existingSession = VideoConsultationSession::create($data);
         }
 
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
         $this->dispatch('consultation-scheduled');
     }
 

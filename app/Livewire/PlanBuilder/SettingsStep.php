@@ -69,7 +69,7 @@ class SettingsStep extends Component
             'public_password' => $this->accessType === 'password' ? $this->planPassword : null,
         ]);
 
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
         $this->dispatch('settings-saved');
     }
 

@@ -99,7 +99,7 @@ class TreatmentStep extends Component
         $this->templateSearch = '';
         $this->templates = [];
 
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function addCustomItem(): void
@@ -140,7 +140,7 @@ class TreatmentStep extends Component
         }
 
         $this->items = $this->plan->items()->orderBy('position')->get();
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function removeItem(int $itemId): void
@@ -153,7 +153,7 @@ class TreatmentStep extends Component
         $this->plan->recalculateTotal();
         $this->plan->refresh();
 
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function duplicateItem(int $itemId): void
@@ -167,7 +167,7 @@ class TreatmentStep extends Component
         $copy->save();
 
         $this->items = $this->plan->items()->orderBy('position')->get();
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function reorderItems(array $order): void
@@ -179,7 +179,7 @@ class TreatmentStep extends Component
         }
 
         $this->items = $this->plan->items()->orderBy('position')->get();
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function toggleOptional(int $itemId): void
@@ -194,7 +194,7 @@ class TreatmentStep extends Component
         $this->plan->recalculateTotal();
         $this->plan->refresh();
 
-        $this->dispatch('plan-updated');
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function refreshSuggestions(): void
