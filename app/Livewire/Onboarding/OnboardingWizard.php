@@ -121,7 +121,25 @@ class OnboardingWizard extends Component
 
     public function getClinic(): Clinic
     {
-        return auth()->user()->clinic ?? Clinic::findOrFail(auth()->user()->clinic_id);
+        $user = auth()->user();
+
+        if ($user->clinic) {
+            return $user->clinic;
+        }
+
+        if ($user->clinic_id) {
+            return Clinic::findOrFail($user->clinic_id);
+        }
+
+        $clinic = Clinic::create([
+            'name' => $user->name . "'s Clinic",
+            'slug' => \Str::slug($user->name . '-clinic-' . $user->id),
+            'email' => $user->email,
+        ]);
+
+        $user->update(['clinic_id' => $clinic->id]);
+
+        return $clinic;
     }
 
     public function nextStep(): void
