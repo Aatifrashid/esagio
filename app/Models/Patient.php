@@ -14,6 +14,15 @@ class Patient extends Model
 {
     use BelongsToClinic, HasFactory, Notifiable, SoftDeletes;
 
+    protected static function booted(): void
+    {
+        static::creating(function (Patient $patient) {
+            if (empty($patient->reference_code)) {
+                $patient->reference_code = 'P-' . strtoupper(substr(md5(uniqid()), 0, 8));
+            }
+        });
+    }
+
     protected $fillable = [
         'reference_code', 'first_name', 'last_name', 'email', 'phone',
         'whatsapp_number', 'country_of_residence', 'city', 'date_of_birth',
