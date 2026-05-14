@@ -28,8 +28,8 @@ Route::view('profile', 'profile')
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard/plans/{plan}/builder', Builder::class)->name('plan.builder');
-    Route::get('/dashboard/crm/pipeline/{pipeline}', PipelineKanban::class)->name('crm.pipeline');
+    Route::get('/plans/{plan}/builder', Builder::class)->name('plan.builder');
+    Route::get('/crm/pipeline/{pipeline}', PipelineKanban::class)->name('crm.pipeline');
 });
 
 // Billing routes
