@@ -56,15 +56,15 @@
 
         @auth
             @if(auth()->user()->clinic_id === $plan->clinic_id)
-            <div class="no-print bg-gray-900 text-white text-sm sticky top-0 z-50">
-                <div class="max-w-[1100px] mx-auto px-6 py-2 flex items-center justify-between">
-                    <span class="flex items-center gap-2 text-gray-300">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            <div class="no-print" style="background:#111827;color:#fff;font-size:13px;position:sticky;top:0;z-index:9999;">
+                <div style="max-width:1100px;margin:0 auto;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;">
+                    <span style="display:flex;align-items:center;gap:8px;color:#9ca3af;">
+                        <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         Viewing as patient
                     </span>
                     <a href="{{ route('plan.builder', $plan) }}"
-                       class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-3 py-1 rounded-md transition text-white font-medium">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                       style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);padding:4px 12px;border-radius:6px;color:#fff;font-weight:500;text-decoration:none;">
+                        <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         Back to Builder
                     </a>
                 </div>
