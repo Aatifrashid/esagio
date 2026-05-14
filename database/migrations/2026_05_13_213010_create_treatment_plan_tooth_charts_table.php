@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('planned_treatments')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-            $table->unique(['treatment_plan_id', 'tooth_number']);
+            $table->unique(['treatment_plan_id', 'tooth_number'], 'tptc_plan_tooth_unique');
         });
     }
 
