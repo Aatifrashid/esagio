@@ -325,6 +325,6 @@ class OnboardingWizard extends Component
     public function render()
     {
         return view('livewire.onboarding.onboarding-wizard')
-            ->layout('components.layouts.app', ['title' => 'Set Up Your Clinic']);
+            ->layout('layouts.app', ['title' => 'Set Up Your Clinic']);
     }
 }
