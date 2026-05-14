@@ -42,43 +42,37 @@
                     }
                  ">
 
-                {{-- Upper jaw --}}
-                <div class="text-center mb-1">
-                    <span class="text-[10px] uppercase tracking-widest text-gray-300 font-bold">Upper Jaw</span>
-                </div>
-
                 @php
                     $upperRight = ['18','17','16','15','14','13','12','11'];
                     $upperLeft  = ['21','22','23','24','25','26','27','28'];
                     $lowerRight = ['48','47','46','45','44','43','42','41'];
                     $lowerLeft  = ['31','32','33','34','35','36','37','38'];
 
-                    // Tooth type mapping for SVG shapes
                     $toothTypes = [
-                        '11' => 'incisor', '12' => 'incisor', '13' => 'canine', '14' => 'premolar', '15' => 'premolar', '16' => 'molar', '17' => 'molar', '18' => 'molar',
-                        '21' => 'incisor', '22' => 'incisor', '23' => 'canine', '24' => 'premolar', '25' => 'premolar', '26' => 'molar', '27' => 'molar', '28' => 'molar',
-                        '31' => 'incisor', '32' => 'incisor', '33' => 'canine', '34' => 'premolar', '35' => 'premolar', '36' => 'molar', '37' => 'molar', '38' => 'molar',
-                        '41' => 'incisor', '42' => 'incisor', '43' => 'canine', '44' => 'premolar', '45' => 'premolar', '46' => 'molar', '47' => 'molar', '48' => 'molar',
+                        '11' => 'central', '12' => 'lateral', '13' => 'canine', '14' => 'premolar1', '15' => 'premolar2', '16' => 'molar1', '17' => 'molar2', '18' => 'molar3',
+                        '21' => 'central', '22' => 'lateral', '23' => 'canine', '24' => 'premolar1', '25' => 'premolar2', '26' => 'molar1', '27' => 'molar2', '28' => 'molar3',
+                        '31' => 'central', '32' => 'lateral', '33' => 'canine', '34' => 'premolar1', '35' => 'premolar2', '36' => 'molar1', '37' => 'molar2', '38' => 'molar3',
+                        '41' => 'central', '42' => 'lateral', '43' => 'canine', '44' => 'premolar1', '45' => 'premolar2', '46' => 'molar1', '47' => 'molar2', '48' => 'molar3',
                     ];
                 @endphp
 
-                {{-- Upper teeth row --}}
-                <div class="flex justify-center gap-0.5 mb-1">
+                {{-- Upper teeth --}}
+                <div class="flex justify-center items-end gap-[2px] mb-1">
                     @foreach(array_merge($upperRight, $upperLeft) as $i => $tooth)
                         @php
                             $conditions = $toothChartData[$tooth]['conditions'] ?? [];
                             $hasConditions = count($conditions) > 0;
                             $isSelected = in_array($tooth, $selectedTeeth);
-                            $type = $toothTypes[$tooth] ?? 'incisor';
-                            $firstConditionColour = null;
-                            if ($hasConditions) {
-                                $condCode = $conditions[0];
+                            $type = $toothTypes[$tooth] ?? 'central';
+                            $isMissing = in_array('MISSING', $conditions);
+                            $condColour = null;
+                            if ($hasConditions && !$isMissing) {
                                 foreach ($availableConditions as $ac) {
-                                    if ($ac['code'] === $condCode) { $firstConditionColour = $ac['colour']; break; }
+                                    if ($ac['code'] === $conditions[0]) { $condColour = $ac['colour']; break; }
                                 }
                             }
                         @endphp
-                        <div class="flex flex-col items-center group {{ $i === 7 ? 'mr-3' : '' }}">
+                        <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
                             <button
                                 wire:click="toggleTooth('{{ $tooth }}')"
                                 x-on:dragover.prevent
@@ -90,53 +84,32 @@
                                         dragging = null;
                                     }
                                 "
-                                class="relative w-10 h-14 flex items-end justify-center transition-all duration-150 rounded-t-[14px] {{ $isSelected ? 'scale-110 z-10' : 'hover:scale-105' }}"
+                                class="relative transition-all duration-150 {{ $isSelected ? 'scale-110 z-10' : 'hover:scale-105' }}"
                             >
-                                {{-- Tooth SVG --}}
-                                <svg viewBox="0 0 40 56" class="w-full h-full drop-shadow-sm">
-                                    @if($type === 'molar')
-                                        <path d="M6 8 C6 3, 14 0, 20 0 C26 0, 34 3, 34 8 L36 16 C37 22, 36 28, 34 34 L32 44 C30 50, 26 54, 20 56 C14 54, 10 50, 8 44 L6 34 C4 28, 3 22, 4 16 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                        <path d="M12 14 Q20 10 28 14" class="fill-none {{ $isSelected ? 'stroke-clinical/40' : 'stroke-gray-200' }}" stroke-width="1" />
-                                        <path d="M14 20 Q20 17 26 20" class="fill-none {{ $isSelected ? 'stroke-clinical/30' : 'stroke-gray-100' }}" stroke-width="0.8" />
-                                    @elseif($type === 'premolar')
-                                        <path d="M8 6 C8 2, 14 0, 20 0 C26 0, 32 2, 32 6 L33 16 C34 24, 32 32, 30 40 L28 48 C26 53, 22 56, 20 56 C18 56, 14 53, 12 48 L10 40 C8 32, 6 24, 7 16 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                        <path d="M14 12 Q20 9 26 12" class="fill-none {{ $isSelected ? 'stroke-clinical/40' : 'stroke-gray-200' }}" stroke-width="1" />
-                                    @elseif($type === 'canine')
-                                        <path d="M10 4 C10 1, 15 0, 20 0 C25 0, 30 1, 30 4 L31 14 C32 22, 30 34, 26 44 L24 50 C22 54, 20 56, 20 56 C20 56, 18 54, 16 50 L14 44 C10 34, 8 22, 9 14 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                    @else
-                                        <path d="M11 4 C11 1, 15 0, 20 0 C25 0, 29 1, 29 4 L30 14 C31 24, 28 36, 26 44 L24 50 C22 54, 20 56, 20 56 C20 56, 18 54, 16 50 L14 44 C12 36, 9 24, 10 14 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                    @endif
-                                </svg>
-
-                                {{-- Condition dots --}}
-                                @if($hasConditions)
-                                    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 flex gap-0.5">
-                                        @foreach(array_slice($conditions, 0, 3) as $cond)
-                                            @php
-                                                $dotColour = '#94a3b8';
-                                                foreach ($availableConditions as $ac) {
-                                                    if ($ac['code'] === $cond) { $dotColour = $ac['colour']; break; }
-                                                }
-                                            @endphp
-                                            <span class="w-2 h-2 rounded-full ring-1 ring-white" style="background-color: {{ $dotColour }}"></span>
-                                        @endforeach
-                                        @if(count($conditions) > 3)
-                                            <span class="w-2 h-2 rounded-full bg-gray-400 ring-1 ring-white text-[6px] text-white flex items-center justify-center">+</span>
-                                        @endif
-                                    </div>
+                                @if($isMissing)
+                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px] opacity-30">
+                                        <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                        <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                    </svg>
+                                @else
+                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px]">
+                                        @include('livewire.plan-builder.partials.tooth-svg-upper', ['type' => $type, 'isSelected' => $isSelected, 'hasConditions' => $hasConditions, 'condColour' => $condColour, 'conditions' => $conditions, 'availableConditions' => $availableConditions])
+                                    </svg>
                                 @endif
 
-                                {{-- Selection ring --}}
+                                {{-- Selection indicator --}}
                                 @if($isSelected)
-                                    <div class="absolute -inset-0.5 rounded-t-[16px] border-2 border-clinical/60 pointer-events-none animate-pulse"></div>
+                                    <div class="absolute -inset-1 rounded-lg border-2 border-clinical/50 pointer-events-none"></div>
+                                @endif
+
+                                {{-- Multi-condition indicators --}}
+                                @if(count($conditions) > 1)
+                                    <div class="absolute -top-1 -right-1 flex gap-px">
+                                        @foreach(array_slice($conditions, 0, 3) as $cond)
+                                            @php $dc = '#94a3b8'; foreach($availableConditions as $ac) { if($ac['code']===$cond){$dc=$ac['colour'];break;} } @endphp
+                                            <span class="w-[6px] h-[6px] rounded-full ring-1 ring-white" style="background:{{ $dc }}"></span>
+                                        @endforeach
+                                    </div>
                                 @endif
                             </button>
                             <span class="text-[9px] font-bold mt-0.5 {{ $isSelected ? 'text-clinical' : ($hasConditions ? 'text-gray-700' : 'text-gray-400') }}">{{ $tooth }}</span>
@@ -145,21 +118,27 @@
                 </div>
 
                 {{-- Gum line --}}
-                <div class="relative my-3">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t-2 border-dashed border-pink-200/60"></div></div>
-                    <div class="relative flex justify-center"><span class="bg-white px-3 text-[9px] uppercase tracking-widest text-pink-300 font-bold">Gum Line</span></div>
+                <div class="relative my-2">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t-2 border-pink-200/50"></div></div>
                 </div>
 
-                {{-- Lower teeth row --}}
-                <div class="flex justify-center gap-0.5 mt-1">
+                {{-- Lower teeth --}}
+                <div class="flex justify-center items-start gap-[2px] mt-1">
                     @foreach(array_merge($lowerRight, $lowerLeft) as $i => $tooth)
                         @php
                             $conditions = $toothChartData[$tooth]['conditions'] ?? [];
                             $hasConditions = count($conditions) > 0;
                             $isSelected = in_array($tooth, $selectedTeeth);
-                            $type = $toothTypes[$tooth] ?? 'incisor';
+                            $type = $toothTypes[$tooth] ?? 'central';
+                            $isMissing = in_array('MISSING', $conditions);
+                            $condColour = null;
+                            if ($hasConditions && !$isMissing) {
+                                foreach ($availableConditions as $ac) {
+                                    if ($ac['code'] === $conditions[0]) { $condColour = $ac['colour']; break; }
+                                }
+                            }
                         @endphp
-                        <div class="flex flex-col items-center group {{ $i === 7 ? 'mr-3' : '' }}">
+                        <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
                             <span class="text-[9px] font-bold mb-0.5 {{ $isSelected ? 'text-clinical' : ($hasConditions ? 'text-gray-700' : 'text-gray-400') }}">{{ $tooth }}</span>
                             <button
                                 wire:click="toggleTooth('{{ $tooth }}')"
@@ -172,58 +151,34 @@
                                         dragging = null;
                                     }
                                 "
-                                class="relative w-10 h-14 flex items-start justify-center transition-all duration-150 rounded-b-[14px] {{ $isSelected ? 'scale-110 z-10' : 'hover:scale-105' }}"
+                                class="relative transition-all duration-150 {{ $isSelected ? 'scale-110 z-10' : 'hover:scale-105' }}"
                             >
-                                {{-- Tooth SVG (flipped for lower) --}}
-                                <svg viewBox="0 0 40 56" class="w-full h-full drop-shadow-sm transform rotate-180">
-                                    @if($type === 'molar')
-                                        <path d="M6 8 C6 3, 14 0, 20 0 C26 0, 34 3, 34 8 L36 16 C37 22, 36 28, 34 34 L32 44 C30 50, 26 54, 20 56 C14 54, 10 50, 8 44 L6 34 C4 28, 3 22, 4 16 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                        <path d="M12 14 Q20 10 28 14" class="fill-none {{ $isSelected ? 'stroke-clinical/40' : 'stroke-gray-200' }}" stroke-width="1" />
-                                        <path d="M14 20 Q20 17 26 20" class="fill-none {{ $isSelected ? 'stroke-clinical/30' : 'stroke-gray-100' }}" stroke-width="0.8" />
-                                    @elseif($type === 'premolar')
-                                        <path d="M8 6 C8 2, 14 0, 20 0 C26 0, 32 2, 32 6 L33 16 C34 24, 32 32, 30 40 L28 48 C26 53, 22 56, 20 56 C18 56, 14 53, 12 48 L10 40 C8 32, 6 24, 7 16 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                        <path d="M14 12 Q20 9 26 12" class="fill-none {{ $isSelected ? 'stroke-clinical/40' : 'stroke-gray-200' }}" stroke-width="1" />
-                                    @elseif($type === 'canine')
-                                        <path d="M10 4 C10 1, 15 0, 20 0 C25 0, 30 1, 30 4 L31 14 C32 22, 30 34, 26 44 L24 50 C22 54, 20 56, 20 56 C20 56, 18 54, 16 50 L14 44 C10 34, 8 22, 9 14 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                    @else
-                                        <path d="M11 4 C11 1, 15 0, 20 0 C25 0, 29 1, 29 4 L30 14 C31 24, 28 36, 26 44 L24 50 C22 54, 20 56, 20 56 C20 56, 18 54, 16 50 L14 44 C12 36, 9 24, 10 14 Z"
-                                              class="{{ $isSelected ? 'fill-clinical/20 stroke-clinical' : ($hasConditions ? 'fill-white stroke-gray-300' : 'fill-white stroke-gray-200') }}"
-                                              stroke-width="{{ $isSelected ? 2 : 1.5 }}" />
-                                    @endif
-                                </svg>
-
-                                {{-- Condition dots --}}
-                                @if($hasConditions)
-                                    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1 flex gap-0.5">
-                                        @foreach(array_slice($conditions, 0, 3) as $cond)
-                                            @php
-                                                $dotColour = '#94a3b8';
-                                                foreach ($availableConditions as $ac) {
-                                                    if ($ac['code'] === $cond) { $dotColour = $ac['colour']; break; }
-                                                }
-                                            @endphp
-                                            <span class="w-2 h-2 rounded-full ring-1 ring-white" style="background-color: {{ $dotColour }}"></span>
-                                        @endforeach
-                                    </div>
+                                @if($isMissing)
+                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px] opacity-30">
+                                        <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                        <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                    </svg>
+                                @else
+                                    <svg viewBox="0 0 36 70" class="w-9 h-[70px]">
+                                        @include('livewire.plan-builder.partials.tooth-svg-lower', ['type' => $type, 'isSelected' => $isSelected, 'hasConditions' => $hasConditions, 'condColour' => $condColour, 'conditions' => $conditions, 'availableConditions' => $availableConditions])
+                                    </svg>
                                 @endif
 
                                 @if($isSelected)
-                                    <div class="absolute -inset-0.5 rounded-b-[16px] border-2 border-clinical/60 pointer-events-none animate-pulse"></div>
+                                    <div class="absolute -inset-1 rounded-lg border-2 border-clinical/50 pointer-events-none"></div>
+                                @endif
+
+                                @if(count($conditions) > 1)
+                                    <div class="absolute -bottom-1 -right-1 flex gap-px">
+                                        @foreach(array_slice($conditions, 0, 3) as $cond)
+                                            @php $dc = '#94a3b8'; foreach($availableConditions as $ac) { if($ac['code']===$cond){$dc=$ac['colour'];break;} } @endphp
+                                            <span class="w-[6px] h-[6px] rounded-full ring-1 ring-white" style="background:{{ $dc }}"></span>
+                                        @endforeach
+                                    </div>
                                 @endif
                             </button>
                         </div>
                     @endforeach
-                </div>
-
-                {{-- Lower jaw label --}}
-                <div class="text-center mt-1">
-                    <span class="text-[10px] uppercase tracking-widest text-gray-300 font-bold">Lower Jaw</span>
                 </div>
             </div>
 
@@ -246,7 +201,6 @@
                         <button wire:click="clearSelectedTeeth" class="text-xs text-gray-400 hover:text-gray-600 transition">Clear selection</button>
                     </div>
 
-                    {{-- Existing conditions on selected teeth --}}
                     @php
                         $selectedConditions = collect($selectedTeeth)
                             ->flatMap(fn ($t) => collect($toothChartData[$t]['conditions'] ?? [])
@@ -270,6 +224,56 @@
                                     </button>
                                 </span>
                             @endforeach
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            {{-- Diagnosis Summary Table (BrightPlans style) --}}
+            @php
+                $teethWithConditions = collect($toothChartData)->filter(fn($d) => count($d['conditions'] ?? []) > 0);
+            @endphp
+            @if($teethWithConditions->count() > 0)
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                    {{-- Upper Jaw --}}
+                    @php
+                        $upperTeethWithCond = $teethWithConditions->filter(fn($d, $k) => intval($k) >= 11 && intval($k) <= 28)->sortKeys();
+                        $lowerTeethWithCond = $teethWithConditions->filter(fn($d, $k) => intval($k) >= 31 && intval($k) <= 48)->sortKeys();
+                    @endphp
+                    @if($upperTeethWithCond->count() > 0)
+                        <div class="px-5 pt-4 pb-1">
+                            <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wide border-b border-gray-200 pb-2 mb-2">Diagnosis — Upper Jaw</h4>
+                            <div class="grid grid-cols-2 gap-x-8 gap-y-1">
+                                @foreach($upperTeethWithCond as $tNum => $tData)
+                                    <div class="flex items-center gap-3 py-1.5 border-b border-gray-50 text-sm">
+                                        <span class="text-gray-400 font-mono text-xs w-6">{{ $tNum }}.</span>
+                                        <span class="text-gray-700">
+                                            @foreach($tData['conditions'] as $c)
+                                                @php $cl = $c; foreach($availableConditions as $ac) { if($ac['code']===$c){$cl=$ac['label'];break;} } @endphp
+                                                {{ $cl }}@if(!$loop->last), @endif
+                                            @endforeach
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    @if($lowerTeethWithCond->count() > 0)
+                        <div class="px-5 pt-3 pb-4">
+                            <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wide border-b border-gray-200 pb-2 mb-2">Diagnosis — Lower Jaw</h4>
+                            <div class="grid grid-cols-2 gap-x-8 gap-y-1">
+                                @foreach($lowerTeethWithCond as $tNum => $tData)
+                                    <div class="flex items-center gap-3 py-1.5 border-b border-gray-50 text-sm">
+                                        <span class="text-gray-400 font-mono text-xs w-6">{{ $tNum }}.</span>
+                                        <span class="text-gray-700">
+                                            @foreach($tData['conditions'] as $c)
+                                                @php $cl = $c; foreach($availableConditions as $ac) { if($ac['code']===$c){$cl=$ac['label'];break;} } @endphp
+                                                {{ $cl }}@if(!$loop->last), @endif
+                                            @endforeach
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>
