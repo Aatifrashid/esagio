@@ -97,20 +97,6 @@
                                     </svg>
                                 @endif
 
-                                {{-- Selection indicator --}}
-                                @if($isSelected)
-                                    <div class="absolute -inset-1 rounded-lg border-2 border-clinical/50 pointer-events-none"></div>
-                                @endif
-
-                                {{-- Multi-condition indicators --}}
-                                @if(count($conditions) > 1)
-                                    <div class="absolute -top-1 -right-1 flex gap-px">
-                                        @foreach(array_slice($conditions, 0, 3) as $cond)
-                                            @php $dc = '#94a3b8'; foreach($availableConditions as $ac) { if($ac['code']===$cond){$dc=$ac['colour'];break;} } @endphp
-                                            <span class="w-[6px] h-[6px] rounded-full ring-1 ring-white" style="background:{{ $dc }}"></span>
-                                        @endforeach
-                                    </div>
-                                @endif
                             </button>
                             <span class="text-[9px] font-bold mt-0.5 {{ $isSelected ? 'text-clinical' : ($hasConditions ? 'text-gray-700' : 'text-gray-400') }}">{{ $tooth }}</span>
                         </div>
@@ -164,18 +150,6 @@
                                     </svg>
                                 @endif
 
-                                @if($isSelected)
-                                    <div class="absolute -inset-1 rounded-lg border-2 border-clinical/50 pointer-events-none"></div>
-                                @endif
-
-                                @if(count($conditions) > 1)
-                                    <div class="absolute -bottom-1 -right-1 flex gap-px">
-                                        @foreach(array_slice($conditions, 0, 3) as $cond)
-                                            @php $dc = '#94a3b8'; foreach($availableConditions as $ac) { if($ac['code']===$cond){$dc=$ac['colour'];break;} } @endphp
-                                            <span class="w-[6px] h-[6px] rounded-full ring-1 ring-white" style="background:{{ $dc }}"></span>
-                                        @endforeach
-                                    </div>
-                                @endif
                             </button>
                         </div>
                     @endforeach

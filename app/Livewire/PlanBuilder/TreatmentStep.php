@@ -4,6 +4,7 @@ namespace App\Livewire\PlanBuilder;
 
 use App\Models\TreatmentPlan;
 use App\Models\TreatmentPlanItem;
+use App\Models\TreatmentPlanPhase;
 use App\Models\TreatmentTemplate;
 use App\Services\PlanBuilder\ItemSuggestionEngine;
 use Illuminate\Support\Collection;
@@ -29,18 +30,39 @@ class TreatmentStep extends Component
 
     public Collection $phases;
 
+    public bool $showVisits = false;
+
+    public int $visitCount = 2;
+
+    public array $visitAssignments = [];
+
     public function mount(TreatmentPlan $plan): void
     {
         $this->plan = $plan;
         $this->items = $plan->items()->orderBy('position')->get();
-        $this->phases = $plan->phases;
+        $this->phases = $plan->phases()->orderBy('sort_order')->get();
         $this->recentTemplates = TreatmentTemplate::where('clinic_id', $plan->clinic_id)
             ->orderByDesc('usage_count')
             ->limit(10)
             ->get(['id', 'name', 'description_short', 'code'])
             ->toArray();
 
+        $this->loadVisitAssignments();
         $this->refreshSuggestions();
+    }
+
+    private function loadVisitAssignments(): void
+    {
+        if ($this->phases->isNotEmpty()) {
+            $this->showVisits = true;
+            $this->visitCount = $this->phases->count();
+            foreach ($this->phases as $phase) {
+                $this->visitAssignments[$phase->id] = [
+                    'name' => $phase->name,
+                    'items' => $this->items->filter(fn ($item) => $item->procedure_phase === (string) $phase->phase_number)->pluck('id')->toArray(),
+                ];
+            }
+        }
     }
 
     public function updatedTemplateSearch(): void
@@ -121,7 +143,7 @@ class TreatmentStep extends Component
 
     public function updateItem(int $itemId, string $field, mixed $value): void
     {
-        $allowed = ['name', 'description', 'quantity', 'unit_price', 'notes', 'procedure_phase', 'is_optional'];
+        $allowed = ['name', 'description', 'quantity', 'unit_price', 'notes', 'procedure_phase', 'is_optional', 'tooth_positions'];
 
         if (! in_array($field, $allowed, true)) {
             return;
@@ -141,6 +163,11 @@ class TreatmentStep extends Component
 
         $this->items = $this->plan->items()->orderBy('position')->get();
         $this->dispatch('plan-updated')->to(Builder::class);
+    }
+
+    public function assignTeethToItem(int $itemId, array $teeth): void
+    {
+        $this->updateItem($itemId, 'tooth_positions', $teeth);
     }
 
     public function removeItem(int $itemId): void
@@ -203,14 +230,95 @@ class TreatmentStep extends Component
         $this->suggestions = $engine->suggestForDiagnosis($this->plan);
     }
 
+    public function toggleVisits(): void
+    {
+        $this->showVisits = ! $this->showVisits;
+
+        if ($this->showVisits && $this->phases->isEmpty()) {
+            $this->createVisits();
+        }
+    }
+
+    public function setVisitCount(int $count): void
+    {
+        $count = max(1, min(5, $count));
+        $this->visitCount = $count;
+
+        TreatmentPlanPhase::where('treatment_plan_id', $this->plan->id)->delete();
+        $this->createVisits();
+    }
+
+    private function createVisits(): void
+    {
+        for ($i = 1; $i <= $this->visitCount; $i++) {
+            TreatmentPlanPhase::create([
+                'treatment_plan_id' => $this->plan->id,
+                'phase_number' => $i,
+                'name' => 'Visit '.$i,
+                'sort_order' => $i,
+            ]);
+        }
+
+        $this->phases = $this->plan->phases()->orderBy('sort_order')->get();
+        $this->loadVisitAssignments();
+        $this->dispatch('plan-updated')->to(Builder::class);
+    }
+
+    public function assignItemToVisit(int $itemId, int $phaseNumber): void
+    {
+        $item = TreatmentPlanItem::where('id', $itemId)
+            ->where('treatment_plan_id', $this->plan->id)
+            ->firstOrFail();
+
+        $item->update(['procedure_phase' => (string) $phaseNumber]);
+
+        $this->items = $this->plan->items()->orderBy('position')->get();
+        $this->loadVisitAssignments();
+        $this->dispatch('plan-updated')->to(Builder::class);
+    }
+
+    public function removeItemFromVisit(int $itemId): void
+    {
+        $item = TreatmentPlanItem::where('id', $itemId)
+            ->where('treatment_plan_id', $this->plan->id)
+            ->firstOrFail();
+
+        $item->update(['procedure_phase' => null]);
+
+        $this->items = $this->plan->items()->orderBy('position')->get();
+        $this->loadVisitAssignments();
+        $this->dispatch('plan-updated')->to(Builder::class);
+    }
+
+    public function updateVisitName(int $phaseId, string $name): void
+    {
+        TreatmentPlanPhase::where('id', $phaseId)
+            ->where('treatment_plan_id', $this->plan->id)
+            ->update(['name' => $name]);
+
+        $this->phases = $this->plan->phases()->orderBy('sort_order')->get();
+        $this->dispatch('plan-updated')->to(Builder::class);
+    }
+
     public function render()
     {
         $total = $this->items->where('is_optional', false)->sum('line_total');
         $optionalTotal = $this->items->where('is_optional', true)->sum('line_total');
 
+        $toothChartData = $this->plan->toothCharts
+            ->keyBy('tooth_number')
+            ->map(fn ($c) => [
+                'conditions' => $c->conditions ?? [],
+            ])
+            ->toArray();
+
+        $unassignedItems = $this->items->filter(fn ($item) => empty($item->procedure_phase));
+
         return view('livewire.plan-builder.treatment-step', [
             'total' => $total,
             'optionalTotal' => $optionalTotal,
+            'toothChartData' => $toothChartData,
+            'unassignedItems' => $unassignedItems,
         ]);
     }
 }

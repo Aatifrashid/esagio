@@ -1,16 +1,26 @@
-<div x-data="{ dragging: null }">
+<div x-data="{
+    dragging: null,
+    dragItemId: null,
+    showToast: false,
+    toastMsg: '',
+    flash(msg) { this.toastMsg = msg; this.showToast = true; setTimeout(() => this.showToast = false, 2000); }
+}">
+
+    {{-- Toast --}}
+    <div x-show="showToast" x-transition.opacity class="fixed top-4 right-4 z-50 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-lg shadow-lg" x-cloak x-text="toastMsg"></div>
 
     <div class="mb-6 flex items-start justify-between gap-4">
         <div>
             <h2 class="font-serif text-2xl font-semibold text-clinical">Treatment Plan</h2>
-            <p class="text-gray-500 text-sm mt-1">Add treatments from templates or create custom line items.</p>
+            <p class="text-gray-500 text-sm mt-1">Add treatments, assign teeth, and schedule visits.</p>
         </div>
         <div class="flex items-center gap-2">
             <button
-                wire:click="$toggle('showPhases')"
-                class="text-xs border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition"
+                wire:click="toggleVisits"
+                class="text-xs border rounded-lg px-3 py-1.5 transition
+                    {{ $showVisits ? 'border-clinical bg-clinical/5 text-clinical' : 'border-gray-200 text-gray-600 hover:bg-gray-50' }}"
             >
-                {{ $showPhases ? 'Hide phases' : 'Show phases' }}
+                {{ $showVisits ? 'Hide visits' : 'Schedule visits' }}
             </button>
         </div>
     </div>
@@ -75,7 +85,6 @@
                     @elseif(strlen($templateSearch) >= 2)
                         <p class="text-sm text-gray-400 text-center py-3">No templates found</p>
                     @else
-                        {{-- Recent templates --}}
                         @if(count($recentTemplates) > 0)
                             <div>
                                 <p class="text-xs text-gray-400 mb-2">Recently used</p>
@@ -110,12 +119,7 @@
                                 <div class="bg-white rounded-lg p-3">
                                     <p class="text-sm font-medium text-gray-800">{{ $suggestion['name'] }}</p>
                                     <p class="text-xs text-gray-400 mt-0.5">{{ $suggestion['reason'] }}</p>
-                                    <button
-                                        wire:click="addCustomItem"
-                                        class="mt-2 text-xs text-clinical hover:text-clinical-700 font-medium transition"
-                                    >
-                                        Add item +
-                                    </button>
+                                    <button wire:click="addCustomItem" class="mt-2 text-xs text-clinical hover:text-clinical-700 font-medium transition">Add item +</button>
                                 </div>
                             @endforeach
                         </div>
@@ -144,7 +148,7 @@
         </div>
 
         {{-- Right: items list --}}
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2 space-y-4">
             <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
                 @if($items->isEmpty())
                     <div class="text-center py-16 px-6">
@@ -158,8 +162,9 @@
                     {{-- Table header --}}
                     <div class="grid grid-cols-12 gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-medium text-gray-500 uppercase tracking-wide">
                         <div class="col-span-1"></div>
-                        <div class="col-span-5">Treatment</div>
-                        <div class="col-span-2 text-right">Qty</div>
+                        <div class="col-span-4">Treatment</div>
+                        <div class="col-span-2">Teeth</div>
+                        <div class="col-span-1 text-right">Qty</div>
                         <div class="col-span-2 text-right">Price</div>
                         <div class="col-span-1 text-right">Total</div>
                         <div class="col-span-1"></div>
@@ -170,6 +175,9 @@
                             <div
                                 class="grid grid-cols-12 gap-2 px-4 py-3 items-center group hover:bg-gray-50/50 transition"
                                 wire:key="item-{{ $item->id }}"
+                                draggable="true"
+                                x-on:dragstart="dragItemId = {{ $item->id }}"
+                                x-on:dragend="dragItemId = null"
                             >
                                 {{-- Drag handle --}}
                                 <div class="col-span-1 flex items-center justify-center cursor-grab text-gray-300 hover:text-gray-500">
@@ -179,7 +187,7 @@
                                 </div>
 
                                 {{-- Name --}}
-                                <div class="col-span-5">
+                                <div class="col-span-4">
                                     <input
                                         type="text"
                                         value="{{ $item->name }}"
@@ -192,8 +200,24 @@
                                     @endif
                                 </div>
 
-                                {{-- Qty --}}
+                                {{-- Teeth --}}
                                 <div class="col-span-2">
+                                    @if(!empty($item->tooth_positions))
+                                        <div class="flex flex-wrap gap-0.5">
+                                            @foreach(array_slice($item->tooth_positions, 0, 4) as $tp)
+                                                <span class="text-[10px] bg-clinical/10 text-clinical font-mono rounded px-1">{{ $tp }}</span>
+                                            @endforeach
+                                            @if(count($item->tooth_positions) > 4)
+                                                <span class="text-[10px] text-gray-400">+{{ count($item->tooth_positions) - 4 }}</span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-gray-300">—</span>
+                                    @endif
+                                </div>
+
+                                {{-- Qty --}}
+                                <div class="col-span-1">
                                     <input
                                         type="number"
                                         value="{{ $item->quantity }}"
@@ -222,33 +246,14 @@
 
                                 {{-- Actions --}}
                                 <div class="col-span-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition">
-                                    <button
-                                        wire:click="toggleOptional({{ $item->id }})"
-                                        title="{{ $item->is_optional ? 'Make required' : 'Make optional' }}"
-                                        class="p-1 rounded text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition"
-                                    >
-                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                                        </svg>
+                                    <button wire:click="toggleOptional({{ $item->id }})" title="{{ $item->is_optional ? 'Make required' : 'Make optional' }}" class="p-1 rounded text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                                     </button>
-                                    <button
-                                        wire:click="duplicateItem({{ $item->id }})"
-                                        title="Duplicate"
-                                        class="p-1 rounded text-gray-400 hover:text-clinical hover:bg-clinical/10 transition"
-                                    >
-                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        </svg>
+                                    <button wire:click="duplicateItem({{ $item->id }})" title="Duplicate" class="p-1 rounded text-gray-400 hover:text-clinical hover:bg-clinical/10 transition">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     </button>
-                                    <button
-                                        wire:click="removeItem({{ $item->id }})"
-                                        wire:confirm="Remove this item?"
-                                        title="Remove"
-                                        class="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-                                    >
-                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
+                                    <button wire:click="removeItem({{ $item->id }})" wire:confirm="Remove this item?" title="Remove" class="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
                                 </div>
                             </div>
@@ -276,6 +281,226 @@
                     </div>
                 @endif
             </div>
+
+            {{-- ============================================================
+                 TOOTH CHART — Assign teeth to treatments
+            ============================================================ --}}
+            @if($items->isNotEmpty())
+                <div class="bg-white border border-gray-200 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-gray-800 mb-1">Treatment Tooth Chart</h3>
+                    <p class="text-xs text-gray-400 mb-4">Click teeth to see which treatments apply. Teeth with diagnosed conditions are highlighted.</p>
+
+                    @php
+                        $upperRight = ['18','17','16','15','14','13','12','11'];
+                        $upperLeft  = ['21','22','23','24','25','26','27','28'];
+                        $lowerRight = ['48','47','46','45','44','43','42','41'];
+                        $lowerLeft  = ['31','32','33','34','35','36','37','38'];
+
+                        $toothTypes = [
+                            '11' => 'central', '12' => 'lateral', '13' => 'canine', '14' => 'premolar1', '15' => 'premolar2', '16' => 'molar1', '17' => 'molar2', '18' => 'molar3',
+                            '21' => 'central', '22' => 'lateral', '23' => 'canine', '24' => 'premolar1', '25' => 'premolar2', '26' => 'molar1', '27' => 'molar2', '28' => 'molar3',
+                            '31' => 'central', '32' => 'lateral', '33' => 'canine', '34' => 'premolar1', '35' => 'premolar2', '36' => 'molar1', '37' => 'molar2', '38' => 'molar3',
+                            '41' => 'central', '42' => 'lateral', '43' => 'canine', '44' => 'premolar1', '45' => 'premolar2', '46' => 'molar1', '47' => 'molar2', '48' => 'molar3',
+                        ];
+
+                        $treatedTeeth = $items->flatMap(fn($i) => $i->tooth_positions ?? [])->unique()->values()->toArray();
+                    @endphp
+
+                    {{-- Upper teeth --}}
+                    <div class="flex justify-center items-end gap-[2px] mb-1">
+                        @foreach(array_merge($upperRight, $upperLeft) as $i => $tooth)
+                            @php
+                                $diagConditions = $toothChartData[$tooth]['conditions'] ?? [];
+                                $hasDiag = count($diagConditions) > 0;
+                                $isTreated = in_array($tooth, $treatedTeeth);
+                                $type = $toothTypes[$tooth] ?? 'central';
+                                $isMissing = in_array('MISSING', $diagConditions);
+                            @endphp
+                            <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
+                                <div class="relative">
+                                    @if($isMissing)
+                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px] opacity-30">
+                                            <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                            <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                        </svg>
+                                    @else
+                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px]">
+                                            @include('livewire.plan-builder.partials.tooth-svg-upper', [
+                                                'type' => $type,
+                                                'isSelected' => false,
+                                                'hasConditions' => $isTreated,
+                                                'condColour' => $isTreated ? '#22c55e' : null,
+                                                'conditions' => $diagConditions,
+                                                'availableConditions' => [],
+                                            ])
+                                        </svg>
+                                    @endif
+                                    @if($hasDiag && !$isMissing && !$isTreated)
+                                        <div class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1 ring-white"></div>
+                                    @endif
+                                </div>
+                                <span class="text-[8px] font-bold mt-0.5 {{ $isTreated ? 'text-green-600' : ($hasDiag ? 'text-amber-500' : 'text-gray-400') }}">{{ $tooth }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Gum line --}}
+                    <div class="relative my-1.5">
+                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-pink-200/40"></div></div>
+                    </div>
+
+                    {{-- Lower teeth --}}
+                    <div class="flex justify-center items-start gap-[2px] mt-1">
+                        @foreach(array_merge($lowerRight, $lowerLeft) as $i => $tooth)
+                            @php
+                                $diagConditions = $toothChartData[$tooth]['conditions'] ?? [];
+                                $hasDiag = count($diagConditions) > 0;
+                                $isTreated = in_array($tooth, $treatedTeeth);
+                                $type = $toothTypes[$tooth] ?? 'central';
+                                $isMissing = in_array('MISSING', $diagConditions);
+                            @endphp
+                            <div class="flex flex-col items-center {{ $i === 7 ? 'mr-4' : '' }}">
+                                <span class="text-[8px] font-bold mb-0.5 {{ $isTreated ? 'text-green-600' : ($hasDiag ? 'text-amber-500' : 'text-gray-400') }}">{{ $tooth }}</span>
+                                <div class="relative">
+                                    @if($isMissing)
+                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px] opacity-30">
+                                            <line x1="8" y1="10" x2="28" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                            <line x1="28" y1="10" x2="8" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+                                        </svg>
+                                    @else
+                                        <svg viewBox="0 0 36 70" class="w-7 h-[55px]">
+                                            @include('livewire.plan-builder.partials.tooth-svg-lower', [
+                                                'type' => $type,
+                                                'isSelected' => false,
+                                                'hasConditions' => $isTreated,
+                                                'condColour' => $isTreated ? '#22c55e' : null,
+                                                'conditions' => $diagConditions,
+                                                'availableConditions' => [],
+                                            ])
+                                        </svg>
+                                    @endif
+                                    @if($hasDiag && !$isMissing && !$isTreated)
+                                        <div class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1 ring-white"></div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Legend --}}
+                    <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
+                        <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Treatment assigned
+                        </div>
+                        <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Diagnosed — needs treatment
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            {{-- ============================================================
+                 VISITS — Drag treatments into visit groups
+            ============================================================ --}}
+            @if($showVisits && $items->isNotEmpty())
+                <div class="bg-white border border-gray-200 rounded-xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-800">Schedule Visits</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Drag treatments into visits to schedule when each procedure will be done.</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            @for($v = 1; $v <= 5; $v++)
+                                <button
+                                    wire:click="setVisitCount({{ $v }})"
+                                    class="w-7 h-7 rounded-lg text-xs font-bold transition
+                                        {{ $visitCount === $v ? 'bg-clinical text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}"
+                                >{{ $v }}</button>
+                            @endfor
+                            <span class="text-[10px] text-gray-400 ml-1">visits</span>
+                        </div>
+                    </div>
+
+                    {{-- Unassigned items --}}
+                    @if($unassignedItems->isNotEmpty())
+                        <div class="mb-4 p-3 bg-amber-50/50 border border-amber-100 rounded-xl">
+                            <p class="text-xs font-semibold text-amber-700 mb-2">Unassigned treatments</p>
+                            <div class="space-y-1">
+                                @foreach($unassignedItems as $item)
+                                    <div
+                                        draggable="true"
+                                        x-on:dragstart="dragItemId = {{ $item->id }}"
+                                        x-on:dragend="dragItemId = null"
+                                        class="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-amber-100 cursor-grab active:cursor-grabbing text-sm"
+                                    >
+                                        <svg class="h-3.5 w-3.5 text-gray-300 flex-none" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 6a2 2 0 100-4 2 2 0 000 4zM8 14a2 2 0 100-4 2 2 0 000 4zM16 6a2 2 0 100-4 2 2 0 000 4zM16 14a2 2 0 100-4 2 2 0 000 4z"/>
+                                        </svg>
+                                        <span class="text-gray-700 truncate flex-1">{{ $item->name ?: 'Untitled' }}</span>
+                                        @if(!empty($item->tooth_positions))
+                                            <span class="text-[10px] text-clinical bg-clinical/10 rounded px-1">{{ count($item->tooth_positions) }} teeth</span>
+                                        @endif
+                                        <span class="text-xs text-gray-400 font-mono">{{ $plan->currency ?? '£' }}{{ number_format($item->line_total, 0) }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Visit columns --}}
+                    <div class="grid grid-cols-1 md:grid-cols-{{ min($visitCount, 3) }} gap-3">
+                        @foreach($phases as $phase)
+                            @php
+                                $visitItems = $items->filter(fn($i) => $i->procedure_phase === (string) $phase->phase_number);
+                                $visitTotal = $visitItems->sum('line_total');
+                            @endphp
+                            <div
+                                class="border-2 border-dashed rounded-xl p-3 transition min-h-[120px]"
+                                :class="dragItemId ? 'border-clinical/40 bg-clinical/5' : 'border-gray-200'"
+                                x-on:dragover.prevent
+                                x-on:drop.prevent="
+                                    if (dragItemId) {
+                                        $wire.assignItemToVisit(dragItemId, {{ $phase->phase_number }});
+                                        flash('Assigned to {{ $phase->name }}');
+                                        dragItemId = null;
+                                    }
+                                "
+                            >
+                                <div class="flex items-center justify-between mb-2">
+                                    <input
+                                        type="text"
+                                        value="{{ $phase->name }}"
+                                        wire:change="updateVisitName({{ $phase->id }}, $event.target.value)"
+                                        class="text-xs font-bold text-gray-700 uppercase tracking-wide border-0 bg-transparent p-0 focus:ring-0 w-24"
+                                    />
+                                    <span class="text-[10px] font-mono text-gray-400">{{ $plan->currency ?? '£' }}{{ number_format($visitTotal, 0) }}</span>
+                                </div>
+
+                                @if($visitItems->isEmpty())
+                                    <div class="flex items-center justify-center h-16 text-xs text-gray-300">
+                                        Drop treatments here
+                                    </div>
+                                @else
+                                    <div class="space-y-1">
+                                        @foreach($visitItems as $vi)
+                                            <div class="flex items-center gap-1.5 bg-gray-50 rounded-lg px-2.5 py-1.5 text-xs group">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-clinical flex-none"></span>
+                                                <span class="text-gray-700 truncate flex-1">{{ $vi->name ?: 'Untitled' }}</span>
+                                                <button
+                                                    wire:click="removeItemFromVisit({{ $vi->id }})"
+                                                    class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition flex-none"
+                                                >
+                                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 
