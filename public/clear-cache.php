@@ -3,7 +3,7 @@ header('Content-Type: text/plain');
 $baseDir = dirname(__DIR__);
 
 $commands = [
-    'php artisan config:clear',
+    'php artisan view:clear',
 ];
 
 foreach ($commands as $cmd) {
