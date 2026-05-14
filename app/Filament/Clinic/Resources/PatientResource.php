@@ -99,6 +99,7 @@ class PatientResource extends Resource
                         Forms\Components\Select::make('pipeline_stage_id')
                             ->label('Pipeline Stage')
                             ->options(fn () => CrmPipelineStage::with('pipeline')
+                                ->whereHas('pipeline')
                                 ->get()
                                 ->mapWithKeys(fn ($stage) => [$stage->id => $stage->pipeline->name.' - '.$stage->name]))
                             ->searchable(),
