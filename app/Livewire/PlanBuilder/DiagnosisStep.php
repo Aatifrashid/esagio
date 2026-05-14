@@ -170,6 +170,7 @@ class DiagnosisStep extends Component
     public function render()
     {
         $availableConditions = ToothChartCondition::orderBy('sort_order')
+            ->whereNotIn('code', ['implant_planned', 'veneer_planned', 'to_extract', 'root_canal_needed'])
             ->get(['code', 'name', 'colour'])
             ->map(fn ($c) => ['code' => $c->code, 'label' => $c->name, 'colour' => $c->colour])
             ->toArray();
