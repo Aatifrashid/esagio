@@ -11,10 +11,10 @@
         const rect = this.$el.getBoundingClientRect();
         this.ctxMenu = { show: true, x: e.clientX - rect.left, y: e.clientY - rect.top, tooth: tooth };
     },
-    applyCtx(code) {
+    async applyCtx(code) {
         if (this.ctxMenu.tooth) {
-            $wire.toggleTooth(this.ctxMenu.tooth);
-            $wire.applyConditionToTeeth(code);
+            await $wire.toggleTooth(this.ctxMenu.tooth);
+            await $wire.applyConditionToTeeth(code);
             this.flash('Applied to tooth ' + this.toothLabel(this.ctxMenu.tooth));
         }
         this.ctxMenu.show = false;
@@ -137,8 +137,8 @@
                             x-on:dragover.prevent
                             x-on:drop.prevent.stop="
                                 if (dragging) {
-                                    $wire.toggleTooth('{{ $tooth }}');
-                                    $wire.applyConditionToTeeth(dragging);
+                                    await $wire.toggleTooth('{{ $tooth }}');
+                                    await $wire.applyConditionToTeeth(dragging);
                                     flash('Applied to tooth {{ $tooth }}');
                                     dragging = null;
                                 }
