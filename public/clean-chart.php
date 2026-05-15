@@ -10,13 +10,6 @@ imagealphablending($dst, false);
 $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
 imagefill($dst, 0, 0, $transparent);
 
-// Label y-bands (to be more aggressive with removal)
-// Upper numbers: y ≈ 162-195
-// Lower numbers: y ≈ 325-358
-function inLabelBand($y) {
-    return ($y >= 160 && $y <= 198) || ($y >= 322 && $y <= 360);
-}
-
 // Star watermark zone
 function inStarZone($x, $y) {
     return ($x >= 1280 && $y >= 640);
@@ -35,12 +28,6 @@ for ($y = 0; $y < $h; $y++) {
 
         // Background: neutral grey in checkerboard range
         $isBg = ($maxDiff < 12 && $avg >= 95 && $avg <= 155);
-
-        // In label bands, also remove dark text (avg < 80 = dark text for sure)
-        // and anything that's very neutral grey even outside the checkerboard range
-        if (inLabelBand($y) && $maxDiff < 20 && $avg < 160) {
-            $isBg = true;
-        }
 
         if (!$isBg) {
             $color = imagecolorallocatealpha($dst, $r, $g, $b, 0);
