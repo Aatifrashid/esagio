@@ -136,7 +136,7 @@
 
 
                 <div class="relative w-full rounded-xl overflow-hidden" style="max-width: 960px; margin: 0 auto; background-color: #000000;">
-                    <img src="{{ asset('images/dental-chart-v3.png') }}" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
+                    <img src="{{ asset('images/dental-chart-v3.png') }}?v=2" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
 
                     {{-- Right-click context menu --}}
                     <div x-show="ctxMenu.show" x-cloak x-transition.opacity
