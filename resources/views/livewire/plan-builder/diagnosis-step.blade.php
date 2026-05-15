@@ -134,7 +134,7 @@
                 @endphp
 
                 <div class="relative w-full rounded-xl overflow-hidden" style="max-width: 960px; margin: 0 auto; background-color: #101010;">
-                    <img src="{{ asset('images/dental-chart-v2.png') }}?v=10" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
+                    <img src="{{ asset('images/dental-chart-v2.png') }}?v=11" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
 
                     {{-- Right-click context menu --}}
                     <div x-show="ctxMenu.show" x-cloak x-transition.opacity
