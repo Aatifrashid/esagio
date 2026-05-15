@@ -147,17 +147,15 @@
                             style="left: {{ $pos['left'] }}; top: {{ $pos['top'] }}; width: {{ $pos['width'] }}; height: {{ $pos['height'] }}; clip-path: {{ $clipPath }};"
                         >
                             @if($isMissing)
-                                <div class="absolute inset-0 bg-white/70 flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </div>
+                                <div class="absolute inset-0" style="background-color: #151515;"></div>
                             @elseif($hasConditions && $condColour)
-                                <div class="absolute inset-0" style="background-color: {{ $condColour }}; opacity: 0.45;"></div>
+                                <div class="absolute inset-0" style="background-color: {{ $condColour }}; opacity: 0.55;"></div>
                             @endif
 
                             @if($isSelected)
-                                <div class="absolute inset-0 bg-indigo-500/40 border-2 border-indigo-400 rounded-sm shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
+                                <div class="absolute inset-0 border-[3px] border-cyan-400" style="background: rgba(6,182,212,0.3); box-shadow: 0 0 12px rgba(6,182,212,0.7), inset 0 0 12px rgba(6,182,212,0.3);"></div>
                             @else
-                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/30 border border-white/50 transition cursor-pointer"></div>
+                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition cursor-pointer" style="background: rgba(255,255,255,0.25); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.6);"></div>
                             @endif
                         </button>
                     @endforeach
