@@ -99,7 +99,7 @@
                 @endphp
 
                 <div class="relative w-full" style="max-width: 960px; margin: 0 auto;">
-                    <img src="{{ asset('images/dental-chart-v2.png') }}?v=8" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
+                    <img src="{{ asset('images/dental-chart-v2.png') }}?v=9" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
 
                     {{-- Right-click context menu --}}
                     <div x-show="ctxMenu.show" x-cloak x-transition.opacity
@@ -157,7 +157,7 @@
                             @if($isSelected)
                                 <div class="absolute inset-0 bg-indigo-500/20 border-2 border-indigo-500"></div>
                             @else
-                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-clinical/10 transition"></div>
+                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/20 transition"></div>
                             @endif
                         </button>
                     @endforeach
