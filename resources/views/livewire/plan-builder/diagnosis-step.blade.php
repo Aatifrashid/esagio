@@ -155,9 +155,9 @@
                             @endif
 
                             @if($isSelected)
-                                <div class="absolute inset-0 bg-indigo-500/20 border-2 border-indigo-500"></div>
+                                <div class="absolute inset-0 bg-indigo-500/40 border-2 border-indigo-400 rounded-sm shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
                             @else
-                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/20 transition"></div>
+                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/30 border border-white/50 transition cursor-pointer"></div>
                             @endif
                         </button>
                     @endforeach
