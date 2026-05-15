@@ -29,12 +29,12 @@
         <p class="text-gray-500 text-sm mt-1">Select teeth, then drag conditions onto them — or click a condition to paint it across selected teeth.</p>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="space-y-6">
 
         {{-- ============================================================
-             LEFT: Interactive Tooth Chart (2 cols)
+             Interactive Tooth Chart (full width)
         ============================================================ --}}
-        <div class="xl:col-span-2 space-y-4">
+        <div class="space-y-4">
 
             {{-- Quick select bar --}}
             <div class="flex items-center gap-2 text-xs">
@@ -98,7 +98,7 @@
                     ];
                 @endphp
 
-                <div class="relative w-full" style="max-width: 700px; margin: 0 auto;">
+                <div class="relative w-full" style="max-width: 960px; margin: 0 auto;">
                     <img src="{{ asset('images/dental-chart.png') }}?v=6" alt="Dental Chart" class="w-full h-auto select-none pointer-events-none" draggable="false">
 
                     {{-- Right-click context menu --}}
@@ -122,7 +122,7 @@
                             $conditions = $toothChartData[$tooth]['conditions'] ?? [];
                             $hasConditions = count($conditions) > 0;
                             $isSelected = in_array($tooth, $selectedTeeth);
-                            $isMissing = in_array('MISSING', $conditions);
+                            $isMissing = in_array('missing', $conditions);
                             $condColour = null;
                             if ($hasConditions && !$isMissing) {
                                 foreach ($availableConditions as $ac) {
@@ -267,7 +267,7 @@
         </div>
 
         {{-- ============================================================
-             RIGHT: Notes + Save (1 col)
+             Notes + Save
         ============================================================ --}}
         <div class="space-y-4">
 
