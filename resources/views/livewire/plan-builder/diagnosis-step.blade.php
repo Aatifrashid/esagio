@@ -45,6 +45,9 @@
                 @if(count($selectedTeeth) > 0)
                     <button wire:click="clearSelectedTeeth" class="px-2.5 py-1 rounded-md bg-red-50 text-red-500 hover:bg-red-100 transition font-medium">Clear ({{ count($selectedTeeth) }})</button>
                 @endif
+                @if(count($toothChartData) > 0)
+                    <button wire:click="clearAllConditions" class="px-2.5 py-1 rounded-md bg-red-50 text-red-500 hover:bg-red-100 transition font-medium">Reset chart</button>
+                @endif
             </div>
 
             {{-- Tooth Chart Card --}}
@@ -148,7 +151,7 @@
                                     <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </div>
                             @elseif($hasConditions && $condColour)
-                                <div class="absolute inset-0 opacity-35" style="background-color: {{ $condColour }};"></div>
+                                <div class="absolute inset-0" style="background-color: {{ $condColour }}; opacity: 0.45;"></div>
                             @endif
 
                             @if($isSelected)

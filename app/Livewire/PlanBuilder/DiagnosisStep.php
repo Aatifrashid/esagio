@@ -115,6 +115,14 @@ class DiagnosisStep extends Component
         $this->activeCondition = null;
     }
 
+    public function clearAllConditions(): void
+    {
+        $this->toothChartData = [];
+        $this->selectedTeeth = [];
+        $this->activeCondition = null;
+        $this->refreshConditionTags();
+    }
+
     public function selectAllUpper(): void
     {
         $upper = ['18','17','16','15','14','13','12','11','21','22','23','24','25','26','27','28'];
