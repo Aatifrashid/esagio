@@ -153,9 +153,9 @@
                             @endif
 
                             @if($isSelected)
-                                <div class="absolute inset-0 border-[3px] border-cyan-400" style="background: rgba(6,182,212,0.3); box-shadow: 0 0 12px rgba(6,182,212,0.7), inset 0 0 12px rgba(6,182,212,0.3);"></div>
+                                <div class="absolute inset-0" style="background: rgba(6,182,212,0.45); outline: 3px solid #22d3ee; outline-offset: -3px;"></div>
                             @else
-                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition cursor-pointer" style="background: rgba(255,255,255,0.25); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.6);"></div>
+                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition cursor-pointer" style="background: rgba(255,255,255,0.35);"></div>
                             @endif
                         </button>
                     @endforeach
