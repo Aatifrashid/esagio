@@ -199,8 +199,8 @@
                     {{-- HTML tooth number labels (always visible, even for missing teeth) --}}
                     @foreach($toothLabels as $fdi => $label)
                         @php $labelMissing = in_array('missing', $toothChartData[$fdi]['conditions'] ?? []); @endphp
-                        <span class="absolute z-20 pointer-events-none text-white font-medium select-none"
-                              style="left: {{ $label['x'] }}; top: {{ $label['y'] }}; transform: translate(-50%, -50%); font-size: clamp(8px, 1.3vw, 13px); {{ $labelMissing ? 'opacity: 0.4;' : '' }}">
+                        <span class="absolute z-20 pointer-events-none text-white font-bold select-none"
+                              style="left: {{ $label['x'] }}; top: {{ $label['y'] }}; transform: translate(-50%, -50%); font-size: clamp(7px, 1.1vw, 11px); background: rgba(0,0,0,0.6); padding: 1px 3px; border-radius: 3px; line-height: 1.2; {{ $labelMissing ? 'opacity: 0.4;' : '' }}">
                             {{ $label['ada'] }}
                         </span>
                     @endforeach
