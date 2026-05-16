@@ -26,7 +26,7 @@
 
     <div class="mb-6">
         <h2 class="font-serif text-2xl font-semibold text-clinical">Diagnosis</h2>
-        <p class="text-gray-500 text-sm mt-1">Select teeth, then drag conditions onto them — or click a condition to paint it across selected teeth.</p>
+        <p class="text-gray-500 text-sm mt-1">Click teeth to select, then choose a condition below — or right-click any tooth for a quick menu.</p>
     </div>
 
     <div class="space-y-6">
@@ -191,7 +191,7 @@
                             @if($isSelected)
                                 <div class="absolute inset-0" style="background: rgba(6,182,212,0.45);"></div>
                             @else
-                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition cursor-pointer" style="background: rgba(255,255,255,0.35);"></div>
+                                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition cursor-pointer" style="background: rgba(6,182,212,0.2);"></div>
                             @endif
                         </button>
                     @endforeach
@@ -219,7 +219,7 @@
                                 @if(count($selectedTeeth) > 1)
                                     {{ implode(', ', array_slice($selectedTeeth, 0, 8)) }}{{ count($selectedTeeth) > 8 ? '...' : '' }}
                                 @else
-                                    Click conditions below to add, or drag them onto the chart
+                                    Choose a condition below to apply
                                 @endif
                             </p>
                         </div>
@@ -254,6 +254,20 @@
                             @endforeach
                         </div>
                     @endif
+
+                    {{-- Condition palette --}}
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach($availableConditions as $condition)
+                            <button wire:click="applyConditionToTeeth('{{ $condition['code'] }}')"
+                                    draggable="true"
+                                    x-on:dragstart="dragging = '{{ $condition['code'] }}'"
+                                    x-on:dragend="dragging = null"
+                                    class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-gray-700 transition cursor-pointer shadow-sm active:scale-95">
+                                <span class="w-2.5 h-2.5 rounded-full flex-none" style="background-color: {{ $condition['colour'] }}"></span>
+                                {{ $condition['label'] }}
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
             @endif
 
