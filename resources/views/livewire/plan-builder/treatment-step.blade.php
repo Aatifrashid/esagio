@@ -275,7 +275,7 @@
 
                         {{-- ADA tooth number labels --}}
                         @foreach($toothLabels as $tooth => $label)
-                            <span class="absolute text-[9px] font-mono text-white/70 pointer-events-none select-none" style="left: {{ $label['x'] }}; top: {{ $label['y'] }}; transform: translate(-50%, -50%);">{{ $label['ada'] }}</span>
+                            <span class="absolute text-[7px] font-mono text-white/40 pointer-events-none select-none" style="left: {{ $label['x'] }}; top: {{ $label['y'] }}; transform: translate(-50%, -50%);">{{ $label['ada'] }}</span>
                         @endforeach
                     </div>
 
