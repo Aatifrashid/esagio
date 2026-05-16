@@ -189,7 +189,7 @@
                             @endif
 
                             @if($isSelected)
-                                <div class="absolute inset-0" style="background: rgba(6,182,212,0.45); outline: 3px solid #22d3ee; outline-offset: -3px;"></div>
+                                <div class="absolute inset-0" style="background: rgba(6,182,212,0.45);"></div>
                             @else
                                 <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition cursor-pointer" style="background: rgba(255,255,255,0.35);"></div>
                             @endif
