@@ -2,41 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dental Chart Polygon Mask Editor</title>
+<title>Dental Chart Mask Editor - Draw Mode</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #1a1a2e; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-#toolbar { background: #16213e; padding: 8px 16px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #0f3460; z-index: 10; flex-shrink: 0; }
-#toolbar button { background: #0f3460; color: #e0e0e0; border: 1px solid #1a4080; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+#toolbar { background: #16213e; padding: 8px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #0f3460; z-index: 10; flex-shrink: 0; flex-wrap: wrap; }
+#toolbar button { background: #0f3460; color: #e0e0e0; border: 1px solid #1a4080; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; white-space: nowrap; }
 #toolbar button:hover { background: #1a4080; }
 #toolbar button.primary { background: #06b6d4; color: #000; border-color: #06b6d4; font-weight: 600; }
 #toolbar button.primary:hover { background: #22d3ee; }
-#selected-info { font-size: 14px; font-weight: 600; color: #06b6d4; min-width: 120px; }
+#toolbar button.danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+#toolbar button.danger:hover { background: #ef4444; }
+#toolbar button.active { background: #16a34a; color: #fff; border-color: #16a34a; }
+#selected-info { font-size: 14px; font-weight: 600; color: #06b6d4; min-width: 100px; }
+#mode-info { font-size: 13px; color: #fbbf24; font-weight: 600; }
 #coords { font-size: 12px; color: #888; margin-left: auto; font-family: monospace; }
 #zoom-info { font-size: 12px; color: #888; }
-#canvas-wrap { flex: 1; overflow: hidden; position: relative; cursor: crosshair; }
+select { background: #0f3460; color: #e0e0e0; border: 1px solid #1a4080; padding: 5px 8px; border-radius: 4px; font-size: 13px; }
+#canvas-wrap { flex: 1; overflow: hidden; position: relative; }
 canvas { position: absolute; top: 0; left: 0; }
-#help { position: fixed; bottom: 10px; right: 10px; background: #16213e; border: 1px solid #0f3460; padding: 8px 12px; border-radius: 6px; font-size: 11px; line-height: 1.6; color: #888; }
+#help { position: fixed; bottom: 10px; right: 10px; background: #16213e; border: 1px solid #0f3460; padding: 10px 14px; border-radius: 6px; font-size: 11px; line-height: 1.8; color: #888; max-width: 400px; }
+#help b { color: #06b6d4; }
+.sep { width: 1px; height: 24px; background: #0f3460; }
 </style>
 </head>
 <body>
 <div id="toolbar">
+    <select id="toothSelect" onchange="selectTooth(this.value)">
+        <option value="">-- Select Tooth --</option>
+    </select>
     <span id="selected-info">No tooth selected</span>
+    <div class="sep"></div>
+    <button id="btnDraw" onclick="setMode('draw')" class="active">Draw</button>
+    <button id="btnEdit" onclick="setMode('edit')">Edit Points</button>
+    <div class="sep"></div>
+    <button onclick="clearCurrentMask()" class="danger">Clear Mask</button>
+    <button onclick="undoAction()">Undo (Z)</button>
+    <div class="sep"></div>
     <button onclick="copyCurrentTooth()" class="primary">Copy PHP</button>
     <button onclick="copyAllTeeth()">Copy All</button>
-    <button onclick="undo()">Undo (Ctrl+Z)</button>
-    <button onclick="zoomIn()">Zoom +</button>
-    <button onclick="zoomOut()">Zoom -</button>
-    <button onclick="resetZoom()">Reset</button>
+    <div class="sep"></div>
+    <button onclick="zoomIn()">+</button>
+    <button onclick="zoomOut()">-</button>
+    <button onclick="resetZoom()">Fit</button>
     <span id="zoom-info">100%</span>
+    <span id="mode-info">DRAW MODE</span>
     <span id="coords">-</span>
 </div>
 <div id="canvas-wrap">
     <canvas id="canvas"></canvas>
 </div>
 <div id="help">
-    Click tooth to select | Drag points to edit | Dbl-click edge = add point | Right-click point = remove<br>
-    Esc = deselect | Ctrl+Z = undo | Ctrl+C = copy tooth | Scroll = zoom | Middle-drag/Space+drag = pan
+    <b>Draw mode:</b> Click & drag to draw mask outline around tooth. Release to close shape.<br>
+    <b>Edit mode:</b> Drag points to adjust. Dbl-click edge = add point. Right-click = remove point.<br>
+    <b>Navigation:</b> Scroll = zoom | Middle-drag or Space+drag = pan<br>
+    <b>Shortcuts:</b> D = draw | E = edit | Z = undo | C = copy | Esc = deselect
 </div>
 
 <script>
@@ -77,13 +97,35 @@ const toothHotspots = {
 '38': {left:91.55,top:59.6,width:6.25,height:23.4,clip:'polygon(1.1% 2.8%, 2.3% 2.3%, 13.6% 2.3%, 20.5% 4%, 26.1% 4.5%, 34.1% 6.8%, 37.5% 6.8%, 46.6% 4.5%, 50% 2.8%, 51.1% 2.8%, 55.7% 1.1%, 58% 1.1%, 59.1% 0.6%, 63.6% 0.6%, 77.3% 4%, 81.8% 4%, 86.4% 6.3%, 92% 13.1%, 93.2% 17.6%, 94.3% 59.7%, 97.7% 64.8%, 97.7% 65.3%, 97.7% 95.5%, 97.7% 96%, 94.3% 97.2%, 90.9% 97.2%, 87.5% 96%, 85.2% 93.8%, 78.4% 81.8%, 65.9% 68.8%, 64.8% 97.2%, 60.2% 98.9%, 56.8% 98.9%, 55.7% 98.3%, 53.4% 98.3%, 48.9% 97.2%, 28.4% 86.9%, 19.3% 81.3%, 13.6% 76.7%, 9.1% 71.6%, 4.5% 64.2%, 1.1% 54.5%, 1.1% 54%, 1.1% 3.4%)'}
 };
 
-// Parse polygon string into array of {x,y} (percentages)
+// Parse polygon string into array of {x,y}
 function parsePolygon(clipStr) {
     const inner = clipStr.match(/polygon\((.+)\)/)[1];
     return inner.split(',').map(pair => {
         const [x, y] = pair.trim().split(/\s+/);
         return { x: parseFloat(x), y: parseFloat(y) };
     });
+}
+
+// Douglas-Peucker simplification
+function perpDist(pt, a, b) {
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len === 0) return Math.sqrt((pt.x - a.x) ** 2 + (pt.y - a.y) ** 2);
+    return Math.abs(dy * pt.x - dx * pt.y + b.x * a.y - b.y * a.x) / len;
+}
+function simplify(points, epsilon) {
+    if (points.length <= 2) return points;
+    let maxD = 0, maxI = 0;
+    for (let i = 1; i < points.length - 1; i++) {
+        const d = perpDist(points[i], points[0], points[points.length - 1]);
+        if (d > maxD) { maxD = d; maxI = i; }
+    }
+    if (maxD > epsilon) {
+        const left = simplify(points.slice(0, maxI + 1), epsilon);
+        const right = simplify(points.slice(maxI), epsilon);
+        return left.slice(0, -1).concat(right);
+    }
+    return [points[0], points[points.length - 1]];
 }
 
 // State
@@ -94,20 +136,56 @@ Object.keys(toothHotspots).forEach(id => {
 });
 
 let selectedTooth = null;
-let draggingPoint = -1;
-let zoom = 1;
-let panX = 0, panY = 0;
-let isPanning = false;
-let panStart = { x: 0, y: 0 };
-let undoStack = [];
+let mode = 'draw'; // 'draw' or 'edit'
+let zoom = 1, panX = 0, panY = 0;
+let isPanning = false, panStart = { x: 0, y: 0 };
 let spaceDown = false;
+let undoStack = [];
+
+// Drawing state
+let isDrawing = false;
+let drawPoints = []; // raw image coords while drawing
+
+// Edit state
+let draggingPoint = -1;
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const wrap = document.getElementById('canvas-wrap');
 const img = new Image();
 img.src = 'images/dental-chart-v3.png';
-img.onload = () => { resize(); render(); };
+img.onload = () => { resize(); populateSelect(); render(); };
+
+// Populate tooth selector (FDI order)
+function populateSelect() {
+    const sel = document.getElementById('toothSelect');
+    const upper = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+    const lower = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+    const optU = document.createElement('optgroup');
+    optU.label = 'Upper';
+    upper.forEach(id => { const o = document.createElement('option'); o.value = id; o.textContent = `Tooth ${id}`; optU.appendChild(o); });
+    sel.appendChild(optU);
+    const optL = document.createElement('optgroup');
+    optL.label = 'Lower';
+    lower.forEach(id => { const o = document.createElement('option'); o.value = id; o.textContent = `Tooth ${id}`; optL.appendChild(o); });
+    sel.appendChild(optL);
+}
+
+function selectTooth(id) {
+    if (!id) { selectedTooth = null; } else { selectedTooth = parseInt(id); }
+    document.getElementById('toothSelect').value = id || '';
+    document.getElementById('selected-info').textContent = selectedTooth ? `Tooth ${selectedTooth} (${teeth[selectedTooth].points.length} pts)` : 'No tooth selected';
+    render();
+}
+
+function setMode(m) {
+    mode = m;
+    document.getElementById('btnDraw').className = m === 'draw' ? 'active' : '';
+    document.getElementById('btnEdit').className = m === 'edit' ? 'active' : '';
+    document.getElementById('mode-info').textContent = m === 'draw' ? 'DRAW MODE' : 'EDIT MODE';
+    wrap.style.cursor = m === 'draw' ? 'crosshair' : 'default';
+    render();
+}
 
 function resize() {
     canvas.width = wrap.clientWidth;
@@ -116,369 +194,449 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 
-function imgToCanvas(ix, iy) {
-    return [(ix * zoom) + panX, (iy * zoom) + panY];
-}
-function canvasToImg(cx, cy) {
-    return [(cx - panX) / zoom, (cy - panY) / zoom];
-}
+function imgToCanvas(ix, iy) { return [(ix * zoom) + panX, (iy * zoom) + panY]; }
+function canvasToImg(cx, cy) { return [(cx - panX) / zoom, (cy - panY) / zoom]; }
 
-// Get absolute pixel position of a tooth point on the image
 function toothPointToImg(tooth, pt) {
-    const bx = (tooth.left / 100) * IMG_W;
-    const by = (tooth.top / 100) * IMG_H;
-    const bw = (tooth.width / 100) * IMG_W;
-    const bh = (tooth.height / 100) * IMG_H;
+    const bx = (tooth.left / 100) * IMG_W, by = (tooth.top / 100) * IMG_H;
+    const bw = (tooth.width / 100) * IMG_W, bh = (tooth.height / 100) * IMG_H;
     return [bx + (pt.x / 100) * bw, by + (pt.y / 100) * bh];
 }
 
-function imgToToothPoint(tooth, ix, iy, pointIndex) {
-    const bx = (tooth.left / 100) * IMG_W;
-    const by = (tooth.top / 100) * IMG_H;
-    const bw = (tooth.width / 100) * IMG_W;
-    const bh = (tooth.height / 100) * IMG_H;
-    let px = ((ix - bx) / bw) * 100;
-    let py = ((iy - by) / bh) * 100;
-    // If point goes outside bounding box, expand the box and recalculate all points
-    if (px < 0 || px > 100 || py < 0 || py > 100) {
-        // Convert all points to absolute image coords
-        const absPoints = tooth.points.map(pt => ({
-            ax: bx + (pt.x / 100) * bw,
-            ay: by + (pt.y / 100) * bh
-        }));
-        // The dragged point's new absolute position
-        if (pointIndex !== undefined) absPoints[pointIndex] = { ax: ix, ay: iy };
-        // Find new bounding box from all points with 1px padding
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        absPoints.forEach(p => { minX = Math.min(minX, p.ax); maxX = Math.max(maxX, p.ax); minY = Math.min(minY, p.ay); maxY = Math.max(maxY, p.ay); });
-        minX = Math.max(0, minX - 1); maxX = Math.min(IMG_W, maxX + 1);
-        minY = Math.max(0, minY - 1); maxY = Math.min(IMG_H, maxY + 1);
-        const newBw = maxX - minX, newBh = maxY - minY;
-        // Recalculate all points as percentages of new bounding box
-        tooth.points = absPoints.map(p => ({
-            x: Math.round(((p.ax - minX) / newBw) * 1000) / 10,
-            y: Math.round(((p.ay - minY) / newBh) * 1000) / 10
-        }));
-        tooth.left = Math.round((minX / IMG_W) * 10000) / 100;
-        tooth.top = Math.round((minY / IMG_H) * 10000) / 100;
-        tooth.width = Math.round((newBw / IMG_W) * 10000) / 100;
-        tooth.height = Math.round((newBh / IMG_H) * 10000) / 100;
-        return tooth.points[pointIndex];
-    }
-    return { x: Math.round(px * 10) / 10, y: Math.round(py * 10) / 10 };
+function saveUndo() {
+    if (!selectedTooth) return;
+    const t = teeth[selectedTooth];
+    undoStack.push({ id: selectedTooth, left: t.left, top: t.top, width: t.width, height: t.height, points: JSON.parse(JSON.stringify(t.points)) });
+    if (undoStack.length > 50) undoStack.shift();
 }
 
+function undoAction() {
+    if (undoStack.length === 0) return;
+    const state = undoStack.pop();
+    const t = teeth[state.id];
+    t.left = state.left; t.top = state.top; t.width = state.width; t.height = state.height;
+    t.points = state.points;
+    selectedTooth = state.id;
+    document.getElementById('toothSelect').value = state.id;
+    document.getElementById('selected-info').textContent = `Tooth ${state.id} (${t.points.length} pts)`;
+    render();
+}
+
+function clearCurrentMask() {
+    if (!selectedTooth) return;
+    saveUndo();
+    teeth[selectedTooth].points = [];
+    document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} (0 pts)`;
+    render();
+}
+
+// Convert raw drawn image-coord points into tooth bounding box + percentage points
+function finalizeDrawing(rawImgPoints) {
+    if (rawImgPoints.length < 3) return null;
+
+    // Simplify: aim for ~80-150 points depending on path length
+    let pts = rawImgPoints;
+    // First pass: remove points that are too close together (< 1px)
+    let filtered = [pts[0]];
+    for (let i = 1; i < pts.length; i++) {
+        const dx = pts[i].x - filtered[filtered.length - 1].x;
+        const dy = pts[i].y - filtered[filtered.length - 1].y;
+        if (Math.sqrt(dx * dx + dy * dy) > 0.5) filtered.push(pts[i]);
+    }
+    pts = filtered;
+
+    // Douglas-Peucker with adaptive epsilon
+    let epsilon = 0.5;
+    let simplified = simplify(pts, epsilon);
+    while (simplified.length > 200 && epsilon < 5) {
+        epsilon += 0.3;
+        simplified = simplify(pts, epsilon);
+    }
+    while (simplified.length < 30 && epsilon > 0.1) {
+        epsilon -= 0.1;
+        simplified = simplify(pts, epsilon);
+    }
+
+    if (simplified.length < 3) return null;
+
+    // Compute bounding box with 2px padding
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    simplified.forEach(p => { minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y); });
+    minX = Math.max(0, minX - 2); maxX = Math.min(IMG_W, maxX + 2);
+    minY = Math.max(0, minY - 2); maxY = Math.min(IMG_H, maxY + 2);
+    const bw = maxX - minX, bh = maxY - minY;
+
+    const percentPoints = simplified.map(p => ({
+        x: Math.round(((p.x - minX) / bw) * 1000) / 10,
+        y: Math.round(((p.y - minY) / bh) * 1000) / 10
+    }));
+
+    return {
+        left: Math.round((minX / IMG_W) * 10000) / 100,
+        top: Math.round((minY / IMG_H) * 1000) / 10,
+        width: Math.round((bw / IMG_W) * 10000) / 100,
+        height: Math.round((bh / IMG_H) * 1000) / 10,
+        points: percentPoints
+    };
+}
+
+// ===== RENDER =====
 function render() {
     if (!img.complete) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw image
     ctx.save();
     ctx.translate(panX, panY);
     ctx.scale(zoom, zoom);
     ctx.drawImage(img, 0, 0, IMG_W, IMG_H);
+    ctx.restore();
 
-    // Draw all teeth
+    // Draw all tooth overlays (dim)
     Object.keys(teeth).forEach(id => {
-        const t = teeth[id];
-        const isSelected = id === selectedTooth;
+        const t = teeth[parseInt(id)];
+        if (t.points.length < 3) return;
+        const isSelected = parseInt(id) === selectedTooth;
+
         ctx.beginPath();
         t.points.forEach((pt, i) => {
-            const [x, y] = toothPointToImg(t, pt);
-            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            const [cx, cy] = imgToCanvas(...toothPointToImg(t, pt));
+            if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
         });
         ctx.closePath();
-        ctx.fillStyle = isSelected ? 'rgba(6,182,212,0.6)' : 'rgba(6,182,212,0.3)';
-        ctx.fill();
-        if (isSelected) { ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 2 / zoom; ctx.stroke(); }
 
-        // Label
-        const cx = (t.left / 100) * IMG_W + (t.width / 100) * IMG_W * 0.5;
-        const cy = (t.top / 100) * IMG_H + (t.height / 100) * IMG_H * 0.5;
-        ctx.fillStyle = '#fff';
-        ctx.font = `bold ${11 / zoom}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(id, cx, cy);
+        if (isSelected) {
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.35)';
+            ctx.fill();
+            ctx.strokeStyle = '#06b6d4';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        } else {
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.12)';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
     });
 
-    // Draw points for selected tooth
-    if (selectedTooth) {
+    // In edit mode, draw point handles for selected tooth
+    if (mode === 'edit' && selectedTooth && teeth[selectedTooth].points.length > 0) {
         const t = teeth[selectedTooth];
-        const r = 4 / zoom;
         t.points.forEach((pt, i) => {
-            const [x, y] = toothPointToImg(t, pt);
+            const [cx, cy] = imgToCanvas(...toothPointToImg(t, pt));
             ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = i === draggingPoint ? '#f59e0b' : '#fff';
+            ctx.arc(cx, cy, draggingPoint === i ? 6 : 4, 0, Math.PI * 2);
+            ctx.fillStyle = draggingPoint === i ? '#fbbf24' : '#06b6d4';
             ctx.fill();
             ctx.strokeStyle = '#000';
-            ctx.lineWidth = 1 / zoom;
+            ctx.lineWidth = 1;
             ctx.stroke();
         });
+    }
 
-        // Draw bounding box
-        const bx = (t.left / 100) * IMG_W;
-        const by = (t.top / 100) * IMG_H;
-        const bw = (t.width / 100) * IMG_W;
-        const bh = (t.height / 100) * IMG_H;
-        ctx.strokeStyle = '#f59e0b';
-        ctx.lineWidth = 1.5 / zoom;
-        ctx.setLineDash([4 / zoom, 4 / zoom]);
-        ctx.strokeRect(bx, by, bw, bh);
+    // Draw in-progress freehand line
+    if (isDrawing && drawPoints.length > 1) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        drawPoints.forEach((p, i) => {
+            const [cx, cy] = imgToCanvas(p.x, p.y);
+            if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        });
+        ctx.stroke();
         ctx.setLineDash([]);
 
-        // Corner handles for bounding box
-        const corners = [[bx,by],[bx+bw,by],[bx+bw,by+bh],[bx,by+bh]];
-        corners.forEach(([cx,cy]) => {
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillRect(cx - 3/zoom, cy - 3/zoom, 6/zoom, 6/zoom);
-        });
+        // Draw close indicator
+        if (drawPoints.length > 10) {
+            const [sx, sy] = imgToCanvas(drawPoints[0].x, drawPoints[0].y);
+            ctx.beginPath();
+            ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
     }
-    ctx.restore();
+
+    document.getElementById('zoom-info').textContent = Math.round(zoom * 100) + '%';
 }
 
-// Hit testing
-function hitTestPoint(mx, my) {
-    if (!selectedTooth) return -1;
-    const t = teeth[selectedTooth];
-    const threshold = 8 / zoom;
-    for (let i = 0; i < t.points.length; i++) {
-        const [px, py] = imgToCanvas(...toothPointToImg(t, t.points[i]));
-        if (Math.hypot(mx - px, my - py) < threshold) return i;
-    }
-    return -1;
-}
-
-function hitTestTooth(mx, my) {
-    const [ix, iy] = canvasToImg(mx, my);
-    // Check in reverse so top-drawn teeth get priority
-    const keys = Object.keys(teeth);
-    for (let k = keys.length - 1; k >= 0; k--) {
-        const id = keys[k];
-        const t = teeth[id];
-        // Quick bounding box check
-        const bx = (t.left / 100) * IMG_W, by = (t.top / 100) * IMG_H;
-        const bw = (t.width / 100) * IMG_W, bh = (t.height / 100) * IMG_H;
-        if (ix < bx || ix > bx + bw || iy < by || iy > by + bh) continue;
-        // Point in polygon
-        const pts = t.points.map(p => toothPointToImg(t, p));
-        if (pointInPoly(ix, iy, pts)) return id;
-    }
-    return null;
-}
-
-function pointInPoly(x, y, pts) {
-    let inside = false;
-    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-        const [xi, yi] = pts[i], [xj, yj] = pts[j];
-        if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
-    }
-    return inside;
-}
-
-// Bounding box drag state
-let bbDrag = null; // {type: 'corner'|'edge', idx, startBB, startMouse}
-
-function hitTestBB(mx, my) {
-    if (!selectedTooth) return null;
-    const t = teeth[selectedTooth];
-    const bx = (t.left / 100) * IMG_W, by = (t.top / 100) * IMG_H;
-    const bw = (t.width / 100) * IMG_W, bh = (t.height / 100) * IMG_H;
-    const corners = [[bx,by],[bx+bw,by],[bx+bw,by+bh],[bx,by+bh]];
-    const threshold = 8 / zoom;
-    for (let i = 0; i < corners.length; i++) {
-        const [cx, cy] = imgToCanvas(corners[i][0], corners[i][1]);
-        if (Math.hypot(mx - cx, my - cy) < threshold) return { type: 'corner', idx: i };
-    }
-    return null;
-}
-
-function saveUndo() {
-    undoStack.push(JSON.parse(JSON.stringify(teeth)));
-    if (undoStack.length > 50) undoStack.shift();
-}
-
-function undo() {
-    if (undoStack.length === 0) return;
-    teeth = undoStack.pop();
-    render();
-}
-
-// Mouse events
+// ===== MOUSE EVENTS =====
 canvas.addEventListener('mousedown', e => {
-    const mx = e.offsetX, my = e.offsetY;
-    if (e.button === 1 || (e.button === 0 && spaceDown)) { isPanning = true; panStart = { x: mx - panX, y: my - panY }; return; }
-    if (e.button === 0) {
-        // Check bounding box corners first
-        const bb = hitTestBB(mx, my);
-        if (bb) { saveUndo(); bbDrag = { ...bb, startBB: { ...teeth[selectedTooth] }, startMouse: canvasToImg(mx, my) }; return; }
-        // Check points
-        const pi = hitTestPoint(mx, my);
-        if (pi >= 0) { saveUndo(); draggingPoint = pi; render(); return; }
-        // Check tooth selection
-        const tid = hitTestTooth(mx, my);
-        if (tid) { selectedTooth = tid; draggingPoint = -1; document.getElementById('selected-info').textContent = `Tooth ${tid}`; render(); return; }
-        selectedTooth = null; draggingPoint = -1; document.getElementById('selected-info').textContent = 'No tooth selected'; render();
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    const [ix, iy] = canvasToImg(cx, cy);
+
+    // Panning with middle button or space
+    if (e.button === 1 || (e.button === 0 && spaceDown)) {
+        isPanning = true;
+        panStart = { x: e.clientX - panX, y: e.clientY - panY };
+        e.preventDefault();
+        return;
+    }
+
+    if (e.button !== 0) return;
+
+    if (mode === 'draw') {
+        if (!selectedTooth) return;
+        saveUndo();
+        isDrawing = true;
+        drawPoints = [{ x: ix, y: iy }];
+        render();
+    } else if (mode === 'edit') {
+        if (!selectedTooth) {
+            // Click on a tooth to select it
+            Object.keys(teeth).forEach(id => {
+                const t = teeth[parseInt(id)];
+                if (t.points.length < 3) return;
+                // Simple bounding box check
+                const bx = (t.left / 100) * IMG_W, by = (t.top / 100) * IMG_H;
+                const bw = (t.width / 100) * IMG_W, bh = (t.height / 100) * IMG_H;
+                if (ix >= bx && ix <= bx + bw && iy >= by && iy <= by + bh) {
+                    selectTooth(id);
+                }
+            });
+            return;
+        }
+
+        // Try to grab a point
+        const t = teeth[selectedTooth];
+        let closestDist = Infinity, closestIdx = -1;
+        t.points.forEach((pt, i) => {
+            const [px, py] = toothPointToImg(t, pt);
+            const [pcx, pcy] = imgToCanvas(px, py);
+            const d = Math.sqrt((cx - pcx) ** 2 + (cy - pcy) ** 2);
+            if (d < closestDist) { closestDist = d; closestIdx = i; }
+        });
+        if (closestDist < 12) {
+            saveUndo();
+            draggingPoint = closestIdx;
+            render();
+        }
     }
 });
 
 canvas.addEventListener('mousemove', e => {
-    const mx = e.offsetX, my = e.offsetY;
-    if (isPanning) { panX = mx - panStart.x; panY = my - panStart.y; render(); return; }
-    if (draggingPoint >= 0 && selectedTooth) {
-        const [ix, iy] = canvasToImg(mx, my);
-        teeth[selectedTooth].points[draggingPoint] = imgToToothPoint(teeth[selectedTooth], ix, iy, draggingPoint);
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    const [ix, iy] = canvasToImg(cx, cy);
+
+    document.getElementById('coords').textContent = `${Math.round(ix)}, ${Math.round(iy)}`;
+
+    if (isPanning) {
+        panX = e.clientX - panStart.x;
+        panY = e.clientY - panStart.y;
         render();
+        return;
     }
-    if (bbDrag && selectedTooth) {
-        const [ix, iy] = canvasToImg(mx, my);
-        const [sx, sy] = bbDrag.startMouse;
-        const dx = ix - sx, dy = iy - sy;
-        const t = teeth[selectedTooth];
-        const sb = bbDrag.startBB;
-        const oldBx = (sb.left / 100) * IMG_W, oldBy = (sb.top / 100) * IMG_H;
-        const oldBw = (sb.width / 100) * IMG_W, oldBh = (sb.height / 100) * IMG_H;
-        // Get absolute positions of all points before resize
-        // Corner 0=TL, 1=TR, 2=BR, 3=BL
-        let newBx = oldBx, newBy = oldBy, newBw = oldBw, newBh = oldBh;
-        if (bbDrag.idx === 0) { newBx = oldBx + dx; newBy = oldBy + dy; newBw = oldBw - dx; newBh = oldBh - dy; }
-        else if (bbDrag.idx === 1) { newBy = oldBy + dy; newBw = oldBw + dx; newBh = oldBh - dy; }
-        else if (bbDrag.idx === 2) { newBw = oldBw + dx; newBh = oldBh + dy; }
-        else if (bbDrag.idx === 3) { newBx = oldBx + dx; newBw = oldBw - dx; newBh = oldBh + dy; }
-        if (newBw < 10 || newBh < 10) return;
-        // Recalculate points
-        const oldPoints = teeth[selectedTooth].points;
-        const newPoints = oldPoints.map(pt => {
-            const absX = oldBx + (pt.x / 100) * oldBw;
-            const absY = oldBy + (pt.y / 100) * oldBh;
-            let nx = ((absX - newBx) / newBw) * 100;
-            let ny = ((absY - newBy) / newBh) * 100;
-            nx = Math.round(nx * 10) / 10;
-            ny = Math.round(ny * 10) / 10;
-            return { x: nx, y: ny };
-        });
-        t.left = Math.round((newBx / IMG_W) * 10000) / 100;
-        t.top = Math.round((newBy / IMG_H) * 10000) / 100;
-        t.width = Math.round((newBw / IMG_W) * 10000) / 100;
-        t.height = Math.round((newBh / IMG_H) * 10000) / 100;
-        t.points = newPoints;
+
+    if (isDrawing) {
+        drawPoints.push({ x: ix, y: iy });
         render();
+        return;
     }
-    // Coords display
-    if (selectedTooth) {
-        const [ix, iy] = canvasToImg(mx, my);
+
+    if (mode === 'edit' && draggingPoint >= 0 && selectedTooth) {
         const t = teeth[selectedTooth];
         const bx = (t.left / 100) * IMG_W, by = (t.top / 100) * IMG_H;
         const bw = (t.width / 100) * IMG_W, bh = (t.height / 100) * IMG_H;
-        const px = ((ix - bx) / bw * 100).toFixed(1);
-        const py = ((iy - by) / bh * 100).toFixed(1);
-        document.getElementById('coords').textContent = `Box: ${px}% ${py}% | Img: ${(ix/IMG_W*100).toFixed(1)}% ${(iy/IMG_H*100).toFixed(1)}%`;
+        let px = ((ix - bx) / bw) * 100;
+        let py = ((iy - by) / bh) * 100;
+
+        if (px < 0 || px > 100 || py < 0 || py > 100) {
+            // Expand bounding box
+            const absPoints = t.points.map(pt => ({
+                ax: bx + (pt.x / 100) * bw, ay: by + (pt.y / 100) * bh
+            }));
+            absPoints[draggingPoint] = { ax: ix, ay: iy };
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            absPoints.forEach(p => { minX = Math.min(minX, p.ax); maxX = Math.max(maxX, p.ax); minY = Math.min(minY, p.ay); maxY = Math.max(maxY, p.ay); });
+            minX = Math.max(0, minX - 1); maxX = Math.min(IMG_W, maxX + 1);
+            minY = Math.max(0, minY - 1); maxY = Math.min(IMG_H, maxY + 1);
+            const newBw = maxX - minX, newBh = maxY - minY;
+            t.points = absPoints.map(p => ({
+                x: Math.round(((p.ax - minX) / newBw) * 1000) / 10,
+                y: Math.round(((p.ay - minY) / newBh) * 1000) / 10
+            }));
+            t.left = Math.round((minX / IMG_W) * 10000) / 100;
+            t.top = Math.round((minY / IMG_H) * 10000) / 100;
+            t.width = Math.round((newBw / IMG_W) * 10000) / 100;
+            t.height = Math.round((newBh / IMG_H) * 1000) / 10;
+        } else {
+            t.points[draggingPoint] = {
+                x: Math.round(px * 10) / 10,
+                y: Math.round(py * 10) / 10
+            };
+        }
+        render();
     }
 });
 
 canvas.addEventListener('mouseup', e => {
-    isPanning = false; draggingPoint = -1; bbDrag = null;
-});
+    if (isPanning) { isPanning = false; return; }
 
-canvas.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    if (!selectedTooth) return;
-    const mx = e.offsetX, my = e.offsetY;
-    const pi = hitTestPoint(mx, my);
-    if (pi >= 0 && teeth[selectedTooth].points.length > 3) {
-        saveUndo();
-        teeth[selectedTooth].points.splice(pi, 1);
+    if (isDrawing) {
+        isDrawing = false;
+        if (drawPoints.length > 10 && selectedTooth) {
+            const result = finalizeDrawing(drawPoints);
+            if (result) {
+                const t = teeth[selectedTooth];
+                t.left = result.left;
+                t.top = result.top;
+                t.width = result.width;
+                t.height = result.height;
+                t.points = result.points;
+                document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} (${t.points.length} pts)`;
+            }
+        }
+        drawPoints = [];
+        render();
+        return;
+    }
+
+    if (draggingPoint >= 0) {
+        draggingPoint = -1;
+        if (selectedTooth) {
+            document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} (${teeth[selectedTooth].points.length} pts)`;
+        }
         render();
     }
 });
 
+// Double-click to add point on edge (edit mode)
 canvas.addEventListener('dblclick', e => {
-    if (!selectedTooth) return;
-    const mx = e.offsetX, my = e.offsetY;
-    const [ix, iy] = canvasToImg(mx, my);
+    if (mode !== 'edit' || !selectedTooth) return;
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    const [ix, iy] = canvasToImg(cx, cy);
     const t = teeth[selectedTooth];
-    const pts = t.points;
+    if (t.points.length < 2) return;
+
     // Find closest edge
-    let bestDist = Infinity, bestIdx = -1;
-    for (let i = 0; i < pts.length; i++) {
-        const j = (i + 1) % pts.length;
-        const [x1, y1] = toothPointToImg(t, pts[i]);
-        const [x2, y2] = toothPointToImg(t, pts[j]);
-        const d = distToSegment(ix, iy, x1, y1, x2, y2);
+    let bestDist = Infinity, bestIdx = 0;
+    for (let i = 0; i < t.points.length; i++) {
+        const j = (i + 1) % t.points.length;
+        const [ax, ay] = toothPointToImg(t, t.points[i]);
+        const [bx, by] = toothPointToImg(t, t.points[j]);
+        // Point-to-segment distance
+        const dx = bx - ax, dy = by - ay;
+        const len2 = dx * dx + dy * dy;
+        let t2 = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((ix - ax) * dx + (iy - ay) * dy) / len2));
+        const px = ax + t2 * dx, py = ay + t2 * dy;
+        const d = Math.sqrt((ix - px) ** 2 + (iy - py) ** 2);
         if (d < bestDist) { bestDist = d; bestIdx = j; }
     }
-    if (bestDist < 15 / zoom) {
+
+    if (bestDist < 20 / zoom) {
         saveUndo();
-        const newPt = imgToToothPoint(t, ix, iy);
-        pts.splice(bestIdx, 0, newPt);
+        const bx = (t.left / 100) * IMG_W, by = (t.top / 100) * IMG_H;
+        const bw = (t.width / 100) * IMG_W, bh = (t.height / 100) * IMG_H;
+        const newPt = {
+            x: Math.round(((ix - bx) / bw) * 1000) / 10,
+            y: Math.round(((iy - by) / bh) * 1000) / 10
+        };
+        t.points.splice(bestIdx, 0, newPt);
+        document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} (${t.points.length} pts)`;
         render();
     }
 });
 
-function distToSegment(px, py, x1, y1, x2, y2) {
-    const dx = x2 - x1, dy = y2 - y1;
-    const len2 = dx * dx + dy * dy;
-    let t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
-    const nx = x1 + t * dx, ny = y1 + t * dy;
-    return Math.hypot(px - nx, py - ny);
-}
-
-// Zoom
-canvas.addEventListener('wheel', e => {
+// Right-click to remove point (edit mode)
+canvas.addEventListener('contextmenu', e => {
+    if (mode !== 'edit' || !selectedTooth) return;
     e.preventDefault();
-    const mx = e.offsetX, my = e.offsetY;
-    const oldZoom = zoom;
-    zoom *= e.deltaY < 0 ? 1.15 : 1 / 1.15;
-    zoom = Math.max(0.5, Math.min(8, zoom));
-    panX = mx - (mx - panX) * (zoom / oldZoom);
-    panY = my - (my - panY) * (zoom / oldZoom);
-    document.getElementById('zoom-info').textContent = Math.round(zoom * 100) + '%';
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    const t = teeth[selectedTooth];
+
+    let closestDist = Infinity, closestIdx = -1;
+    t.points.forEach((pt, i) => {
+        const [px, py] = toothPointToImg(t, pt);
+        const [pcx, pcy] = imgToCanvas(px, py);
+        const d = Math.sqrt((cx - pcx) ** 2 + (cy - pcy) ** 2);
+        if (d < closestDist) { closestDist = d; closestIdx = i; }
+    });
+
+    if (closestDist < 12 && t.points.length > 3) {
+        saveUndo();
+        t.points.splice(closestIdx, 1);
+        document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} (${t.points.length} pts)`;
+        render();
+    }
+});
+
+// Scroll to zoom
+wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const [ix, iy] = canvasToImg(mx, my);
+    const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+    zoom *= factor;
+    zoom = Math.max(0.2, Math.min(20, zoom));
+    panX = mx - ix * zoom;
+    panY = my - iy * zoom;
     render();
 }, { passive: false });
 
-function zoomIn() { const cx = canvas.width/2, cy = canvas.height/2; const oz = zoom; zoom = Math.min(8, zoom*1.3); panX = cx-(cx-panX)*(zoom/oz); panY = cy-(cy-panY)*(zoom/oz); document.getElementById('zoom-info').textContent = Math.round(zoom*100)+'%'; render(); }
-function zoomOut() { const cx = canvas.width/2, cy = canvas.height/2; const oz = zoom; zoom = Math.max(0.5, zoom/1.3); panX = cx-(cx-panX)*(zoom/oz); panY = cy-(cy-panY)*(zoom/oz); document.getElementById('zoom-info').textContent = Math.round(zoom*100)+'%'; render(); }
-function resetZoom() { zoom = 1; panX = 0; panY = 0; document.getElementById('zoom-info').textContent = '100%'; render(); }
-
 // Keyboard
 document.addEventListener('keydown', e => {
-    if (e.code === 'Space') { spaceDown = true; e.preventDefault(); }
-    if (e.code === 'Escape') { selectedTooth = null; draggingPoint = -1; document.getElementById('selected-info').textContent = 'No tooth selected'; render(); }
-    if (e.ctrlKey && e.code === 'KeyZ') { e.preventDefault(); undo(); }
-    if (e.ctrlKey && e.code === 'KeyC') { e.preventDefault(); copyCurrentTooth(); }
+    if (e.code === 'Space') { spaceDown = true; wrap.style.cursor = 'grab'; e.preventDefault(); }
+    if (e.key === 'z' || e.key === 'Z') undoAction();
+    if (e.key === 'd' || e.key === 'D') setMode('draw');
+    if (e.key === 'e' || e.key === 'E') setMode('edit');
+    if (e.key === 'c' || e.key === 'C') copyCurrentTooth();
+    if (e.key === 'Escape') { selectedTooth = null; document.getElementById('toothSelect').value = ''; document.getElementById('selected-info').textContent = 'No tooth selected'; render(); }
 });
-document.addEventListener('keyup', e => { if (e.code === 'Space') spaceDown = false; });
+document.addEventListener('keyup', e => {
+    if (e.code === 'Space') { spaceDown = false; wrap.style.cursor = mode === 'draw' ? 'crosshair' : 'default'; }
+});
 
-// Export
+function zoomIn() { zoom *= 1.3; render(); }
+function zoomOut() { zoom /= 1.3; render(); }
+function resetZoom() {
+    const scaleX = canvas.width / IMG_W, scaleY = canvas.height / IMG_H;
+    zoom = Math.min(scaleX, scaleY) * 0.95;
+    panX = (canvas.width - IMG_W * zoom) / 2;
+    panY = (canvas.height - IMG_H * zoom) / 2;
+    render();
+}
+
+// ===== EXPORT =====
 function toothToPhp(id) {
     const t = teeth[id];
-    const clip = 'polygon(' + t.points.map(p => `${p.x}% ${p.y}%`).join(', ') + ')';
-    return `'${id}' => ['left' => '${t.left}%', 'top' => '${t.top}%', 'width' => '${t.width}%', 'height' => '${t.height}%', 'clip' => '${clip}'],`;
+    if (t.points.length < 3) return null;
+    const clipParts = t.points.map(p => `${p.x}% ${p.y}%`);
+    return `'${id}' => ['left' => '${t.left}%', 'top' => '${t.top}%', 'width' => '${t.width}%', 'height' => '${t.height}%', 'clip' => 'polygon(${clipParts.join(", ")})'],`;
 }
 
 function copyCurrentTooth() {
     if (!selectedTooth) return;
-    navigator.clipboard.writeText(toothToPhp(selectedTooth));
-    document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} - Copied!`;
-    setTimeout(() => { document.getElementById('selected-info').textContent = `Tooth ${selectedTooth}`; }, 1500);
+    const php = toothToPhp(selectedTooth);
+    if (php) {
+        navigator.clipboard.writeText(php);
+        document.getElementById('selected-info').textContent = `Copied tooth ${selectedTooth}!`;
+        setTimeout(() => { document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} (${teeth[selectedTooth].points.length} pts)`; }, 1500);
+    }
 }
 
 function copyAllTeeth() {
-    const order = ['18','17','16','15','14','13','12','11','21','22','23','24','25','26','27','28','48','47','46','45','44','43','42','41','31','32','33','34','35','36','37','38'];
-    const lines = order.map(id => toothToPhp(id));
-    navigator.clipboard.writeText('$toothHotspots = [\n' + lines.join('\n') + '\n];');
-    document.getElementById('selected-info').textContent = 'All teeth copied!';
-    setTimeout(() => { document.getElementById('selected-info').textContent = selectedTooth ? `Tooth ${selectedTooth}` : 'No tooth selected'; }, 1500);
+    const lines = [];
+    [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38].forEach(id => {
+        const php = toothToPhp(id);
+        if (php) lines.push(php);
+    });
+    navigator.clipboard.writeText(lines.join('\n'));
+    document.getElementById('selected-info').textContent = `Copied all ${lines.length} teeth!`;
+    setTimeout(() => {
+        if (selectedTooth) document.getElementById('selected-info').textContent = `Tooth ${selectedTooth} (${teeth[selectedTooth].points.length} pts)`;
+        else document.getElementById('selected-info').textContent = 'No tooth selected';
+    }, 1500);
 }
 
-// Initial fit
-img.onload = () => {
-    const scale = Math.min(wrap.clientWidth / IMG_W, wrap.clientHeight / IMG_H);
-    zoom = scale;
-    panX = (wrap.clientWidth - IMG_W * zoom) / 2;
-    panY = (wrap.clientHeight - IMG_H * zoom) / 2;
-    document.getElementById('zoom-info').textContent = Math.round(zoom * 100) + '%';
-    resize();
-};
+// Auto-fit on load
+setTimeout(resetZoom, 100);
 </script>
 </body>
 </html>
