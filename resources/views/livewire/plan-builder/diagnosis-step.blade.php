@@ -259,53 +259,53 @@
 
             {{-- Diagnosis Summary Table (BrightPlans style) --}}
             @php
-                $teethWithConditions = collect($toothChartData)->filter(fn($d) => count($d['conditions'] ?? []) > 0);
+                $allUpperTeeth = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+                $allLowerTeeth = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
             @endphp
-            @if($teethWithConditions->count() > 0)
                 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                    {{-- Upper Jaw --}}
-                    @php
-                        $upperTeethWithCond = $teethWithConditions->filter(fn($d, $k) => intval($k) >= 11 && intval($k) <= 28)->sortKeys();
-                        $lowerTeethWithCond = $teethWithConditions->filter(fn($d, $k) => intval($k) >= 31 && intval($k) <= 48)->sortKeys();
-                    @endphp
-                    @if($upperTeethWithCond->count() > 0)
-                        <div class="px-5 pt-4 pb-1">
-                            <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wide border-b border-gray-200 pb-2 mb-2">Diagnosis — Upper Jaw</h4>
-                            <div class="grid grid-cols-2 gap-x-8 gap-y-1">
-                                @foreach($upperTeethWithCond as $tNum => $tData)
-                                    <div class="flex items-center gap-3 py-1.5 border-b border-gray-50 text-sm">
-                                        <span class="text-gray-400 font-mono text-xs w-6">{{ $tNum }}.</span>
+                    <div class="px-5 pt-4 pb-1">
+                        <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wide border-b border-gray-200 pb-2 mb-2">Diagnosis — Upper Jaw</h4>
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-1">
+                            @foreach($allUpperTeeth as $tNum)
+                                @php $conditions = $toothChartData[$tNum]['conditions'] ?? []; @endphp
+                                <div class="flex items-center gap-3 py-1.5 border-b border-gray-50 text-sm">
+                                    <span class="text-gray-400 font-mono text-xs w-6">{{ $tNum }}.</span>
+                                    @if(count($conditions) > 0)
                                         <span class="text-gray-700">
-                                            @foreach($tData['conditions'] as $c)
+                                            @foreach($conditions as $c)
                                                 @php $cl = $c; foreach($availableConditions as $ac) { if($ac['code']===$c){$cl=$ac['label'];break;} } @endphp
                                                 {{ $cl }}@if(!$loop->last), @endif
                                             @endforeach
                                         </span>
-                                    </div>
-                                @endforeach
-                            </div>
+                                    @else
+                                        <span class="text-green-600">Intact</span>
+                                    @endif
+                                </div>
+                            @endforeach
                         </div>
-                    @endif
-                    @if($lowerTeethWithCond->count() > 0)
-                        <div class="px-5 pt-3 pb-4">
-                            <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wide border-b border-gray-200 pb-2 mb-2">Diagnosis — Lower Jaw</h4>
-                            <div class="grid grid-cols-2 gap-x-8 gap-y-1">
-                                @foreach($lowerTeethWithCond as $tNum => $tData)
-                                    <div class="flex items-center gap-3 py-1.5 border-b border-gray-50 text-sm">
-                                        <span class="text-gray-400 font-mono text-xs w-6">{{ $tNum }}.</span>
+                    </div>
+                    <div class="px-5 pt-3 pb-4">
+                        <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wide border-b border-gray-200 pb-2 mb-2">Diagnosis — Lower Jaw</h4>
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-1">
+                            @foreach($allLowerTeeth as $tNum)
+                                @php $conditions = $toothChartData[$tNum]['conditions'] ?? []; @endphp
+                                <div class="flex items-center gap-3 py-1.5 border-b border-gray-50 text-sm">
+                                    <span class="text-gray-400 font-mono text-xs w-6">{{ $tNum }}.</span>
+                                    @if(count($conditions) > 0)
                                         <span class="text-gray-700">
-                                            @foreach($tData['conditions'] as $c)
+                                            @foreach($conditions as $c)
                                                 @php $cl = $c; foreach($availableConditions as $ac) { if($ac['code']===$c){$cl=$ac['label'];break;} } @endphp
                                                 {{ $cl }}@if(!$loop->last), @endif
                                             @endforeach
                                         </span>
-                                    </div>
-                                @endforeach
-                            </div>
+                                    @else
+                                        <span class="text-green-600">Intact</span>
+                                    @endif
+                                </div>
+                            @endforeach
                         </div>
-                    @endif
+                    </div>
                 </div>
-            @endif
 
         </div>
 
