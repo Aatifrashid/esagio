@@ -301,12 +301,17 @@
 
             <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
                 @if($items->isEmpty())
-                    <div class="text-center py-16 px-6">
-                        <svg class="h-12 w-12 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                        <p class="text-gray-500 font-medium">No treatments added yet</p>
-                        <p class="text-sm text-gray-400 mt-1">Search templates or add a custom item from the panel on the left.</p>
+                    <div class="flex flex-col items-center justify-center py-16 text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-clinical/10 flex items-center justify-center mb-4">
+                            <svg class="h-8 w-8 text-clinical/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-700 mb-1">No treatments added yet</h3>
+                        <p class="text-xs text-gray-400 mb-4 max-w-xs">Search templates on the left, click a suggestion below, or add a custom item to get started.</p>
+                        <button wire:click="addCustomItem" class="text-sm font-medium text-clinical hover:text-clinical/80 transition">
+                            + Add custom treatment
+                        </button>
                     </div>
                 @else
                     {{-- Table header --}}
@@ -323,7 +328,7 @@
                     <div class="divide-y divide-gray-50">
                         @foreach($items as $item)
                             <div
-                                class="grid grid-cols-12 gap-2 px-4 py-3 items-center group transition cursor-pointer {{ $activeItemId === $item->id ? 'bg-clinical/5 ring-1 ring-clinical/20 rounded-lg' : 'hover:bg-gray-50/50' }}"
+                                class="grid grid-cols-12 gap-2 px-4 py-3 items-center group transition cursor-pointer rounded-lg {{ $activeItemId === $item->id ? 'bg-clinical/10 ring-2 ring-clinical/30 shadow-sm border-l-4 border-clinical' : 'hover:bg-gray-50 border-l-4 border-transparent' }}"
                                 wire:key="item-{{ $item->id }}"
                                 wire:click="setActiveItem({{ $item->id }})"
                                 draggable="true"
@@ -398,7 +403,7 @@
                                 </div>
 
                                 {{-- Actions --}}
-                                <div class="col-span-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition" @click.stop>
+                                <div class="col-span-1 flex items-center justify-end gap-1 transition {{ $activeItemId === $item->id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}" @click.stop>
                                     <button wire:click="toggleOptional({{ $item->id }})" title="{{ $item->is_optional ? 'Make required' : 'Make optional' }}" class="p-1 rounded text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition">
                                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                                     </button>
@@ -411,6 +416,19 @@
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+
+                    {{-- Add item button --}}
+                    <div class="px-4 py-3 border-t border-dashed border-gray-200">
+                        <button
+                            wire:click="addCustomItem"
+                            class="flex items-center gap-2 text-sm text-gray-400 hover:text-clinical transition group"
+                        >
+                            <span class="w-6 h-6 rounded-full border-2 border-dashed border-gray-300 group-hover:border-clinical flex items-center justify-center transition">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            </span>
+                            Add treatment item
+                        </button>
                     </div>
 
                     {{-- Totals --}}
@@ -426,9 +444,9 @@
                                     <span class="text-gray-500">{{ $plan->currency ?? 'GBP' }} {{ number_format($optionalTotal, 2) }}</span>
                                 </div>
                             @endif
-                            <div class="flex items-center justify-between pt-2 border-t border-gray-200">
-                                <span class="text-sm font-semibold text-gray-700">Total</span>
-                                <span class="text-lg font-bold text-clinical">{{ $plan->currency ?? 'GBP' }} {{ number_format($total, 2) }}</span>
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                                <span class="text-base font-bold text-gray-800">Total</span>
+                                <span class="text-xl font-bold text-clinical">{{ $plan->currency ?? 'GBP' }} {{ number_format($total, 2) }}</span>
                             </div>
                         </div>
                     </div>
