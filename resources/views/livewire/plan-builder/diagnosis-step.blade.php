@@ -160,7 +160,7 @@
                             $isSelected = in_array($tooth, $selectedTeeth);
                             $isMissing = in_array('missing', $conditions);
                             $condColour = null;
-                            if ($hasConditions && !$isMissing) {
+                            if ($hasConditions) {
                                 foreach ($availableConditions as $ac) {
                                     if ($ac['code'] === $conditions[0]) { $condColour = $ac['colour']; break; }
                                 }
@@ -182,9 +182,7 @@
                             class="absolute transition-all duration-150 group"
                             style="left: {{ $pos['left'] }}; top: {{ $pos['top'] }}; width: {{ $pos['width'] }}; height: {{ $pos['height'] }}; clip-path: {{ $clipPath }};"
                         >
-                            @if($isMissing)
-                                <div class="absolute inset-0" style="background-color: #000000;"></div>
-                            @elseif($hasConditions && $condColour)
+                            @if($hasConditions && $condColour)
                                 <div class="absolute inset-0" style="background-color: {{ $condColour }}; opacity: 0.35;"></div>
                             @endif
 
