@@ -173,8 +173,9 @@
                     <div class="divide-y divide-gray-50">
                         @foreach($items as $item)
                             <div
-                                class="grid grid-cols-12 gap-2 px-4 py-3 items-center group hover:bg-gray-50/50 transition"
+                                class="grid grid-cols-12 gap-2 px-4 py-3 items-center group transition cursor-pointer {{ $activeItemId === $item->id ? 'bg-clinical/5 ring-1 ring-clinical/20 rounded-lg' : 'hover:bg-gray-50/50' }}"
                                 wire:key="item-{{ $item->id }}"
+                                wire:click="setActiveItem({{ $item->id }})"
                                 draggable="true"
                                 x-on:dragstart="dragItemId = {{ $item->id }}"
                                 x-on:dragend="dragItemId = null"
@@ -187,7 +188,7 @@
                                 </div>
 
                                 {{-- Name --}}
-                                <div class="col-span-4">
+                                <div class="col-span-4" @click.stop>
                                     <input
                                         type="text"
                                         value="{{ $item->name }}"
@@ -201,7 +202,7 @@
                                 </div>
 
                                 {{-- Teeth --}}
-                                <div class="col-span-2">
+                                <div class="col-span-2" wire:click.stop="setActiveItem({{ $item->id }})">
                                     @if(!empty($item->tooth_positions))
                                         <div class="flex flex-wrap gap-0.5">
                                             @foreach(array_slice($item->tooth_positions, 0, 4) as $tp)
@@ -212,12 +213,14 @@
                                             @endif
                                         </div>
                                     @else
-                                        <span class="text-xs text-gray-300">—</span>
+                                        <span class="text-xs text-gray-400 {{ $activeItemId === $item->id ? 'text-clinical' : '' }}">
+                                            {{ $activeItemId === $item->id ? 'Click teeth on chart →' : '—' }}
+                                        </span>
                                     @endif
                                 </div>
 
                                 {{-- Qty --}}
-                                <div class="col-span-1">
+                                <div class="col-span-1" @click.stop>
                                     <input
                                         type="number"
                                         value="{{ $item->quantity }}"
@@ -228,7 +231,7 @@
                                 </div>
 
                                 {{-- Unit price --}}
-                                <div class="col-span-2">
+                                <div class="col-span-2" @click.stop>
                                     <input
                                         type="number"
                                         value="{{ $item->unit_price }}"
@@ -245,7 +248,7 @@
                                 </div>
 
                                 {{-- Actions --}}
-                                <div class="col-span-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition">
+                                <div class="col-span-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition" @click.stop>
                                     <button wire:click="toggleOptional({{ $item->id }})" title="{{ $item->is_optional ? 'Make required' : 'Make optional' }}" class="p-1 rounded text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition">
                                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                                     </button>
@@ -288,7 +291,13 @@
             @if($items->isNotEmpty())
                 <div class="bg-white border border-gray-200 rounded-xl p-5">
                     <h3 class="text-sm font-semibold text-gray-800 mb-1">Treatment Tooth Chart</h3>
-                    <p class="text-xs text-gray-400 mb-4">Click teeth to see which treatments apply. Teeth with diagnosed conditions are highlighted.</p>
+                    <p class="text-xs text-gray-400 mb-4">
+                        @if($activeItemId)
+                            Click teeth to assign them to the selected treatment.
+                        @else
+                            Select a treatment item first, then click teeth to assign.
+                        @endif
+                    </p>
 
                     @php
                         $treatedTeeth = $items->flatMap(fn($i) => $i->tooth_positions ?? [])->unique()->values()->toArray();
@@ -339,30 +348,43 @@
                                 $isTreated = in_array($tooth, $treatedTeeth);
                                 $isMissing = in_array('MISSING', $diagConditions);
                                 $clipPath = $pos['clip'] ?? '';
+                                $activeItem = $activeItemId ? $items->firstWhere('id', $activeItemId) : null;
+                                $activeTeeth = $activeItem ? ($activeItem->tooth_positions ?? []) : [];
+                                $isActiveAssigned = in_array($tooth, $activeTeeth);
                             @endphp
-                            <div
-                                class="absolute"
+                            <button
+                                wire:click="toggleToothForItem('{{ $tooth }}')"
+                                class="absolute transition-all duration-150 group {{ $activeItemId ? 'cursor-pointer' : 'cursor-default' }}"
                                 style="left: {{ $pos['left'] }}; top: {{ $pos['top'] }}; width: {{ $pos['width'] }}; height: {{ $pos['height'] }}; clip-path: {{ $clipPath }};"
                             >
                                 @if($isMissing)
                                     <div class="absolute inset-0 bg-white/70"></div>
+                                @elseif($isActiveAssigned)
+                                    <div class="absolute inset-0 bg-clinical/40"></div>
                                 @elseif($isTreated)
                                     <div class="absolute inset-0 bg-green-500/25"></div>
+                                @elseif($hasDiag)
+                                    <div class="absolute inset-0 bg-amber-400/20"></div>
                                 @endif
-                                @if($hasDiag && !$isMissing && !$isTreated)
-                                    <div class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1 ring-white"></div>
+                                @if($activeItemId && !$isActiveAssigned && !$isMissing)
+                                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-clinical/15"></div>
                                 @endif
-                            </div>
+                            </button>
                         @endforeach
                     </div>
 
                     {{-- Legend --}}
-                    <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
+                    <div class="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-100">
+                        @if($activeItemId)
+                            <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
+                                <span class="w-2.5 h-2.5 rounded-full bg-clinical"></span> Assigned to selected
+                            </div>
+                        @endif
                         <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
                             <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Treatment assigned
                         </div>
                         <div class="flex items-center gap-1.5 text-[10px] text-gray-500">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Diagnosed — needs treatment
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Diagnosed
                         </div>
                     </div>
                 </div>

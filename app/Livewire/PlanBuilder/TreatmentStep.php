@@ -32,6 +32,8 @@ class TreatmentStep extends Component
 
     public bool $showVisits = false;
 
+    public ?int $activeItemId = null;
+
     public int $visitCount = 2;
 
     public array $visitAssignments = [];
@@ -168,6 +170,36 @@ class TreatmentStep extends Component
     public function assignTeethToItem(int $itemId, array $teeth): void
     {
         $this->updateItem($itemId, 'tooth_positions', $teeth);
+    }
+
+    public function setActiveItem(?int $itemId): void
+    {
+        $this->activeItemId = $this->activeItemId === $itemId ? null : $itemId;
+    }
+
+    public function toggleToothForItem(string $tooth): void
+    {
+        if (! $this->activeItemId) {
+            return;
+        }
+
+        $item = TreatmentPlanItem::where('id', $this->activeItemId)
+            ->where('treatment_plan_id', $this->plan->id)
+            ->first();
+
+        if (! $item) {
+            return;
+        }
+
+        $positions = $item->tooth_positions ?? [];
+
+        if (in_array($tooth, $positions)) {
+            $positions = array_values(array_diff($positions, [$tooth]));
+        } else {
+            $positions[] = $tooth;
+        }
+
+        $this->updateItem($this->activeItemId, 'tooth_positions', $positions);
     }
 
     public function removeItem(int $itemId): void
