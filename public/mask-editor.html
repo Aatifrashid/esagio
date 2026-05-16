@@ -132,15 +132,39 @@ function toothPointToImg(tooth, pt) {
     return [bx + (pt.x / 100) * bw, by + (pt.y / 100) * bh];
 }
 
-function imgToToothPoint(tooth, ix, iy) {
+function imgToToothPoint(tooth, ix, iy, pointIndex) {
     const bx = (tooth.left / 100) * IMG_W;
     const by = (tooth.top / 100) * IMG_H;
     const bw = (tooth.width / 100) * IMG_W;
     const bh = (tooth.height / 100) * IMG_H;
     let px = ((ix - bx) / bw) * 100;
     let py = ((iy - by) / bh) * 100;
-    px = Math.max(0, Math.min(100, px));
-    py = Math.max(0, Math.min(100, py));
+    // If point goes outside bounding box, expand the box and recalculate all points
+    if (px < 0 || px > 100 || py < 0 || py > 100) {
+        // Convert all points to absolute image coords
+        const absPoints = tooth.points.map(pt => ({
+            ax: bx + (pt.x / 100) * bw,
+            ay: by + (pt.y / 100) * bh
+        }));
+        // The dragged point's new absolute position
+        if (pointIndex !== undefined) absPoints[pointIndex] = { ax: ix, ay: iy };
+        // Find new bounding box from all points with 1px padding
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        absPoints.forEach(p => { minX = Math.min(minX, p.ax); maxX = Math.max(maxX, p.ax); minY = Math.min(minY, p.ay); maxY = Math.max(maxY, p.ay); });
+        minX = Math.max(0, minX - 1); maxX = Math.min(IMG_W, maxX + 1);
+        minY = Math.max(0, minY - 1); maxY = Math.min(IMG_H, maxY + 1);
+        const newBw = maxX - minX, newBh = maxY - minY;
+        // Recalculate all points as percentages of new bounding box
+        tooth.points = absPoints.map(p => ({
+            x: Math.round(((p.ax - minX) / newBw) * 1000) / 10,
+            y: Math.round(((p.ay - minY) / newBh) * 1000) / 10
+        }));
+        tooth.left = Math.round((minX / IMG_W) * 10000) / 100;
+        tooth.top = Math.round((minY / IMG_H) * 10000) / 100;
+        tooth.width = Math.round((newBw / IMG_W) * 10000) / 100;
+        tooth.height = Math.round((newBh / IMG_H) * 10000) / 100;
+        return tooth.points[pointIndex];
+    }
     return { x: Math.round(px * 10) / 10, y: Math.round(py * 10) / 10 };
 }
 
@@ -302,7 +326,7 @@ canvas.addEventListener('mousemove', e => {
     if (isPanning) { panX = mx - panStart.x; panY = my - panStart.y; render(); return; }
     if (draggingPoint >= 0 && selectedTooth) {
         const [ix, iy] = canvasToImg(mx, my);
-        teeth[selectedTooth].points[draggingPoint] = imgToToothPoint(teeth[selectedTooth], ix, iy);
+        teeth[selectedTooth].points[draggingPoint] = imgToToothPoint(teeth[selectedTooth], ix, iy, draggingPoint);
         render();
     }
     if (bbDrag && selectedTooth) {
@@ -328,8 +352,8 @@ canvas.addEventListener('mousemove', e => {
             const absY = oldBy + (pt.y / 100) * oldBh;
             let nx = ((absX - newBx) / newBw) * 100;
             let ny = ((absY - newBy) / newBh) * 100;
-            nx = Math.max(0, Math.min(100, Math.round(nx * 10) / 10));
-            ny = Math.max(0, Math.min(100, Math.round(ny * 10) / 10));
+            nx = Math.round(nx * 10) / 10;
+            ny = Math.round(ny * 10) / 10;
             return { x: nx, y: ny };
         });
         t.left = Math.round((newBx / IMG_W) * 10000) / 100;
