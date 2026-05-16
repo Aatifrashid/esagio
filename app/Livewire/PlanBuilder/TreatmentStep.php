@@ -157,8 +157,13 @@ class TreatmentStep extends Component
 
         $item->update([$field => $value]);
 
-        if (in_array($field, ['quantity', 'unit_price'], true)) {
-            $item->update(['line_total' => $item->fresh()->quantity * $item->fresh()->unit_price]);
+        if ($field === 'tooth_positions' && is_array($value) && count($value) > 0) {
+            $item->update(['quantity' => count($value)]);
+        }
+
+        if (in_array($field, ['quantity', 'unit_price', 'tooth_positions'], true)) {
+            $fresh = $item->fresh();
+            $item->update(['line_total' => $fresh->quantity * $fresh->unit_price]);
             $this->plan->recalculateTotal();
             $this->plan->refresh();
         }
