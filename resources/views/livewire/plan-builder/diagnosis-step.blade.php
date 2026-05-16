@@ -185,7 +185,7 @@
                             @if($isMissing)
                                 <div class="absolute inset-0" style="background-color: #000000;"></div>
                             @elseif($hasConditions && $condColour)
-                                <div class="absolute inset-0" style="background-color: {{ $condColour }}; opacity: 0.55;"></div>
+                                <div class="absolute inset-0" style="background-color: {{ $condColour }}; opacity: 0.35;"></div>
                             @endif
 
                             @if($isSelected)
