@@ -360,14 +360,14 @@
                                 @if($isMissing)
                                     <div class="absolute inset-0 bg-white/70"></div>
                                 @elseif($isActiveAssigned)
-                                    <div class="absolute inset-0 bg-clinical/40"></div>
+                                    <div class="absolute inset-0" style="background: rgba(6,182,212,0.55);"></div>
                                 @elseif($isTreated)
-                                    <div class="absolute inset-0 bg-green-500/25"></div>
+                                    <div class="absolute inset-0" style="background: rgba(34,197,94,0.35);"></div>
                                 @elseif($hasDiag)
-                                    <div class="absolute inset-0 bg-amber-400/20"></div>
+                                    <div class="absolute inset-0" style="background: rgba(251,191,36,0.3);"></div>
                                 @endif
                                 @if($activeItemId && !$isActiveAssigned && !$isMissing)
-                                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-clinical/15"></div>
+                                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition" style="background: rgba(6,182,212,0.25);"></div>
                                 @endif
                             </button>
                         @endforeach
