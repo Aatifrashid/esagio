@@ -63,7 +63,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function isClinicAdmin(): bool
     {
-        return in_array($this->role, [self::ROLE_CLINIC_OWNER, self::ROLE_CLINIC_ADMIN]);
+        return in_array($this->role, [self::ROLE_CLINIC_OWNER, self::ROLE_CLINIC_ADMIN, 'admin']);
     }
 
     public function canAccessPanel(Panel $panel): bool
