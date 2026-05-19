@@ -79,8 +79,7 @@
                                 @foreach(array_slice($day['appointments'], 0, 3) as $appt)
                                     <div class="flex items-center rounded truncate shrink-0"
                                          style="font-size:10px;line-height:1.3;gap:3px;padding:2px 5px;background-color: {{ $appt['colour'] ?? '#E8663D' }}15; border-left: 2px solid {{ $appt['colour'] ?? '#E8663D' }};">
-                                        <span class="shrink-0" style="font-weight:600;color: {{ $appt['colour'] ?? '#E8663D' }}">{{ \Carbon\Carbon::parse($appt['starts_at'])->format('H:i') }}</span>
-                                        <span class="truncate" style="color: #374151;">{{ $appt['title'] }}</span>
+                                        <span class="truncate" style="color: #374151;"><span style="font-weight:600;color: {{ $appt['colour'] ?? '#E8663D' }}">{{ \Carbon\Carbon::parse($appt['starts_at'])->format('g:ia') }}</span> {{ $appt['title'] }}</span>
                                     </div>
                                 @endforeach
                                 @if(count($day['appointments']) > 3)
