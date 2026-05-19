@@ -14,9 +14,9 @@
         </div>
 
         <div class="p-6">
-            @error('connection')
-                <div class="mb-4 p-3 bg-red-900/30 border border-red-700 rounded-lg text-sm text-red-400">{{ $message }}</div>
-            @enderror
+            @if($connectionError)
+                <div class="mb-4 p-3 bg-red-900/30 border border-red-700 rounded-lg text-sm text-red-400">{{ $connectionError }}</div>
+            @endif
 
             @if(! $sessionId)
                 {{-- Not connected --}}

@@ -16,6 +16,8 @@ class WhatsappConnect extends Component
 
     public ?int $sessionId = null;
 
+    public string $connectionError = '';
+
     public function mount(): void
     {
         $this->loadSession();
@@ -35,6 +37,8 @@ class WhatsappConnect extends Component
 
     public function connect(): void
     {
+        $this->connectionError = '';
+
         try {
             $bridge = app(WhatsappBridgeService::class);
             $clinic = auth()->user()->clinic;
@@ -43,7 +47,7 @@ class WhatsappConnect extends Component
             $this->sessionId = $session->id;
             $this->sessionStatus = 'connecting';
         } catch (\Exception $e) {
-            $this->addError('connection', 'Failed to connect to WhatsApp bridge: ' . $e->getMessage());
+            $this->connectionError = 'WhatsApp bridge is not running. Please set up the bridge server first.';
         }
     }
 
