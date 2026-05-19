@@ -611,7 +611,7 @@
                             Treatment Plans
                             <span class="pv-pill" style="background: var(--surface2); color: var(--t3);">{{ $patient->treatmentPlans->count() }}</span>
                         </h3>
-                        <a href="{{ route('plan.builder', ['plan' => $patient->id]) }}" target="_blank" class="pv-btn pv-btn-purple" style="font-size: 11px; padding: 5px 12px;">+ New</a>
+                        <a href="{{ url('/dashboard/treatment-plans/create') }}" target="_blank" class="pv-btn pv-btn-purple" style="font-size: 11px; padding: 5px 12px;">+ New</a>
                     </div>
                     @forelse($patient->treatmentPlans->sortByDesc('created_at') as $plan)
                     @php $plc = ['draft' => '--t4', 'sent' => '--accent', 'accepted' => '--green', 'declined' => '--red', 'expired' => '--orange'][$plan->status] ?? '--t4'; @endphp
