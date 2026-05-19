@@ -180,7 +180,7 @@
     {{-- =================== CREATE MODAL =================== --}}
     @if($showCreateModal)
     <div class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);" wire:click.self="$set('showCreateModal', false)">
-        <div class="w-full max-w-md mx-4" style="background-color: #1F2937; border: 1px solid #374151; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+        <div class="w-full max-w-md mx-4" style="background-color: #1F2937; border: 1px solid #374151; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); overflow: hidden;">
             {{-- Header --}}
             <div class="flex items-center justify-between" style="padding: 20px 24px 16px; border-bottom: 1px solid #374151;">
                 <h3 style="font-size: 18px; font-weight: 600; color: #F9FAFB; margin: 0;">New Appointment</h3>
@@ -201,39 +201,39 @@
                 </div>
 
                 {{-- Start / End --}}
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-                    <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; overflow: hidden;">
+                    <div style="min-width: 0;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Start</label>
                         <input type="datetime-local" wire:model="startsAt"
-                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
+                            style="width: 100%; max-width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 10px; font-size: 13px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
                             onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="this.style.borderColor='#4B5563'; this.style.boxShadow='none'">
                         @error('startsAt') <span style="font-size: 12px; color: #F87171; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
                     </div>
-                    <div>
+                    <div style="min-width: 0;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">End</label>
                         <input type="datetime-local" wire:model="endsAt"
-                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
+                            style="width: 100%; max-width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 10px; font-size: 13px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
                             onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="this.style.borderColor='#4B5563'; this.style.boxShadow='none'">
                         @error('endsAt') <span style="font-size: 12px; color: #F87171; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 {{-- Type / Patient --}}
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-                    <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; overflow: hidden;">
+                    <div style="min-width: 0;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Type</label>
                         <select wire:model="appointmentType"
-                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box; appearance: auto;">
+                            style="width: 100%; max-width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 10px; font-size: 13px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box; appearance: auto;">
                             <option value="consultation">Consultation</option>
                             <option value="follow_up">Follow Up</option>
                             <option value="treatment">Treatment</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
-                    <div>
+                    <div style="min-width: 0;">
                         <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Patient</label>
                         <select wire:model="patientId"
-                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box; appearance: auto;">
+                            style="width: 100%; max-width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 10px; font-size: 13px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box; appearance: auto;">
                             <option value="">None</option>
                             @foreach($this->patients as $patient)
                                 <option value="{{ $patient->id }}">{{ $patient->first_name }} {{ $patient->last_name }}</option>
