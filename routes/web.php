@@ -76,4 +76,10 @@ Route::prefix('api/whatsapp/webhook')->name('whatsapp.webhook.')->middleware(\Ap
     Route::post('/session-status', [WhatsappWebhookController::class, 'sessionStatus'])->name('session');
 });
 
+// Temporary migration route - remove after running
+Route::get('/run-migrate-appointments', function () {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    return 'Migration complete: ' . \Illuminate\Support\Facades\Artisan::output();
+});
+
 require __DIR__.'/auth.php';
