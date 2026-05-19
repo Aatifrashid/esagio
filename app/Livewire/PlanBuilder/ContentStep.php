@@ -35,7 +35,7 @@ class ContentStep extends Component
 
     public function addSection(): void
     {
-        $nextOrder = $this->sections->max('sort_order') + 1;
+        $nextOrder = ($this->sections->max('sort_order') ?? 0) + 1;
 
         TreatmentPlanSection::create([
             'treatment_plan_id' => $this->plan->id,

@@ -5,7 +5,6 @@ namespace App\Livewire\PlanBuilder;
 use App\Models\TreatmentPlan;
 use App\Services\PlanBuilder\AutoSaveManager;
 use App\Services\PlanBuilder\BuilderStateMachine;
-use Carbon\Carbon;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -23,7 +22,7 @@ class Builder extends Component
 
     public string $saveStatus = 'saved';
 
-    public ?Carbon $lastSavedAt = null;
+    public ?string $lastSavedAt = null;
 
     public array $stepLabels = [
         1 => 'Patient',
@@ -49,7 +48,7 @@ class Builder extends Component
             'assignedTo',
         ]);
 
-        $this->lastSavedAt = $plan->updated_at;
+        $this->lastSavedAt = $plan->updated_at?->toIso8601String();
     }
 
     public function goToStep(int $step): void
@@ -82,7 +81,7 @@ class Builder extends Component
             $manager = app(AutoSaveManager::class);
             $this->plan = $manager->save($this->plan, $data ?: ['title' => $this->plan->title]);
             $this->saveStatus = 'saved';
-            $this->lastSavedAt = now();
+            $this->lastSavedAt = now()->toIso8601String();
         } catch (\Throwable $e) {
             $this->saveStatus = 'error';
         }

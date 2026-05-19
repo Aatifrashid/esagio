@@ -98,7 +98,7 @@ class TreatmentStep extends Component
     {
         $template = TreatmentTemplate::findOrFail($templateId);
 
-        $nextPosition = $this->items->max('position') + 1;
+        $nextPosition = ($this->items->max('position') ?? 0) + 1;
 
         $item = TreatmentPlanItem::create([
             'treatment_plan_id' => $this->plan->id,
@@ -128,7 +128,7 @@ class TreatmentStep extends Component
 
     public function addCustomItem(): void
     {
-        $nextPosition = $this->items->max('position') + 1;
+        $nextPosition = ($this->items->max('position') ?? 0) + 1;
 
         TreatmentPlanItem::create([
             'treatment_plan_id' => $this->plan->id,
@@ -157,13 +157,13 @@ class TreatmentStep extends Component
 
         $item->update([$field => $value]);
 
-        if ($field === 'tooth_positions' && is_array($value) && count($value) > 0) {
-            $item->update(['quantity' => count($value)]);
+        if ($field === 'tooth_positions' && is_array($value)) {
+            $item->update(['quantity' => max(1, count($value))]);
         }
 
         if (in_array($field, ['quantity', 'unit_price', 'tooth_positions'], true)) {
-            $fresh = $item->fresh();
-            $item->update(['line_total' => $fresh->quantity * $fresh->unit_price]);
+            $item->refresh();
+            $item->update(['line_total' => $item->quantity * $item->unit_price]);
             $this->plan->recalculateTotal();
             $this->plan->refresh();
         }
@@ -227,7 +227,7 @@ class TreatmentStep extends Component
             ->firstOrFail();
 
         $copy = $original->replicate();
-        $copy->position = $this->items->max('position') + 1;
+        $copy->position = ($this->items->max('position') ?? 0) + 1;
         $copy->save();
 
         $this->items = $this->plan->items()->orderBy('position')->get();

@@ -30,8 +30,7 @@ class VisualsStep extends Component
         $this->animationClips = $clipIds;
         $this->beforeAfterCases = $caseIds;
 
-        $this->availableClips = AnimationClip::where('clinic_id', $plan->clinic_id)
-            ->orWhereNull('clinic_id')
+        $this->availableClips = AnimationClip::where(fn($q) => $q->where('clinic_id', $plan->clinic_id)->orWhereNull('clinic_id'))
             ->get(['id', 'name', 'thumbnail_path', 'duration_seconds']);
 
         $this->availableCases = BeforeAfterCase::where('clinic_id', $plan->clinic_id)

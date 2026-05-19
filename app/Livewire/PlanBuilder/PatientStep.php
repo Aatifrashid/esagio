@@ -61,7 +61,7 @@ class PatientStep extends Component
 
     public function selectPatient(int $id): void
     {
-        $patient = Patient::findOrFail($id);
+        $patient = Patient::where('clinic_id', $this->plan->clinic_id)->findOrFail($id);
 
         $this->plan->update(['patient_id' => $patient->id]);
         $this->plan->refresh();
