@@ -33,6 +33,7 @@ class ClinicPanelProvider extends PanelProvider
                 'danger' => Color::hex('#dc2626'),
             ])
             ->brandName('Esagio')
+            ->darkMode(false)
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn () => view('filament.clinic.theme'),
