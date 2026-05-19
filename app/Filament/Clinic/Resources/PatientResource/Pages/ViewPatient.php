@@ -138,7 +138,7 @@ class ViewPatient extends Page
             'task_title' => 'required|string|max:255',
         ]);
 
-        $this->patient->tasks()->create([
+        $task = $this->patient->tasks()->create([
             'clinic_id' => $this->patient->clinic_id,
             'created_by' => auth()->id(),
             'assigned_to' => auth()->id(),
@@ -149,6 +149,32 @@ class ViewPatient extends Page
             'status' => 'pending',
         ]);
 
+        // Auto-create calendar appointment when task has a due date
+        $addedToCalendar = false;
+        if ($this->task_due_date) {
+            $dueDate = \Carbon\Carbon::parse($this->task_due_date);
+            \App\Models\Appointment::create([
+                'clinic_id' => $this->patient->clinic_id,
+                'patient_id' => $this->patient->id,
+                'assigned_to' => auth()->id(),
+                'created_by' => auth()->id(),
+                'title' => $this->task_title,
+                'description' => $this->task_description ?: null,
+                'starts_at' => $dueDate->copy()->setTime(9, 0),
+                'ends_at' => $dueDate->copy()->setTime(9, 30),
+                'status' => 'scheduled',
+                'type' => 'other',
+                'colour' => match ($this->task_priority) {
+                    'urgent' => '#dc2626',
+                    'high' => '#f59e0b',
+                    'medium' => '#E8663D',
+                    'low' => '#6b7280',
+                    default => '#E8663D',
+                },
+            ]);
+            $addedToCalendar = true;
+        }
+
         $this->patient->load('tasks.assignedUser');
 
         $this->task_title = '';
@@ -156,7 +182,7 @@ class ViewPatient extends Page
         $this->task_due_date = null;
         $this->task_priority = 'medium';
 
-        $this->dispatch('notify', type: 'success', message: 'Task created.');
+        $this->dispatch('notify', type: 'success', message: $addedToCalendar ? 'Task created and added to calendar.' : 'Task created.');
     }
 
     public function toggleTaskStatus(int $taskId): void
