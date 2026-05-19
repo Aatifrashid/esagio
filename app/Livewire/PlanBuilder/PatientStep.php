@@ -100,8 +100,9 @@ class PatientStep extends Component
     public function removePatient(): void
     {
         $this->plan->update(['patient_id' => null]);
+        $this->plan->refresh();
         $this->selectedPatient = null;
-        $this->dispatch('plan-updated', []);
+        $this->dispatch('plan-updated')->to(Builder::class);
     }
 
     public function render()
