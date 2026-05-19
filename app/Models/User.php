@@ -75,5 +75,10 @@ class User extends Authenticatable implements FilamentUser
         };
     }
 
+    public function patients(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Patient::class, 'assigned_to');
+    }
+
     protected static function bootBelongsToClinic(): void {}
 }
