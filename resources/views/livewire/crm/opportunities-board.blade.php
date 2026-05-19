@@ -1,10 +1,7 @@
 <div
-    x-data="opportunitiesBoard()"
-    x-init="init()"
+    x-data="opportunitiesBoard"
     class="flex flex-col h-[calc(100vh-64px)] bg-gray-900"
 >
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-
     {{-- Header bar --}}
     <div class="sticky top-0 z-10 flex items-center gap-4 px-4 py-3 border-b border-gray-700 bg-gray-900">
         {{-- Pipeline selector --}}
@@ -248,9 +245,13 @@
     @endif
 </div>
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+@endpush
+
+@script
 <script>
-function opportunitiesBoard() {
-    return {
+    Alpine.data('opportunitiesBoard', () => ({
         sortables: [],
 
         init() {
@@ -266,21 +267,22 @@ function opportunitiesBoard() {
             this.sortables.forEach(s => s.destroy());
             this.sortables = [];
 
-            const columns = document.querySelectorAll('.kanban-column');
+            const columns = this.$root.querySelectorAll('.kanban-column');
+            const wire = this.$wire;
 
             columns.forEach(column => {
                 const sortable = Sortable.create(column, {
                     group: 'opportunities',
                     animation: 150,
                     ghostClass: 'opacity-40',
-                    chosenClass: 'ring-2 ring-blue-400',
+                    chosenClass: 'ring-blue-400',
                     dragClass: 'rotate-2',
                     onEnd: (event) => {
                         const patientId = parseInt(event.item.dataset.patientId);
                         const stageId = parseInt(event.to.dataset.stageId);
 
                         if (event.from !== event.to) {
-                            @this.movePatient(patientId, stageId);
+                            wire.movePatient(patientId, stageId);
                         }
                     },
                 });
@@ -288,6 +290,6 @@ function opportunitiesBoard() {
                 this.sortables.push(sortable);
             });
         },
-    };
-}
+    }));
 </script>
+@endscript
