@@ -77,8 +77,9 @@
 
                             <div class="flex flex-col gap-0.5 mt-1 min-h-0 overflow-hidden flex-1">
                                 @foreach(array_slice($day['appointments'], 0, 3) as $appt)
-                                    <div class="flex items-center rounded truncate shrink-0"
-                                         style="font-size:10px;line-height:1.3;gap:3px;padding:2px 5px;background-color: {{ $appt['colour'] ?? '#E8663D' }}15; border-left: 2px solid {{ $appt['colour'] ?? '#E8663D' }};">
+                                    <div wire:click.stop="openEditModal({{ $appt['id'] }})" class="flex items-center rounded truncate shrink-0 cursor-pointer"
+                                         style="font-size:10px;line-height:1.3;gap:3px;padding:2px 5px;background-color: {{ $appt['colour'] ?? '#E8663D' }}15; border-left: 2px solid {{ $appt['colour'] ?? '#E8663D' }};"
+                                         onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                                         <span class="truncate" style="color: #374151;"><span style="font-weight:600;color: {{ $appt['colour'] ?? '#E8663D' }}">{{ \Carbon\Carbon::parse($appt['starts_at'])->format('g:ia') }}</span> {{ $appt['title'] }}</span>
                                     </div>
                                 @endforeach
@@ -123,8 +124,9 @@
                             return \Carbon\Carbon::parse($a['starts_at'])->format('Y-m-d') === $day['date']
                                 && \Carbon\Carbon::parse($a['starts_at'])->hour === $h;
                         }) as $appt)
-                            <div class="absolute inset-x-0.5 top-0.5 rounded px-1 py-0.5 text-[10px] leading-tight truncate z-10"
-                                 style="background-color: {{ $appt['colour'] ?? '#E8663D' }}; color: white;">
+                            <div wire:click.stop="openEditModal({{ $appt['id'] }})" class="absolute inset-x-0.5 top-0.5 rounded px-1 py-0.5 text-[10px] leading-tight truncate z-10 cursor-pointer"
+                                 style="background-color: {{ $appt['colour'] ?? '#E8663D' }}; color: white;"
+                                 onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
                                 {{ \Carbon\Carbon::parse($appt['starts_at'])->format('H:i') }} {{ $appt['title'] }}
                             </div>
                         @endforeach
@@ -165,8 +167,9 @@
                             return \Carbon\Carbon::parse($a['starts_at'])->format('Y-m-d') === $dayDate->format('Y-m-d')
                                 && \Carbon\Carbon::parse($a['starts_at'])->hour === $h;
                         }) as $appt)
-                            <div class="absolute inset-x-1 top-0.5 rounded-md px-2 py-1 text-xs z-10 shadow-sm"
-                                 style="background-color: {{ $appt['colour'] ?? '#E8663D' }}; color: white;">
+                            <div wire:click.stop="openEditModal({{ $appt['id'] }})" class="absolute inset-x-1 top-0.5 rounded-md px-2 py-1 text-xs z-10 shadow-sm cursor-pointer"
+                                 style="background-color: {{ $appt['colour'] ?? '#E8663D' }}; color: white;"
+                                 onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
                                 <span class="font-medium">{{ \Carbon\Carbon::parse($appt['starts_at'])->format('H:i') }} - {{ \Carbon\Carbon::parse($appt['ends_at'])->format('H:i') }}</span>
                                 <span class="ml-1">{{ $appt['title'] }}</span>
                             </div>
@@ -184,14 +187,14 @@
         <div class="w-full max-w-md mx-4" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); overflow: hidden;">
             {{-- Header --}}
             <div class="flex items-center justify-between" style="padding: 20px 24px 16px; border-bottom: 1px solid #e5e7eb;">
-                <h3 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0;">New Appointment</h3>
+                <h3 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0;">{{ $editingAppointmentId ? 'Edit Appointment' : 'New Appointment' }}</h3>
                 <button wire:click="$set('showCreateModal', false)" style="padding: 6px; border-radius: 6px; color: #9CA3AF; background: none; border: none; cursor: pointer; display: flex;" onmouseover="this.style.color='#1a1a1a'" onmouseout="this.style.color='#9CA3AF'">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
             {{-- Form --}}
-            <form wire:submit="createAppointment" style="padding: 24px;">
+            <form wire:submit="{{ $editingAppointmentId ? 'updateAppointment' : 'createAppointment' }}" style="padding: 24px;">
                 {{-- Title --}}
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 6px;">Title</label>
@@ -281,17 +284,28 @@
                 </div>
 
                 {{-- Actions --}}
-                <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 4px;">
-                    <button type="button" wire:click="$set('showCreateModal', false)"
-                        style="padding: 10px 20px; font-size: 14px; font-weight: 500; color: #6b7280; background: none; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer;"
-                        onmouseover="this.style.color='#1a1a1a'; this.style.borderColor='#d1d5db'" onmouseout="this.style.color='#6b7280'; this.style.borderColor='#e5e7eb'">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                        style="padding: 10px 24px; font-size: 14px; font-weight: 500; color: #fff; background: #E8663D; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
-                        onmouseover="this.style.background='#d4572f'" onmouseout="this.style.background='#E8663D'">
-                        Save
-                    </button>
+                <div style="display: flex; justify-content: space-between; padding-top: 4px;">
+                    @if($editingAppointmentId)
+                        <button type="button" wire:click="deleteAppointment" wire:confirm="Are you sure you want to delete this appointment?"
+                            style="padding: 10px 20px; font-size: 14px; font-weight: 500; color: #dc2626; background: none; border: 1px solid #fecaca; border-radius: 10px; cursor: pointer;"
+                            onmouseover="this.style.background='#fef2f2'; this.style.borderColor='#dc2626'" onmouseout="this.style.background='none'; this.style.borderColor='#fecaca'">
+                            Delete
+                        </button>
+                    @else
+                        <div></div>
+                    @endif
+                    <div style="display: flex; gap: 12px;">
+                        <button type="button" wire:click="$set('showCreateModal', false)"
+                            style="padding: 10px 20px; font-size: 14px; font-weight: 500; color: #6b7280; background: none; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer;"
+                            onmouseover="this.style.color='#1a1a1a'; this.style.borderColor='#d1d5db'" onmouseout="this.style.color='#6b7280'; this.style.borderColor='#e5e7eb'">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            style="padding: 10px 24px; font-size: 14px; font-weight: 500; color: #fff; background: #E8663D; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
+                            onmouseover="this.style.background='#d4572f'" onmouseout="this.style.background='#E8663D'">
+                            {{ $editingAppointmentId ? 'Update' : 'Save' }}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

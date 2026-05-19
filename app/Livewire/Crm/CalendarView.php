@@ -28,6 +28,7 @@ class CalendarView extends Component
     public string $appointmentType = 'consultation';
     public string $description = '';
     public ?int $assignedTo = null;
+    public ?int $editingAppointmentId = null;
 
     public function mount(): void
     {
@@ -159,6 +160,71 @@ class CalendarView extends Component
         $this->loadAppointments();
     }
 
+    public function openEditModal(int $id): void
+    {
+        $appointment = Appointment::where('clinic_id', auth()->user()->clinic_id)->findOrFail($id);
+
+        $this->resetForm();
+        $this->editingAppointmentId = $appointment->id;
+        $this->title = $appointment->title;
+        $this->startsAt = $appointment->starts_at->format('Y-m-d\TH:i');
+        $this->endsAt = $appointment->ends_at->format('Y-m-d\TH:i');
+        $this->appointmentType = $appointment->type ?? 'consultation';
+        $this->description = $appointment->description ?? '';
+        $this->assignedTo = $appointment->assigned_to;
+
+        if ($appointment->patient_id) {
+            $patient = Patient::find($appointment->patient_id);
+            if ($patient) {
+                $this->patientId = $patient->id;
+                $this->patientName = $patient->first_name . ' ' . $patient->last_name;
+            }
+        }
+
+        $this->showCreateModal = true;
+    }
+
+    public function updateAppointment(): void
+    {
+        $this->validate([
+            'title' => 'required|string|max:255',
+            'startsAt' => 'required|date',
+            'endsAt' => 'required|date|after:startsAt',
+            'appointmentType' => 'required|in:consultation,follow_up,treatment,other',
+            'patientId' => 'nullable|exists:patients,id',
+        ]);
+
+        $appointment = Appointment::where('clinic_id', auth()->user()->clinic_id)
+            ->findOrFail($this->editingAppointmentId);
+
+        $appointment->update([
+            'title' => $this->title,
+            'patient_id' => $this->patientId ?: null,
+            'assigned_to' => $this->assignedTo ?: auth()->id(),
+            'description' => $this->description ?: null,
+            'starts_at' => Carbon::parse($this->startsAt),
+            'ends_at' => Carbon::parse($this->endsAt),
+            'type' => $this->appointmentType,
+        ]);
+
+        $this->showCreateModal = false;
+        $this->resetForm();
+        $this->loadAppointments();
+    }
+
+    public function deleteAppointment(): void
+    {
+        if ($this->editingAppointmentId) {
+            Appointment::where('clinic_id', auth()->user()->clinic_id)
+                ->where('id', $this->editingAppointmentId)
+                ->delete();
+
+            $this->showCreateModal = false;
+            $this->resetForm();
+            $this->loadAppointments();
+        }
+    }
+
     public function selectPatient(int $id): void
     {
         $patient = Patient::find($id);
@@ -194,6 +260,7 @@ class CalendarView extends Component
 
     private function resetForm(): void
     {
+        $this->editingAppointmentId = null;
         $this->title = '';
         $this->patientId = null;
         $this->patientSearch = '';
