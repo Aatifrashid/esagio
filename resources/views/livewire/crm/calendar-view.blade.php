@@ -179,36 +179,51 @@
 
     {{-- =================== CREATE MODAL =================== --}}
     @if($showCreateModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" wire:click.self="$set('showCreateModal', false)">
-        <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 border border-gray-700">
-            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-700">
-                <h3 class="text-lg font-semibold text-white">New Appointment</h3>
-                <button wire:click="$set('showCreateModal', false)" class="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    <div class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);" wire:click.self="$set('showCreateModal', false)">
+        <div class="w-full max-w-md mx-4" style="background-color: #1F2937; border: 1px solid #374151; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            {{-- Header --}}
+            <div class="flex items-center justify-between" style="padding: 20px 24px 16px; border-bottom: 1px solid #374151;">
+                <h3 style="font-size: 18px; font-weight: 600; color: #F9FAFB; margin: 0;">New Appointment</h3>
+                <button wire:click="$set('showCreateModal', false)" style="padding: 6px; border-radius: 6px; color: #9CA3AF; background: none; border: none; cursor: pointer; display: flex;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9CA3AF'">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <form wire:submit="createAppointment" class="p-5 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Title</label>
-                    <input type="text" wire:model="title" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Add a title" autofocus>
-                    @error('title') <span class="text-xs text-red-400 mt-1">{{ $message }}</span> @enderror
+
+            {{-- Form --}}
+            <form wire:submit="createAppointment" style="padding: 24px;">
+                {{-- Title --}}
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Title</label>
+                    <input type="text" wire:model="title" placeholder="Add a title" autofocus
+                        style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
+                        onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="this.style.borderColor='#4B5563'; this.style.boxShadow='none'">
+                    @error('title') <span style="font-size: 12px; color: #F87171; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+
+                {{-- Start / End --}}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Start</label>
-                        <input type="datetime-local" wire:model="startsAt" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style="color-scheme: dark;">
-                        @error('startsAt') <span class="text-xs text-red-400 mt-1">{{ $message }}</span> @enderror
+                        <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Start</label>
+                        <input type="datetime-local" wire:model="startsAt"
+                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
+                            onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="this.style.borderColor='#4B5563'; this.style.boxShadow='none'">
+                        @error('startsAt') <span style="font-size: 12px; color: #F87171; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">End</label>
-                        <input type="datetime-local" wire:model="endsAt" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style="color-scheme: dark;">
-                        @error('endsAt') <span class="text-xs text-red-400 mt-1">{{ $message }}</span> @enderror
+                        <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">End</label>
+                        <input type="datetime-local" wire:model="endsAt"
+                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
+                            onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="this.style.borderColor='#4B5563'; this.style.boxShadow='none'">
+                        @error('endsAt') <span style="font-size: 12px; color: #F87171; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+
+                {{-- Type / Patient --}}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Type</label>
-                        <select wire:model="appointmentType" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style="color-scheme: dark;">
+                        <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Type</label>
+                        <select wire:model="appointmentType"
+                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box; appearance: auto;">
                             <option value="consultation">Consultation</option>
                             <option value="follow_up">Follow Up</option>
                             <option value="treatment">Treatment</option>
@@ -216,8 +231,9 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Patient</label>
-                        <select wire:model="patientId" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style="color-scheme: dark;">
+                        <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Patient</label>
+                        <select wire:model="patientId"
+                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box; appearance: auto;">
                             <option value="">None</option>
                             @foreach($this->patients as $patient)
                                 <option value="{{ $patient->id }}">{{ $patient->first_name }} {{ $patient->last_name }}</option>
@@ -225,13 +241,27 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Notes</label>
-                    <textarea wire:model="description" rows="2" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Add description..."></textarea>
+
+                {{-- Notes --}}
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Notes</label>
+                    <textarea wire:model="description" rows="3" placeholder="Add description..."
+                        style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box; resize: vertical;"
+                        onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="this.style.borderColor='#4B5563'; this.style.boxShadow='none'"></textarea>
                 </div>
-                <div class="flex justify-end gap-2 pt-1">
-                    <button type="button" wire:click="$set('showCreateModal', false)" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg hover:bg-gray-700 transition-colors">Cancel</button>
-                    <button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Save</button>
+
+                {{-- Actions --}}
+                <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 4px;">
+                    <button type="button" wire:click="$set('showCreateModal', false)"
+                        style="padding: 10px 20px; font-size: 14px; font-weight: 500; color: #9CA3AF; background: none; border: 1px solid #4B5563; border-radius: 10px; cursor: pointer;"
+                        onmouseover="this.style.color='#fff'; this.style.borderColor='#6B7280'" onmouseout="this.style.color='#9CA3AF'; this.style.borderColor='#4B5563'">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        style="padding: 10px 24px; font-size: 14px; font-weight: 500; color: #fff; background-color: #2563EB; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.3);"
+                        onmouseover="this.style.backgroundColor='#1D4ED8'" onmouseout="this.style.backgroundColor='#2563EB'">
+                        Save
+                    </button>
                 </div>
             </form>
         </div>
