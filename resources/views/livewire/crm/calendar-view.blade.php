@@ -66,11 +66,11 @@
                         >
                             {{-- Day number --}}
                             @if($day['isToday'])
-                                <span class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold bg-blue-600 text-white rounded-full shrink-0">
+                                <span class="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white rounded-full shrink-0" style="background-color: #2563EB;">
                                     {{ $day['dayNumber'] }}
                                 </span>
                             @else
-                                <span class="inline-flex items-center justify-center w-8 h-8 text-sm font-medium {{ $day['isCurrentMonth'] ? 'text-gray-200' : 'text-gray-600' }} shrink-0">
+                                <span class="inline-flex items-center justify-center w-8 h-8 text-sm font-medium shrink-0" style="color: {{ $day['isCurrentMonth'] ? '#E5E7EB' : '#4B5563' }};">
                                     {{ $day['dayNumber'] }}
                                 </span>
                             @endif
