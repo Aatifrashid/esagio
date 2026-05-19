@@ -21,27 +21,12 @@
                     </div>
                 </div>
 
-                {{-- Quick action buttons --}}
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                    @if($patient->phone)
-                    <a href="tel:{{ $patient->phone }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background-color: #374151; border-radius: 8px; color: #D1D5DB; font-size: 12px; text-decoration: none; border: 1px solid #4B5563;" onmouseover="this.style.backgroundColor='#4B5563'" onmouseout="this.style.backgroundColor='#374151'">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        Call
-                    </a>
-                    @endif
-                    @if($patient->email)
-                    <a href="mailto:{{ $patient->email }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background-color: #374151; border-radius: 8px; color: #D1D5DB; font-size: 12px; text-decoration: none; border: 1px solid #4B5563;" onmouseover="this.style.backgroundColor='#4B5563'" onmouseout="this.style.backgroundColor='#374151'">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        Email
-                    </a>
-                    @endif
-                    @if($patient->whatsapp_number)
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $patient->whatsapp_number) }}" target="_blank" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background-color: #374151; border-radius: 8px; color: #D1D5DB; font-size: 12px; text-decoration: none; border: 1px solid #4B5563;" onmouseover="this.style.backgroundColor='#4B5563'" onmouseout="this.style.backgroundColor='#374151'">
-                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.558 4.143 1.534 5.883L.053 23.71l5.964-1.567A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-2.02 0-3.935-.547-5.591-1.498l-.4-.238-3.538.93.944-3.452-.26-.414A9.81 9.81 0 012.18 12c0-5.424 4.396-9.82 9.82-9.82 5.424 0 9.82 4.396 9.82 9.82 0 5.424-4.396 9.82-9.82 9.82z"/></svg>
-                        WhatsApp
-                    </a>
-                    @endif
-                </div>
+                {{-- Send Message button --}}
+                <a href="{{ url('/dashboard/conversations') }}" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background-color: #3B82F6; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 16px;"
+                   onmouseover="this.style.backgroundColor='#2563EB'" onmouseout="this.style.backgroundColor='#3B82F6'">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    Send Message
+                </a>
 
                 {{-- Status badge --}}
                 <div style="margin-bottom: 12px;">
