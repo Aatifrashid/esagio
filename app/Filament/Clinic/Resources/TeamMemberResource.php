@@ -71,9 +71,9 @@ class TeamMemberResource extends Resource
                     ->options([
                         'clinic_owner' => 'Clinic Owner — Full access to everything',
                         'clinic_admin' => 'Admin — Manage patients, team, settings',
-                        'dentist' => 'Dentist — View & manage assigned patients',
-                        'treatment_coordinator' => 'Coordinator — Manage leads, plans, follow-ups',
-                        'viewer' => 'Viewer — Read-only access',
+                        'sales_staff' => 'Sales Staff — Manage assigned leads, patients & deals',
+                        'dentist' => 'Dentist — View & manage assigned patients only',
+                        'viewer' => 'Viewer — Read-only access to assigned data',
                     ])
                     ->required()
                     ->native(false),
@@ -102,16 +102,17 @@ class TeamMemberResource extends Resource
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'clinic_owner' => 'Owner',
                         'clinic_admin' => 'Admin',
+                        'sales_staff' => 'Sales Staff',
                         'dentist' => 'Dentist',
-                        'treatment_coordinator' => 'Coordinator',
+                        'treatment_coordinator' => 'Sales Staff', // legacy
                         'viewer' => 'Viewer',
                         default => ucfirst($state),
                     })
                     ->color(fn (string $state) => match ($state) {
                         'clinic_owner' => 'danger',
                         'clinic_admin' => 'warning',
+                        'sales_staff', 'treatment_coordinator' => 'success',
                         'dentist' => 'info',
-                        'treatment_coordinator' => 'success',
                         'viewer' => 'gray',
                         default => 'gray',
                     }),

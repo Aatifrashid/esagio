@@ -50,4 +50,9 @@ class UserFactory extends Factory
     {
         return $this->state(['role' => User::ROLE_TREATMENT_COORDINATOR]);
     }
+
+    public function salesStaff(): static
+    {
+        return $this->state(['role' => User::ROLE_SALES_STAFF]);
+    }
 }

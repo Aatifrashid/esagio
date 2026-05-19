@@ -28,7 +28,7 @@ class UserResource extends Resource
                         'clinic_owner' => 'Clinic Owner',
                         'clinic_admin' => 'Clinic Admin',
                         'dentist' => 'Dentist',
-                        'treatment_coordinator' => 'Treatment Coordinator',
+                        'sales_staff' => 'Sales Staff',
                         'viewer' => 'Viewer',
                     ])
                     ->required(),
@@ -50,7 +50,7 @@ class UserResource extends Resource
                         'warning' => 'clinic_owner',
                         'primary' => 'clinic_admin',
                         'success' => 'dentist',
-                        'secondary' => fn ($state) => in_array($state, ['treatment_coordinator', 'viewer']),
+                        'secondary' => fn ($state) => in_array($state, ['sales_staff', 'treatment_coordinator', 'viewer']),
                     ]),
                 Tables\Columns\IconColumn::make('is_active')->label('Active')->boolean(),
                 Tables\Columns\TextColumn::make('last_login_at')
@@ -65,7 +65,7 @@ class UserResource extends Resource
                         'clinic_owner' => 'Clinic Owner',
                         'clinic_admin' => 'Clinic Admin',
                         'dentist' => 'Dentist',
-                        'treatment_coordinator' => 'Treatment Coordinator',
+                        'sales_staff' => 'Sales Staff',
                         'viewer' => 'Viewer',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),

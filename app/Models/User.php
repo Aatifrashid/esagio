@@ -24,7 +24,8 @@ class User extends Authenticatable implements FilamentUser
 
     public const ROLE_DENTIST = 'dentist';
 
-    public const ROLE_TREATMENT_COORDINATOR = 'treatment_coordinator';
+    public const ROLE_TREATMENT_COORDINATOR = 'treatment_coordinator'; // legacy
+    public const ROLE_SALES_STAFF = 'sales_staff';
 
     public const ROLE_VIEWER = 'viewer';
 
@@ -64,6 +65,21 @@ class User extends Authenticatable implements FilamentUser
     public function isClinicAdmin(): bool
     {
         return in_array($this->role, [self::ROLE_CLINIC_OWNER, self::ROLE_CLINIC_ADMIN, 'admin']);
+    }
+
+    public function isSalesStaff(): bool
+    {
+        return in_array($this->role, [self::ROLE_SALES_STAFF, self::ROLE_TREATMENT_COORDINATOR]);
+    }
+
+    public function isRestrictedRole(): bool
+    {
+        return in_array($this->role, [
+            self::ROLE_DENTIST,
+            self::ROLE_SALES_STAFF,
+            self::ROLE_TREATMENT_COORDINATOR,
+            self::ROLE_VIEWER,
+        ]);
     }
 
     public function canAccessPanel(Panel $panel): bool
