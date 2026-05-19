@@ -21,6 +21,7 @@ class CalendarView extends Component
     // Form fields
     public string $title = '';
     public ?int $patientId = null;
+    public string $patientSearch = '';
     public string $startsAt = '';
     public string $endsAt = '';
     public string $appointmentType = 'consultation';
@@ -157,10 +158,35 @@ class CalendarView extends Component
         $this->loadAppointments();
     }
 
+    public function selectPatient(int $id, string $name): void
+    {
+        $this->patientId = $id;
+        $this->patientSearch = '';
+    }
+
+    #[Computed]
+    public function patientResults(): Collection
+    {
+        if (strlen($this->patientSearch) < 1) {
+            return collect();
+        }
+
+        return Patient::where('clinic_id', auth()->user()->clinic_id)
+            ->where(function ($q) {
+                $q->where('first_name', 'like', '%' . $this->patientSearch . '%')
+                  ->orWhere('last_name', 'like', '%' . $this->patientSearch . '%')
+                  ->orWhere('email', 'like', '%' . $this->patientSearch . '%');
+            })
+            ->orderBy('first_name')
+            ->limit(10)
+            ->get(['id', 'first_name', 'last_name', 'email']);
+    }
+
     private function resetForm(): void
     {
         $this->title = '';
         $this->patientId = null;
+        $this->patientSearch = '';
         $this->startsAt = '';
         $this->endsAt = '';
         $this->appointmentType = 'consultation';
