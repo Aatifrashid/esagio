@@ -205,33 +205,58 @@
                 </div>
             </div>
 
+            {{-- Condition palette (always visible) --}}
+            <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-800">Conditions</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            @if($activeCondition)
+                                Paint mode: click teeth to apply <strong>{{ collect($availableConditions)->firstWhere('code', $activeCondition)['label'] ?? $activeCondition }}</strong>
+                            @elseif(count($selectedTeeth) > 0)
+                                {{ count($selectedTeeth) }} {{ count($selectedTeeth) === 1 ? 'tooth' : 'teeth' }} selected — click a condition to apply
+                            @else
+                                Select a condition first, then click teeth to paint — or select teeth first
+                            @endif
+                        </p>
+                    </div>
+                    @if($activeCondition)
+                        <button wire:click="selectCondition('{{ $activeCondition }}')" class="text-xs text-red-500 hover:text-red-700 font-medium transition">Exit paint mode</button>
+                    @elseif(count($selectedTeeth) > 0)
+                        <button wire:click="clearSelectedTeeth" class="text-xs text-gray-400 hover:text-gray-600 transition">Clear selection</button>
+                    @endif
+                </div>
+
+                {{-- Condition buttons --}}
+                <div class="flex flex-wrap gap-1.5">
+                    @foreach($availableConditions as $condition)
+                        <button wire:click="selectCondition('{{ $condition['code'] }}')"
+                                draggable="true"
+                                x-on:dragstart="dragging = '{{ $condition['code'] }}'"
+                                x-on:dragend="dragging = null"
+                                class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg border transition cursor-pointer shadow-sm active:scale-95
+                                    {{ $activeCondition === $condition['code'] ? 'ring-2 ring-offset-1 border-gray-400 bg-gray-100 font-bold' : 'border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300' }} text-gray-700"
+                                @if($activeCondition === $condition['code']) style="ring-color: {{ $condition['colour'] }};" @endif>
+                            <span class="w-2.5 h-2.5 rounded-full flex-none" style="background-color: {{ $condition['colour'] }}"></span>
+                            {{ $condition['label'] }}
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
             {{-- Selected teeth detail panel --}}
             @if(count($selectedTeeth) > 0)
-                <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-800">
-                                {{ count($selectedTeeth) === 1 ? 'Tooth ' . $selectedTeeth[0] : count($selectedTeeth) . ' teeth selected' }}
-                            </h3>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                                @if(count($selectedTeeth) > 1)
-                                    {{ implode(', ', array_slice($selectedTeeth, 0, 8)) }}{{ count($selectedTeeth) > 8 ? '...' : '' }}
-                                @else
-                                    Choose a condition below to apply
-                                @endif
-                            </p>
-                        </div>
-                        <button wire:click="clearSelectedTeeth" class="text-xs text-gray-400 hover:text-gray-600 transition">Clear selection</button>
-                    </div>
-
-                    @php
-                        $selectedConditions = collect($selectedTeeth)
-                            ->flatMap(fn ($t) => collect($toothChartData[$t]['conditions'] ?? [])
-                                ->map(fn ($c) => ['tooth' => $t, 'code' => $c]))
-                            ->all();
-                    @endphp
-                    @if(count($selectedConditions) > 0)
-                        <div class="flex flex-wrap gap-1 mb-4">
+                @php
+                    $fdiToUni = [18=>1,17=>2,16=>3,15=>4,14=>5,13=>6,12=>7,11=>8,21=>9,22=>10,23=>11,24=>12,25=>13,26=>14,27=>15,28=>16,38=>17,37=>18,36=>19,35=>20,34=>21,33=>22,32=>23,31=>24,41=>25,42=>26,43=>27,44=>28,45=>29,46=>30,47=>31,48=>32];
+                    $selectedConditions = collect($selectedTeeth)
+                        ->flatMap(fn ($t) => collect($toothChartData[$t]['conditions'] ?? [])
+                            ->map(fn ($c) => ['tooth' => $t, 'code' => $c]))
+                        ->all();
+                @endphp
+                @if(count($selectedConditions) > 0)
+                    <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Applied conditions</h4>
+                        <div class="flex flex-wrap gap-1">
                             @foreach($selectedConditions as $sc)
                                 @php
                                     $condLabel = $sc['code'];
@@ -239,7 +264,6 @@
                                     foreach ($availableConditions as $ac) {
                                         if ($ac['code'] === $sc['code']) { $condLabel = $ac['label']; $condColour = $ac['colour']; break; }
                                     }
-                                    $fdiToUni = [18=>1,17=>2,16=>3,15=>4,14=>5,13=>6,12=>7,11=>8,21=>9,22=>10,23=>11,24=>12,25=>13,26=>14,27=>15,28=>16,38=>17,37=>18,36=>19,35=>20,34=>21,33=>22,32=>23,31=>24,41=>25,42=>26,43=>27,44=>28,45=>29,46=>30,47=>31,48=>32];
                                     $uniNum = $fdiToUni[(int)$sc['tooth']] ?? $sc['tooth'];
                                 @endphp
                                 <span class="inline-flex items-center gap-1 text-xs font-medium pl-1.5 pr-1 py-0.5 rounded-md text-white" style="background-color: {{ $condColour }}">
@@ -251,22 +275,8 @@
                                 </span>
                             @endforeach
                         </div>
-                    @endif
-
-                    {{-- Condition palette --}}
-                    <div class="flex flex-wrap gap-1.5">
-                        @foreach($availableConditions as $condition)
-                            <button wire:click="applyConditionToTeeth('{{ $condition['code'] }}')"
-                                    draggable="true"
-                                    x-on:dragstart="dragging = '{{ $condition['code'] }}'"
-                                    x-on:dragend="dragging = null"
-                                    class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-gray-700 transition cursor-pointer shadow-sm active:scale-95">
-                                <span class="w-2.5 h-2.5 rounded-full flex-none" style="background-color: {{ $condition['colour'] }}"></span>
-                                {{ $condition['label'] }}
-                            </button>
-                        @endforeach
                     </div>
-                </div>
+                @endif
             @endif
 
             {{-- Diagnosis Summary Table (BrightPlans style) --}}
