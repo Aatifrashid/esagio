@@ -29,7 +29,8 @@ class ClinicPanelProvider extends PanelProvider
             ->path('dashboard')
             ->authGuard('web')
             ->colors([
-                'primary' => Color::hex('#0A2540'),
+                'primary' => Color::hex('#E8663D'),
+                'danger' => Color::hex('#dc2626'),
             ])
             ->brandName('Esagio')
             ->renderHook(
