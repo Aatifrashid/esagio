@@ -8,13 +8,13 @@ class Inbox extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    protected static ?string $navigationLabel = 'Inbox';
+    protected static ?string $navigationLabel = 'Conversations';
 
     protected static ?string $title = 'Conversations';
 
-    protected static ?string $navigationGroup = 'CRM';
+    protected static ?string $navigationGroup = null;
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 2;
 
     protected static string $view = 'filament.clinic.pages.inbox';
 

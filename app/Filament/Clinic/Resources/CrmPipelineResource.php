@@ -16,11 +16,11 @@ class CrmPipelineResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-funnel';
 
-    protected static ?string $navigationGroup = 'CRM';
+    protected static ?string $navigationGroup = 'Clinic Setup';
 
-    protected static ?string $navigationLabel = 'Pipelines';
+    protected static ?string $navigationLabel = 'Pipeline Settings';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {
