@@ -49,7 +49,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
                 <span class="text-white/60">
-                    Saved {{ $lastSavedAt?->diffForHumans() }}
+                    Saved {{ $lastSavedAt ? \Carbon\Carbon::parse($lastSavedAt)->diffForHumans() : '' }}
                 </span>
             @else
                 <svg class="h-3.5 w-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
