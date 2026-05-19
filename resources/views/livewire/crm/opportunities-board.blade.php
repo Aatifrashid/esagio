@@ -12,9 +12,10 @@
             wire:model.live="selectedPipelineId"
             wire:change="switchPipeline($event.target.value)"
             class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
+            style="color-scheme: dark;"
         >
             @foreach ($pipelines as $pipeline)
-                <option value="{{ $pipeline['id'] }}">{{ $pipeline['name'] }}</option>
+                <option value="{{ $pipeline['id'] }}" class="bg-gray-800 text-white">{{ $pipeline['name'] }}</option>
             @endforeach
         </select>
 
@@ -109,7 +110,7 @@
                     >
                         @forelse ($patients as $patient)
                             @php
-                                $daysInStage = \Carbon\Carbon::parse($patient['updated_at'])->diffInDays(now());
+                                $daysInStage = (int) \Carbon\Carbon::parse($patient['updated_at'])->diffInDays(now());
                             @endphp
                             <div
                                 class="bg-gray-800 rounded-lg p-3 border border-gray-700 cursor-grab active:cursor-grabbing select-none hover:border-gray-500 transition-colors"
@@ -216,7 +217,7 @@
                     @foreach ($stages as $stage)
                         @foreach ($stage['patients'] ?? [] as $patient)
                             @php
-                                $daysInStage = \Carbon\Carbon::parse($patient['updated_at'])->diffInDays(now());
+                                $daysInStage = (int) \Carbon\Carbon::parse($patient['updated_at'])->diffInDays(now());
                             @endphp
                             <tr class="border-b border-gray-700 hover:bg-gray-800/50 transition-colors">
                                 <td class="px-4 py-3 text-white font-medium">
