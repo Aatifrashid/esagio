@@ -68,11 +68,4 @@ Route::middleware('auth')->prefix('gdpr')->name('gdpr.')->group(function () {
     Route::delete('/patient/{patient}', [GdprController::class, 'delete'])->name('delete');
 });
 
-// Temporary: run migrations via web (remove after use)
-Route::get('/run-migrations', function () {
-    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-
-    return '<pre>'.Artisan::output().'</pre>';
-})->middleware('auth');
-
 require __DIR__.'/auth.php';
