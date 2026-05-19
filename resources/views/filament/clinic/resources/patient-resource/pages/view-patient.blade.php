@@ -5,50 +5,21 @@
         .fi-body-content { padding: 0 !important; }
         .fi-page > .fi-page-content-ctn > div { gap: 0 !important; }
 
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        .pv * { font-family: 'Lexend Deca', -apple-system, BlinkMacSystemFont, sans-serif; box-sizing: border-box; margin: 0; }
 
-        .pv * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; box-sizing: border-box; margin: 0; }
-
-        /* Dark (default) */
         .pv {
-            --bg: #111827;
-            --surface: #1f2937;
-            --surface2: #283141;
-            --border: #374151;
-            --border-light: #2d3748;
-            --t1: #f9fafb;
-            --t2: #d1d5db;
-            --t3: #9ca3af;
-            --t4: #6b7280;
-            --accent: #3b82f6;
-            --accent-h: #2563eb;
-            --accent-bg: rgba(59,130,246,0.12);
-            --green: #10b981;
-            --green-bg: rgba(16,185,129,0.12);
-            --orange: #f59e0b;
-            --orange-bg: rgba(245,158,11,0.12);
-            --red: #ef4444;
-            --red-bg: rgba(239,68,68,0.12);
-            --purple: #8b5cf6;
-            --purple-bg: rgba(139,92,246,0.12);
-            --input-bg: #111827;
-            --scheme: dark;
-        }
-
-        /* Light */
-        .pv.light {
-            --bg: #f3f4f6;
+            --bg: #f5f5f5;
             --surface: #ffffff;
             --surface2: #f9fafb;
             --border: #e5e7eb;
-            --border-light: #f3f4f6;
-            --t1: #111827;
+            --border-light: #f0f0f0;
+            --t1: #1a1a1a;
             --t2: #374151;
             --t3: #6b7280;
             --t4: #9ca3af;
-            --accent: #2563eb;
-            --accent-h: #1d4ed8;
-            --accent-bg: rgba(37,99,235,0.08);
+            --accent: #E8663D;
+            --accent-h: #d4572f;
+            --accent-bg: rgba(232,102,61,0.08);
             --green: #059669;
             --green-bg: rgba(5,150,105,0.08);
             --orange: #d97706;
@@ -63,7 +34,7 @@
 
         /* Inputs */
         .pv input, .pv textarea, .pv select {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Lexend Deca', sans-serif;
             color-scheme: var(--scheme);
         }
 
@@ -71,8 +42,7 @@
             padding: 10px 16px;
             border-bottom: 1px solid var(--border-light);
         }
-        .pv-field:hover { background: rgba(255,255,255,0.02); }
-        .pv.light .pv-field:hover { background: rgba(0,0,0,0.015); }
+        .pv-field:hover { background: rgba(0,0,0,0.015); }
 
         .pv-field label {
             display: block;
@@ -212,8 +182,7 @@
             transition: background 0.1s;
         }
         .pv-item:last-child { border-bottom: none; }
-        .pv-item:hover { background: rgba(255,255,255,0.02); }
-        .pv.light .pv-item:hover { background: rgba(0,0,0,0.015); }
+        .pv-item:hover { background: rgba(0,0,0,0.015); }
 
         /* Buttons */
         .pv-btn {
@@ -267,33 +236,6 @@
         }
         .pv-icon-btn:hover { background: var(--red-bg); color: var(--red); }
 
-        /* Toggle */
-        .pv-theme-toggle {
-            width: 40px;
-            height: 22px;
-            border-radius: 11px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .pv-theme-toggle::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--t3);
-            top: 2px;
-            left: 2px;
-            transition: all 0.2s;
-        }
-        .pv.light .pv-theme-toggle::after {
-            transform: translateX(18px);
-            background: var(--accent);
-        }
 
         /* Empty state */
         .pv-empty {
@@ -339,7 +281,6 @@
                     </a>
                     <span style="font-size: 14px; font-weight: 600; color: var(--t1);">Contact Details</span>
                 </div>
-                <div class="pv-theme-toggle" onclick="document.getElementById('pvRoot').classList.toggle('light'); localStorage.setItem('pv-theme', document.getElementById('pvRoot').classList.contains('light') ? 'light' : 'dark');" title="Toggle theme"></div>
             </div>
 
             {{-- Scrollable fields --}}
@@ -347,7 +288,7 @@
 
                 {{-- Contact card --}}
                 <div style="padding: 20px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #E8663D, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;">
                         {{ strtoupper(substr($patient->first_name, 0, 1)) }}{{ strtoupper(substr($patient->last_name, 0, 1)) }}
                     </div>
                     <div style="min-width: 0;">
@@ -487,7 +428,7 @@
             {{-- Top bar --}}
             <div style="padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--surface);">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #E8663D, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;">
                         {{ strtoupper(substr($patient->first_name, 0, 1)) }}{{ strtoupper(substr($patient->last_name, 0, 1)) }}
                     </div>
                     <div>
@@ -688,9 +629,4 @@
         </div>
     </div>
 
-    <script>
-        if (localStorage.getItem('pv-theme') === 'light') {
-            document.getElementById('pvRoot').classList.add('light');
-        }
-    </script>
 </x-filament-panels::page>
