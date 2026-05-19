@@ -245,9 +245,9 @@
     @endif
 </div>
 
-@push('scripts')
+@assets
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-@endpush
+@endassets
 
 @script
 <script>
@@ -263,7 +263,6 @@
         },
 
         setupSortable() {
-            // Destroy existing sortables
             this.sortables.forEach(s => s.destroy());
             this.sortables = [];
 
@@ -271,7 +270,7 @@
             const wire = this.$wire;
 
             columns.forEach(column => {
-                const sortable = Sortable.create(column, {
+                const sortable = new Sortable(column, {
                     group: 'opportunities',
                     animation: 150,
                     ghostClass: 'opacity-40',
