@@ -447,11 +447,11 @@
                 </a>
             </div>
 
-            {{-- Content area --}}
+            {{-- Content area — Conversations only --}}
             <div style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; background: var(--bg);">
 
                 {{-- Conversations --}}
-                <div class="pv-card">
+                <div class="pv-card" style="flex: 1; display: flex; flex-direction: column;">
                     <div class="pv-card-head">
                         <h3>
                             <svg width="16" height="16" fill="none" stroke="var(--orange)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
@@ -459,25 +459,101 @@
                             <span class="pv-pill" style="background: var(--surface2); color: var(--t3);">{{ $patient->conversations->count() }}</span>
                         </h3>
                     </div>
-                    @forelse($patient->conversations->sortByDesc('last_message_at') as $convo)
-                    @php $cc = ['whatsapp' => '--green', 'email' => '--accent', 'sms' => '--orange'][$convo->channel] ?? '--t4'; @endphp
-                    <div class="pv-item" style="justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="pv-pill" style="background: var({{ $cc }}-bg); color: var({{ $cc }});">{{ ucfirst($convo->channel) }}</span>
-                            <span style="font-size: 13px; color: var(--t1);">{{ $convo->channel_identifier }}</span>
+                    <div style="flex: 1; overflow-y: auto;">
+                        @forelse($patient->conversations->sortByDesc('last_message_at') as $convo)
+                        @php $cc = ['whatsapp' => '--green', 'email' => '--accent', 'sms' => '--orange'][$convo->channel] ?? '--t4'; @endphp
+                        <div class="pv-item" style="justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="pv-pill" style="background: var({{ $cc }}-bg); color: var({{ $cc }});">{{ ucfirst($convo->channel) }}</span>
+                                <span style="font-size: 13px; color: var(--t1);">{{ $convo->channel_identifier }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 11px; color: var(--t4);">{{ $convo->messages->count() }} msgs</span>
+                                <span style="font-size: 11px; color: var(--t4);">{{ $convo->last_message_at?->diffForHumans() }}</span>
+                            </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 11px; color: var(--t4);">{{ $convo->messages->count() }} msgs</span>
-                            <span style="font-size: 11px; color: var(--t4);">{{ $convo->last_message_at?->diffForHumans() }}</span>
+                        @empty
+                        <div class="pv-empty" style="padding: 48px 16px;">
+                            <svg width="32" height="32" fill="none" stroke="var(--t4)" viewBox="0 0 24 24" style="margin: 0 auto 12px; display: block; opacity: 0.5;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            No conversations yet.<br>Start one using Send Message above.
                         </div>
+                        @endforelse
                     </div>
-                    @empty
-                    <div class="pv-empty">No conversations yet</div>
-                    @endforelse
                 </div>
 
-                {{-- Tasks --}}
-                <div class="pv-card">
+            </div>
+        </div>
+
+        {{-- ═══ RIGHT COLUMN — Activity + Tasks + Treatment Plans ═══ --}}
+        <div style="width: 360px; min-width: 360px; display: flex; flex-direction: column; background: var(--surface);">
+
+            <div style="flex: 1; overflow-y: auto;">
+
+                {{-- Activity section --}}
+                <div style="padding: 12px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; position: sticky; top: 0; background: var(--surface); z-index: 1;">
+                    <span style="font-size: 14px; font-weight: 600; color: var(--t1);">Activity</span>
+                </div>
+
+                {{-- Quick log form --}}
+                <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); flex-shrink: 0;">
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <select wire:model="activity_type" class="pv-box-input" style="flex: 1;">
+                            <option value="note">Note</option>
+                            <option value="call">Call</option>
+                            <option value="email">Email</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="whatsapp">WhatsApp</option>
+                        </select>
+                        <select wire:model="activity_outcome" class="pv-box-input" style="flex: 1;">
+                            <option value="">Outcome</option>
+                            <option value="positive">Positive</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="negative">Negative</option>
+                            <option value="no_answer">No Answer</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" wire:model="activity_subject" placeholder="Subject..." class="pv-box-input" style="flex: 1;">
+                        <button wire:click="logActivity" class="pv-btn pv-btn-blue" style="padding: 7px 14px;">+ Log</button>
+                    </div>
+                    @error('activity_subject') <span style="font-size: 10px; color: var(--red); margin-top: 6px; display: block;">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Timeline --}}
+                @forelse($patient->activities->sortByDesc('occurred_at') as $activity)
+                @php
+                    $tc = ['call' => '--accent', 'email' => '--green', 'meeting' => '--orange', 'note' => '--t4', 'whatsapp' => '--green', 'other' => '--purple'][$activity->type] ?? '--t4';
+                    $oc = ['positive' => '--green', 'neutral' => '--t4', 'negative' => '--red', 'no_answer' => '--orange'][$activity->outcome ?? ''] ?? null;
+                @endphp
+                <div style="padding: 14px 16px; border-bottom: 1px solid var(--border-light); display: flex; gap: 12px; transition: background 0.1s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+                    <div class="pv-dot-wrap" style="background: var({{ $tc }}-bg, var(--surface2)); margin-top: 2px;">
+                        <div class="pv-dot" style="background: var({{ $tc }});"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 600; color: var(--t1); margin-bottom: 4px;">{{ $activity->subject }}</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 4px;">
+                            <span class="pv-pill" style="background: var({{ $tc }}-bg, var(--surface2)); color: var({{ $tc }});">{{ ucfirst($activity->type) }}</span>
+                            @if($oc)
+                            <span class="pv-pill" style="background: var({{ $oc }}-bg, var(--surface2)); color: var({{ $oc }});">{{ ucwords(str_replace('_', ' ', $activity->outcome)) }}</span>
+                            @endif
+                        </div>
+                        @if($activity->description)
+                        <p style="font-size: 12px; color: var(--t3); margin: 4px 0 0; line-height: 1.4;">{{ \Illuminate\Support\Str::limit(strip_tags($activity->description), 120) }}</p>
+                        @endif
+                        <div style="font-size: 11px; color: var(--t4); margin-top: 6px;">{{ $activity->user?->name ?? 'System' }} &middot; {{ $activity->occurred_at?->diffForHumans() ?? $activity->created_at->diffForHumans() }}</div>
+                    </div>
+                    <button wire:click="deleteActivity({{ $activity->id }})" wire:confirm="Delete this activity?" class="pv-icon-btn" style="align-self: flex-start;">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                @empty
+                <div class="pv-empty">
+                    No activities yet. Log one above.
+                </div>
+                @endforelse
+
+                {{-- Tasks section --}}
+                <div style="margin-top: 8px; border-top: 2px solid var(--border);">
                     <div class="pv-card-head">
                         <h3>
                             <svg width="16" height="16" fill="none" stroke="var(--green)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
@@ -488,7 +564,7 @@
 
                     {{-- Quick add form --}}
                     <div style="padding: 10px 16px; border-bottom: 1px solid var(--border-light); display: flex; gap: 8px; flex-wrap: wrap; background: var(--surface2);">
-                        <input type="text" wire:model="task_title" placeholder="Task title..." class="pv-box-input" style="flex: 1; min-width: 160px;">
+                        <input type="text" wire:model="task_title" placeholder="Task title..." class="pv-box-input" style="flex: 1; min-width: 120px;">
                         <input type="date" wire:model="task_due_date" class="pv-box-input" style="width: auto; flex: none;">
                         <select wire:model="task_priority" class="pv-box-input" style="width: auto; flex: none;">
                             <option value="low">Low</option>
@@ -527,8 +603,8 @@
                     @endforelse
                 </div>
 
-                {{-- Treatment Plans --}}
-                <div class="pv-card">
+                {{-- Treatment Plans section --}}
+                <div style="margin-top: 8px; border-top: 2px solid var(--border);">
                     <div class="pv-card-head">
                         <h3>
                             <svg width="16" height="16" fill="none" stroke="var(--purple)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -556,75 +632,6 @@
                     @endforelse
                 </div>
 
-            </div>
-        </div>
-
-        {{-- ═══ RIGHT COLUMN — Activity ═══ --}}
-        <div style="width: 320px; min-width: 320px; display: flex; flex-direction: column; background: var(--surface);">
-
-            <div style="padding: 12px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;">
-                <span style="font-size: 14px; font-weight: 600; color: var(--t1);">Activity</span>
-            </div>
-
-            {{-- Quick log form --}}
-            <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); flex-shrink: 0;">
-                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                    <select wire:model="activity_type" class="pv-box-input" style="flex: 1;">
-                        <option value="note">Note</option>
-                        <option value="call">Call</option>
-                        <option value="email">Email</option>
-                        <option value="meeting">Meeting</option>
-                        <option value="whatsapp">WhatsApp</option>
-                    </select>
-                    <select wire:model="activity_outcome" class="pv-box-input" style="flex: 1;">
-                        <option value="">Outcome</option>
-                        <option value="positive">Positive</option>
-                        <option value="neutral">Neutral</option>
-                        <option value="negative">Negative</option>
-                        <option value="no_answer">No Answer</option>
-                    </select>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" wire:model="activity_subject" placeholder="Subject..." class="pv-box-input" style="flex: 1;">
-                    <button wire:click="logActivity" class="pv-btn pv-btn-blue" style="padding: 7px 14px;">+ Log</button>
-                </div>
-                @error('activity_subject') <span style="font-size: 10px; color: var(--red); margin-top: 6px; display: block;">{{ $message }}</span> @enderror
-            </div>
-
-            {{-- Timeline --}}
-            <div style="flex: 1; overflow-y: auto;">
-                @forelse($patient->activities->sortByDesc('occurred_at') as $activity)
-                @php
-                    $tc = ['call' => '--accent', 'email' => '--green', 'meeting' => '--orange', 'note' => '--t4', 'whatsapp' => '--green', 'other' => '--purple'][$activity->type] ?? '--t4';
-                    $oc = ['positive' => '--green', 'neutral' => '--t4', 'negative' => '--red', 'no_answer' => '--orange'][$activity->outcome ?? ''] ?? null;
-                @endphp
-                <div style="padding: 14px 16px; border-bottom: 1px solid var(--border-light); display: flex; gap: 12px; transition: background 0.1s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
-                    <div class="pv-dot-wrap" style="background: var({{ $tc }}-bg, var(--surface2)); margin-top: 2px;">
-                        <div class="pv-dot" style="background: var({{ $tc }});"></div>
-                    </div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="font-size: 13px; font-weight: 600; color: var(--t1); margin-bottom: 4px;">{{ $activity->subject }}</div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 4px;">
-                            <span class="pv-pill" style="background: var({{ $tc }}-bg, var(--surface2)); color: var({{ $tc }});">{{ ucfirst($activity->type) }}</span>
-                            @if($oc)
-                            <span class="pv-pill" style="background: var({{ $oc }}-bg, var(--surface2)); color: var({{ $oc }});">{{ ucwords(str_replace('_', ' ', $activity->outcome)) }}</span>
-                            @endif
-                        </div>
-                        @if($activity->description)
-                        <p style="font-size: 12px; color: var(--t3); margin: 4px 0 0; line-height: 1.4;">{{ \Illuminate\Support\Str::limit(strip_tags($activity->description), 120) }}</p>
-                        @endif
-                        <div style="font-size: 11px; color: var(--t4); margin-top: 6px;">{{ $activity->user?->name ?? 'System' }} &middot; {{ $activity->occurred_at?->diffForHumans() ?? $activity->created_at->diffForHumans() }}</div>
-                    </div>
-                    <button wire:click="deleteActivity({{ $activity->id }})" wire:confirm="Delete this activity?" class="pv-icon-btn" style="align-self: flex-start;">
-                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-                @empty
-                <div class="pv-empty" style="padding: 48px 16px;">
-                    <svg width="32" height="32" fill="none" stroke="var(--t4)" viewBox="0 0 24 24" style="margin: 0 auto 12px; display: block; opacity: 0.5;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    No activities yet.<br>Log one above.
-                </div>
-                @endforelse
             </div>
         </div>
     </div>
