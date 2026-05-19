@@ -22,6 +22,7 @@ class CalendarView extends Component
     public string $title = '';
     public ?int $patientId = null;
     public string $patientSearch = '';
+    public string $patientName = '';
     public string $startsAt = '';
     public string $endsAt = '';
     public string $appointmentType = 'consultation';
@@ -158,9 +159,18 @@ class CalendarView extends Component
         $this->loadAppointments();
     }
 
-    public function selectPatient(int $id, string $name): void
+    public function selectPatient(int $id): void
     {
+        $patient = Patient::find($id);
         $this->patientId = $id;
+        $this->patientName = $patient ? $patient->first_name . ' ' . $patient->last_name : '';
+        $this->patientSearch = '';
+    }
+
+    public function clearPatient(): void
+    {
+        $this->patientId = null;
+        $this->patientName = '';
         $this->patientSearch = '';
     }
 
@@ -187,6 +197,7 @@ class CalendarView extends Component
         $this->title = '';
         $this->patientId = null;
         $this->patientSearch = '';
+        $this->patientName = '';
         $this->startsAt = '';
         $this->endsAt = '';
         $this->appointmentType = 'consultation';
@@ -245,14 +256,6 @@ class CalendarView extends Component
         }
 
         return $days;
-    }
-
-    #[Computed]
-    public function patients(): Collection
-    {
-        return Patient::where('clinic_id', auth()->user()->clinic_id)
-            ->orderBy('first_name')
-            ->get(['id', 'first_name', 'last_name']);
     }
 
     #[Computed]

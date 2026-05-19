@@ -231,52 +231,47 @@
                 </div>
 
                 {{-- Patient search --}}
-                <div style="margin-bottom: 20px; position: relative;"
-                     x-data="{
-                        open: false,
-                        search: @entangle('patientSearch'),
-                        selectedName: '{{ $patientId ? optional($this->patients->firstWhere("id", $patientId))->first_name . " " . optional($this->patients->firstWhere("id", $patientId))->last_name : "" }}',
-                     }"
-                     x-on:click.away="open = false">
+                <div style="margin-bottom: 20px; position: relative;">
                     <label style="display: block; font-size: 13px; font-weight: 500; color: #D1D5DB; margin-bottom: 6px;">Patient</label>
                     <div style="position: relative;">
-                        <input type="text"
-                            x-model="search"
-                            x-on:focus="open = true"
-                            x-on:input="open = true; selectedName = ''"
-                            wire:model.live.debounce.300ms="patientSearch"
-                            placeholder="Search patients..."
-                            style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 36px 10px 10px; font-size: 13px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
-                            onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="this.style.borderColor='#4B5563'; this.style.boxShadow='none'"
-                            x-bind:value="selectedName || search">
-                        {{-- Search icon --}}
-                        <svg style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        {{-- Clear button --}}
-                        @if($patientId)
-                            <button type="button" wire:click="$set('patientId', null)" x-on:click="search = ''; selectedName = ''; open = false"
-                                style="position: absolute; right: 32px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 2px; display: flex;">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
+                        @if($patientId && $patientName)
+                            {{-- Selected patient display --}}
+                            <div style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 36px 10px 10px; font-size: 13px; color: #F9FAFB; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between;">
+                                <span>{{ $patientName }}</span>
+                                <button type="button" wire:click="clearPatient"
+                                    style="background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 2px; display: flex;"
+                                    onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#9CA3AF'">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        @else
+                            {{-- Search input --}}
+                            <input type="text"
+                                wire:model.live.debounce.300ms="patientSearch"
+                                placeholder="Search patients..."
+                                style="width: 100%; background-color: #374151; border: 1px solid #4B5563; border-radius: 10px; padding: 10px 36px 10px 10px; font-size: 13px; color: #F9FAFB; outline: none; color-scheme: dark; box-sizing: border-box;"
+                                onfocus="this.style.borderColor='#3B82F6'; this.style.boxShadow='0 0 0 2px rgba(59,130,246,0.3)'" onblur="setTimeout(() => { this.style.borderColor='#4B5563'; this.style.boxShadow='none' }, 200)">
+                            <svg style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         @endif
                     </div>
                     {{-- Dropdown results --}}
-                    <div x-show="open && search.length >= 1" x-cloak
-                        style="position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; background-color: #1F2937; border: 1px solid #374151; border-radius: 10px; max-height: 200px; overflow-y: auto; z-index: 60; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
-                        @forelse($this->patientResults as $patient)
-                            <div wire:key="patient-{{ $patient->id }}"
-                                wire:click="selectPatient({{ $patient->id }}, '{{ addslashes($patient->first_name . ' ' . $patient->last_name) }}')"
-                                x-on:click="selectedName = '{{ addslashes($patient->first_name . ' ' . $patient->last_name) }}'; search = ''; open = false"
-                                style="padding: 10px 12px; cursor: pointer; font-size: 13px; color: #E5E7EB; border-bottom: 1px solid #374151;"
-                                onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='transparent'">
-                                <span style="font-weight: 500;">{{ $patient->first_name }} {{ $patient->last_name }}</span>
-                                @if($patient->email)
-                                    <span style="color: #6B7280; font-size: 12px; margin-left: 8px;">{{ $patient->email }}</span>
-                                @endif
-                            </div>
-                        @empty
-                            <div style="padding: 12px; font-size: 13px; color: #6B7280; text-align: center;">No patients found</div>
-                        @endforelse
-                    </div>
+                    @if(!$patientId && strlen($patientSearch) >= 1)
+                        <div style="position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; background-color: #1F2937; border: 1px solid #374151; border-radius: 10px; max-height: 200px; overflow-y: auto; z-index: 60; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
+                            @forelse($this->patientResults as $patient)
+                                <div wire:key="patient-{{ $patient->id }}"
+                                    wire:click="selectPatient({{ $patient->id }})"
+                                    style="padding: 10px 12px; cursor: pointer; font-size: 13px; color: #E5E7EB; border-bottom: 1px solid #374151;"
+                                    onmouseover="this.style.backgroundColor='#374151'" onmouseout="this.style.backgroundColor='transparent'">
+                                    <span style="font-weight: 500;">{{ $patient->first_name }} {{ $patient->last_name }}</span>
+                                    @if($patient->email)
+                                        <span style="color: #6B7280; font-size: 12px; margin-left: 8px;">{{ $patient->email }}</span>
+                                    @endif
+                                </div>
+                            @empty
+                                <div style="padding: 12px; font-size: 13px; color: #6B7280; text-align: center;">No patients found</div>
+                            @endforelse
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Notes --}}
