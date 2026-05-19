@@ -43,11 +43,11 @@ class CalendarView extends Component
         $currentDate = $this->currentDate;
 
         if ($this->viewMode === 'month') {
-            $start = $currentDate->copy()->startOfMonth()->startOfWeek(Carbon::SUNDAY);
-            $end = $currentDate->copy()->endOfMonth()->endOfWeek(Carbon::SATURDAY);
+            $start = $currentDate->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY);
+            $end = $currentDate->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY);
         } elseif ($this->viewMode === 'week') {
-            $start = $currentDate->copy()->startOfWeek(Carbon::SUNDAY);
-            $end = $currentDate->copy()->endOfWeek(Carbon::SATURDAY);
+            $start = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
+            $end = $currentDate->copy()->endOfWeek(Carbon::SUNDAY);
         } else {
             $start = $currentDate->copy()->startOfDay();
             $end = $currentDate->copy()->endOfDay();
@@ -174,7 +174,7 @@ class CalendarView extends Component
         $currentDate = $this->currentDate;
         $startOfMonth = $currentDate->copy()->startOfMonth();
         $endOfMonth = $currentDate->copy()->endOfMonth();
-        $startOfGrid = $startOfMonth->copy()->startOfWeek(Carbon::SUNDAY);
+        $startOfGrid = $startOfMonth->copy()->startOfWeek(Carbon::MONDAY);
 
         $days = [];
         $date = $startOfGrid->copy();
@@ -204,7 +204,7 @@ class CalendarView extends Component
     public function getWeekDays(): array
     {
         $currentDate = $this->currentDate;
-        $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::SUNDAY);
+        $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
         $today = now()->format('Y-m-d');
 
         $days = [];
@@ -236,7 +236,7 @@ class CalendarView extends Component
 
         return match ($this->viewMode) {
             'month' => $currentDate->format('F Y'),
-            'week' => $currentDate->copy()->startOfWeek(Carbon::SUNDAY)->format('M d') . ' - ' . $currentDate->copy()->endOfWeek(Carbon::SATURDAY)->format('M d, Y'),
+            'week' => $currentDate->copy()->startOfWeek(Carbon::MONDAY)->format('M d') . ' - ' . $currentDate->copy()->endOfWeek(Carbon::SUNDAY)->format('M d, Y'),
             'day' => $currentDate->format('l, F j, Y'),
         };
     }
