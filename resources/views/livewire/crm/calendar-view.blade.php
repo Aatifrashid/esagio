@@ -262,7 +262,7 @@
                     {{-- Dropdown results --}}
                     <div x-show="open && search.length >= 1" x-cloak
                         style="position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; background-color: #1F2937; border: 1px solid #374151; border-radius: 10px; max-height: 200px; overflow-y: auto; z-index: 60; box-shadow: 0 10px 25px rgba(0,0,0,0.4);">
-                        @forelse($patientResults as $patient)
+                        @forelse($this->patientResults as $patient)
                             <div wire:key="patient-{{ $patient->id }}"
                                 wire:click="selectPatient({{ $patient->id }}, '{{ addslashes($patient->first_name . ' ' . $patient->last_name) }}')"
                                 x-on:click="selectedName = '{{ addslashes($patient->first_name . ' ' . $patient->last_name) }}'; search = ''; open = false"
