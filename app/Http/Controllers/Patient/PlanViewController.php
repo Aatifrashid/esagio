@@ -91,9 +91,7 @@ class PlanViewController extends Controller
 
         $request->validate(['password' => 'required|string']);
 
-        if (! Hash::check($request->password, $plan->public_password)
-            && $request->password !== $plan->public_password
-        ) {
+        if (! Hash::check($request->password, $plan->public_password)) {
             return back()->withErrors(['password' => 'Incorrect password. Please try again.']);
         }
 

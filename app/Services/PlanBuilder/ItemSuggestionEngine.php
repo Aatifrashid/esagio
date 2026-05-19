@@ -56,9 +56,9 @@ class ItemSuggestionEngine
                 }
 
                 if ($condition === 'missing') {
-                    if ($tooth >= 11 && $tooth <= 28) {
+                    if (($tooth >= 11 && $tooth <= 18) || ($tooth >= 21 && $tooth <= 28)) {
                         $upperMissing[] = $tooth;
-                    } elseif ($tooth >= 31 && $tooth <= 48) {
+                    } elseif (($tooth >= 31 && $tooth <= 38) || ($tooth >= 41 && $tooth <= 48)) {
                         $lowerMissing[] = $tooth;
                     }
                 }

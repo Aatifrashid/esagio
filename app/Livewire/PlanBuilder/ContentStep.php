@@ -22,13 +22,14 @@ class ContentStep extends Component
     public function mount(TreatmentPlan $plan): void
     {
         $this->plan = $plan;
-        $this->introLetter = $plan->notes_to_patient ?? '';
 
         $this->sections = $plan->sections()->orderBy('sort_order')->get();
 
+        $intro = $plan->sections()->where('type', 'intro_letter')->first();
         $guarantee = $plan->sections()->where('type', 'guarantee')->first();
         $legal = $plan->sections()->where('type', 'legal_disclaimer')->first();
 
+        $this->introLetter = $intro?->content ?? '';
         $this->guaranteeText = $guarantee?->content ?? '';
         $this->legalDisclaimer = $legal?->content ?? '';
     }
@@ -84,9 +85,7 @@ class ContentStep extends Component
 
     public function saveContent(): void
     {
-        $this->plan->update(['notes_to_patient' => $this->introLetter]);
-
-        foreach (['guarantee' => $this->guaranteeText, 'legal_disclaimer' => $this->legalDisclaimer] as $type => $content) {
+        foreach (['intro_letter' => $this->introLetter, 'guarantee' => $this->guaranteeText, 'legal_disclaimer' => $this->legalDisclaimer] as $type => $content) {
             TreatmentPlanSection::updateOrCreate(
                 ['treatment_plan_id' => $this->plan->id, 'type' => $type],
                 ['title' => ucwords(str_replace('_', ' ', $type)), 'content' => $content, 'sort_order' => 99, 'is_visible' => true]

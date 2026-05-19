@@ -38,16 +38,18 @@ class ReviewStep extends Component
         }
 
         $requiredItems = $this->plan->items->where('is_optional', false);
+        $hasNameless = false;
+        $hasPriceless = false;
 
         foreach ($requiredItems as $item) {
-            if (empty($item->name)) {
+            if (empty($item->name) && ! $hasNameless) {
                 $errors[] = 'One or more treatment items are missing a name.';
-                break;
+                $hasNameless = true;
             }
 
-            if ($item->unit_price <= 0) {
+            if ($item->unit_price <= 0 && ! $hasPriceless) {
                 $errors[] = 'One or more treatment items have no price set.';
-                break;
+                $hasPriceless = true;
             }
         }
 

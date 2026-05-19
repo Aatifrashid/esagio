@@ -172,17 +172,23 @@ class TreatmentPlan extends Model
 
     public function recordView(string $ipAddress, string $userAgent): void
     {
-        $updates = [
-            'viewed_count' => $this->viewed_count + 1,
-            'last_viewed_at' => now(),
-        ];
+        $query = static::where('id', $this->id);
 
         if (! $this->viewed_at) {
-            $updates['status'] = 'viewed';
-            $updates['viewed_at'] = now();
+            $query->update([
+                'viewed_count' => \Illuminate\Support\Facades\DB::raw('viewed_count + 1'),
+                'last_viewed_at' => now(),
+                'status' => 'viewed',
+                'viewed_at' => now(),
+            ]);
+        } else {
+            $query->update([
+                'viewed_count' => \Illuminate\Support\Facades\DB::raw('viewed_count + 1'),
+                'last_viewed_at' => now(),
+            ]);
         }
 
-        $this->update($updates);
+        $this->refresh();
     }
 
     public function accept(string $signature, string $ipAddress, string $userAgent): void

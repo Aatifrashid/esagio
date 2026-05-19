@@ -236,7 +236,13 @@ class TreatmentStep extends Component
 
     public function reorderItems(array $order): void
     {
+        $validIds = $this->items->pluck('id')->toArray();
+
         foreach ($order as $position => $itemId) {
+            if (! in_array((int) $itemId, $validIds, true)) {
+                continue;
+            }
+
             TreatmentPlanItem::where('id', $itemId)
                 ->where('treatment_plan_id', $this->plan->id)
                 ->update(['position' => $position]);

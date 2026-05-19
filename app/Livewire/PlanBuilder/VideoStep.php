@@ -39,6 +39,12 @@ class VideoStep extends Component
 
     public function scheduleConsultation(): void
     {
+        if (! $this->plan->patient_id) {
+            $this->addError('patient', 'A patient must be assigned to the plan before scheduling a consultation.');
+
+            return;
+        }
+
         $this->validate([
             'scheduledDate' => 'required|date|after_or_equal:today',
             'scheduledTime' => 'required',

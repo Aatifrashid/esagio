@@ -3,6 +3,7 @@
 namespace App\Livewire\PlanBuilder;
 
 use App\Models\TreatmentPlan;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
 class SettingsStep extends Component
@@ -35,7 +36,7 @@ class SettingsStep extends Component
         $this->validUntil = $plan->valid_until?->format('Y-m-d') ?? '';
         $this->depositFixed = $plan->deposit_amount ? (float) $plan->deposit_amount : null;
         $this->internalNotes = $plan->notes_internal ?? '';
-        $this->planPassword = $plan->public_password ?? '';
+        $this->planPassword = '';
         $this->accessType = $plan->public_password ? 'password' : ($plan->valid_until ? 'expiring' : 'open');
     }
 
@@ -66,7 +67,7 @@ class SettingsStep extends Component
             'valid_until' => $this->validUntil ?: null,
             'deposit_amount' => $depositAmount,
             'notes_internal' => $this->internalNotes,
-            'public_password' => $this->accessType === 'password' ? $this->planPassword : null,
+            'public_password' => $this->accessType === 'password' && $this->planPassword ? Hash::make($this->planPassword) : null,
         ]);
 
         $this->dispatch('plan-updated')->to(Builder::class);

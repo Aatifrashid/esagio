@@ -42,12 +42,16 @@ class DiagnosisStep extends Component
     {
         if (in_array($toothNumber, $this->selectedTeeth, true)) {
             $this->selectedTeeth = array_values(array_filter($this->selectedTeeth, fn ($t) => $t !== $toothNumber));
+
+            if ($this->activeCondition) {
+                $this->removeConditionFromTooth($toothNumber, $this->activeCondition);
+            }
         } else {
             $this->selectedTeeth[] = $toothNumber;
-        }
 
-        if ($this->activeCondition && in_array($toothNumber, $this->selectedTeeth, true)) {
-            $this->applyConditionToTooth($toothNumber, $this->activeCondition);
+            if ($this->activeCondition) {
+                $this->applyConditionToTooth($toothNumber, $this->activeCondition);
+            }
         }
     }
 

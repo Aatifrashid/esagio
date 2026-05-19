@@ -67,10 +67,8 @@ class VisualsStep extends Component
 
     private function persistVisuals(): void
     {
-        $firstItem = $this->plan->items()->first();
-
-        if ($firstItem) {
-            $firstItem->update([
+        foreach ($this->plan->items as $item) {
+            $item->update([
                 'included_animation_clip_ids' => $this->animationClips,
                 'included_before_after_ids' => $this->beforeAfterCases,
             ]);
