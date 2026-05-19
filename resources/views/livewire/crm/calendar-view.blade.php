@@ -60,9 +60,9 @@
                             wire:click="openCreateModal('{{ $day['date'] }}')"
                             class="flex flex-col p-2 cursor-pointer transition-colors overflow-hidden
                                 {{ !$loop->first ? 'border-l border-gray-700/60' : '' }}
-                                {{ $day['isCurrentMonth'] ? 'bg-gray-900' : 'bg-gray-800/40' }}
-                                {{ $day['isToday'] ? 'bg-blue-900/15 ring-1 ring-inset ring-blue-500/40' : '' }}
-                                hover:bg-gray-800/60"
+                                {{ $day['isToday'] ? '' : '' }}
+                                hover:bg-gray-800"
+                            style="{{ !$day['isCurrentMonth'] ? 'background-color: rgba(31,41,55,0.5);' : 'background-color: #111827;' }}{{ $day['isToday'] ? 'background-color: rgba(30,58,138,0.15); box-shadow: inset 0 0 0 1px rgba(59,130,246,0.4);' : '' }}"
                         >
                             {{-- Day number --}}
                             @if($day['isToday'])
