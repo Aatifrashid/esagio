@@ -278,6 +278,7 @@ class PatientResource extends Resource
             RelationManagers\ActivitiesRelationManager::class,
             RelationManagers\TasksRelationManager::class,
             RelationManagers\PlansRelationManager::class,
+            RelationManagers\ConversationsRelationManager::class,
         ];
     }
 

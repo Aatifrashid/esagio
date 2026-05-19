@@ -15,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('exchange:fetch')->daily()->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->validateCsrfTokens(except: [
+            'api/whatsapp/webhook/*',
+            'stripe/webhook',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

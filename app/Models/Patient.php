@@ -91,4 +91,9 @@ class Patient extends Model
     {
         return $this->hasMany(CrmActivity::class);
     }
+
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }

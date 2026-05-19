@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\WhatsappWebhookController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\GdprController;
@@ -66,6 +67,13 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->prefix('gdpr')->name('gdpr.')->group(function () {
     Route::get('/patient/{patient}/export', [GdprController::class, 'export'])->name('export');
     Route::delete('/patient/{patient}', [GdprController::class, 'delete'])->name('delete');
+});
+
+// WhatsApp Bridge Webhooks
+Route::prefix('api/whatsapp/webhook')->name('whatsapp.webhook.')->middleware(\App\Http\Middleware\VerifyWhatsappBridgeSignature::class)->group(function () {
+    Route::post('/message-received', [WhatsappWebhookController::class, 'messageReceived'])->name('message');
+    Route::post('/status-update', [WhatsappWebhookController::class, 'statusUpdate'])->name('status');
+    Route::post('/session-status', [WhatsappWebhookController::class, 'sessionStatus'])->name('session');
 });
 
 require __DIR__.'/auth.php';

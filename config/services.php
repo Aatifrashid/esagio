@@ -45,4 +45,9 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'whatsapp_bridge' => [
+        'base_url' => env('WHATSAPP_BRIDGE_URL', 'http://localhost:3001'),
+        'api_key' => env('WHATSAPP_BRIDGE_API_KEY'),
+    ],
+
 ];

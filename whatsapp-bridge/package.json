@@ -1,0 +1,19 @@
+{
+  "name": "esagio-whatsapp-bridge",
+  "version": "1.0.0",
+  "description": "WhatsApp bridge for Esagio CRM using Baileys",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.0",
+    "axios": "^1.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.18.0",
+    "pino": "^9.0.0",
+    "qrcode": "^1.5.0"
+  }
+}
