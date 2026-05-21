@@ -7,7 +7,7 @@ use Filament\Widgets\Widget;
 
 class UpcomingTasksWidget extends Widget
 {
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 2;
 
     protected static string $view = 'filament.clinic.widgets.upcoming-tasks';
 

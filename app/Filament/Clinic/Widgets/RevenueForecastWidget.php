@@ -13,7 +13,7 @@ class RevenueForecastWidget extends Widget
 {
     protected static string $view = 'filament.clinic.widgets.revenue-forecast-widget';
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 4;
 
     protected int | string | array $columnSpan = 'full';
 
