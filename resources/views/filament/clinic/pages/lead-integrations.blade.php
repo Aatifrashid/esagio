@@ -280,15 +280,15 @@ Content-Type: application/json
 Body:
 {
   "api_key": "{{ $apiKey }}",
-  "first_name": "{{'{{'}}First Name{{'}}'}}",
-  "last_name": "{{'{{'}}Last Name{{'}}'}}",
-  "email": "{{'{{'}}Email{{'}}'}}",
-  "phone": "{{'{{'}}Phone Number{{'}}'}}",
+  "first_name": "@{{ First Name }}",
+  "last_name": "@{{ Last Name }}",
+  "email": "@{{ Email }}",
+  "phone": "@{{ Phone Number }}",
   "source": "facebook_ads",
   "lead_channel": "facebook_ads",
   "utm_source": "facebook",
   "utm_medium": "cpc",
-  "utm_campaign": "{{'{{'}}Campaign Name{{'}}'}}"
+  "utm_campaign": "@{{ Campaign Name }}"
 }</div>
                     <div class="li-step">
                         <span class="li-step-num">4</span>
@@ -387,9 +387,9 @@ Body:
 <button class="li-code-copy" onclick="copyEl('tt-code')">Copy</button>
 {
   "api_key": "{{ $apiKey }}",
-  "first_name": "{{'{{'}}Name{{'}}'}}",
-  "email": "{{'{{'}}Email{{'}}'}}",
-  "phone": "{{'{{'}}Phone{{'}}'}}",
+  "first_name": "@{{ Name }}",
+  "email": "@{{ Email }}",
+  "phone": "@{{ Phone }}",
   "source": "tiktok_ads",
   "lead_channel": "tiktok_ads",
   "utm_source": "tiktok",
