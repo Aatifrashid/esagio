@@ -31,6 +31,8 @@ class Patient extends Model
         'referred_by_patient_id', 'assigned_to', 'created_by', 'status',
         'notes', 'tags', 'pipeline_stage_id', 'last_contacted_at',
         'next_action_at', 'next_action_description', 'deal_value', 'clinic_id',
+        'utm_source', 'utm_medium', 'utm_campaign', 'utm_term',
+        'utm_content', 'landing_page', 'referrer_url', 'lead_channel',
     ];
 
     protected $casts = [

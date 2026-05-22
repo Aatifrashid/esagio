@@ -14,7 +14,7 @@ class Clinic extends Model
     use Billable, HasFactory;
 
     protected $fillable = [
-        'name', 'slug', 'email', 'phone', 'country', 'timezone',
+        'api_key', 'name', 'slug', 'email', 'phone', 'country', 'timezone',
         'currency_default', 'language_default', 'logo_path',
         'primary_colour', 'secondary_colour', 'font_family',
         'address', 'registration_number', 'vat_number', 'plan_tier',

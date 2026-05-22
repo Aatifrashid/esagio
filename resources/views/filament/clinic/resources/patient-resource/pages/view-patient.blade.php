@@ -363,7 +363,7 @@
                     <div class="pv-select-wrap">
                         <select wire:model.blur="source">
                             <option value="">--</option>
-                            @foreach(['website' => 'Website', 'referral' => 'Referral', 'social_media' => 'Social Media', 'google_ads' => 'Google Ads', 'facebook_ads' => 'Facebook Ads', 'walk_in' => 'Walk In', 'email_campaign' => 'Email Campaign', 'other' => 'Other'] as $v => $l)
+                            @foreach(['website' => 'Website', 'referral' => 'Referral', 'social_media' => 'Social Media', 'google_ads' => 'Google Ads', 'facebook_ads' => 'Facebook Ads', 'instagram_ads' => 'Instagram Ads', 'tiktok_ads' => 'TikTok Ads', 'walk_in' => 'Walk In', 'email_campaign' => 'Email Campaign', 'api' => 'API / Integration', 'other' => 'Other'] as $v => $l)
                             <option value="{{ $v }}">{{ $l }}</option>
                             @endforeach
                         </select>

@@ -84,8 +84,11 @@ class PatientResource extends Resource
                                 'social_media' => 'Social Media',
                                 'google_ads' => 'Google Ads',
                                 'facebook_ads' => 'Facebook Ads',
+                                'instagram_ads' => 'Instagram Ads',
+                                'tiktok_ads' => 'TikTok Ads',
                                 'walk_in' => 'Walk In',
                                 'email_campaign' => 'Email Campaign',
+                                'api' => 'API / Integration',
                                 'other' => 'Other',
                             ]),
                         Forms\Components\Select::make('assigned_to')
@@ -149,7 +152,35 @@ class PatientResource extends Resource
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('source')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Lead Source')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state) => match ($state) {
+                        'website' => 'Website',
+                        'referral' => 'Referral',
+                        'social_media' => 'Social Media',
+                        'google_ads' => 'Google Ads',
+                        'facebook_ads' => 'Facebook Ads',
+                        'instagram_ads' => 'Instagram Ads',
+                        'tiktok_ads' => 'TikTok Ads',
+                        'walk_in' => 'Walk In',
+                        'email_campaign' => 'Email',
+                        'api' => 'API',
+                        default => ucwords(str_replace('_', ' ', $state ?? '--')),
+                    })
+                    ->color(fn (?string $state) => match ($state) {
+                        'google_ads' => 'info',
+                        'facebook_ads', 'instagram_ads' => 'primary',
+                        'tiktok_ads' => 'danger',
+                        'website' => 'success',
+                        'referral' => 'warning',
+                        'walk_in' => 'gray',
+                        'email_campaign' => 'info',
+                        'social_media' => 'primary',
+                        'api' => 'gray',
+                        default => 'gray',
+                    })
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('last_contacted_at')
                     ->label('Last Contacted')
                     ->dateTime('d M Y')
@@ -181,8 +212,11 @@ class PatientResource extends Resource
                         'social_media' => 'Social Media',
                         'google_ads' => 'Google Ads',
                         'facebook_ads' => 'Facebook Ads',
+                        'instagram_ads' => 'Instagram Ads',
+                        'tiktok_ads' => 'TikTok Ads',
                         'walk_in' => 'Walk In',
                         'email_campaign' => 'Email Campaign',
+                        'api' => 'API / Integration',
                         'other' => 'Other',
                     ]),
                 Tables\Filters\Filter::make('has_treatment_plan')

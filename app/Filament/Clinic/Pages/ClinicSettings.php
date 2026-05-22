@@ -88,6 +88,31 @@ class ClinicSettings extends Page
                         ->required(),
                 ])->columns(3),
 
+                Forms\Components\Section::make('API & Integrations')
+                    ->description('Use your API key to send leads from website forms, Facebook Ads, Google Ads, and other sources directly into your CRM.')
+                    ->schema([
+                        Forms\Components\TextInput::make('api_key')
+                            ->label('API Key')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText('Send leads to: POST https://esagio.com/api/leads with this API key. See docs for details.')
+                            ->suffixAction(
+                                Forms\Components\Actions\Action::make('regenerateApiKey')
+                                    ->icon('heroicon-o-arrow-path')
+                                    ->requiresConfirmation()
+                                    ->modalHeading('Regenerate API Key')
+                                    ->modalDescription('This will invalidate your current API key. Any integrations using the old key will stop working.')
+                                    ->action(function () {
+                                        $clinic = Auth::user()?->clinic;
+                                        if ($clinic) {
+                                            $clinic->update(['api_key' => 'esa_' . \Illuminate\Support\Str::random(40)]);
+                                            $this->form->fill($clinic->fresh()->toArray());
+                                            Notification::make()->title('API key regenerated')->success()->send();
+                                        }
+                                    })
+                            ),
+                    ])->columns(1),
+
                 Forms\Components\Section::make('Branding')->schema([
                     Forms\Components\FileUpload::make('logo_path')
                         ->label('Logo')
