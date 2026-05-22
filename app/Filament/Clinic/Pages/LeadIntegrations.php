@@ -24,11 +24,16 @@ class LeadIntegrations extends Page
         $clinic = Auth::user()?->clinic;
 
         if ($clinic) {
-            if (! $clinic->api_key) {
-                $clinic->update(['api_key' => 'esa_' . Str::random(40)]);
-                $clinic->refresh();
+            try {
+                if (! $clinic->api_key) {
+                    $clinic->update(['api_key' => 'esa_' . Str::random(40)]);
+                    $clinic->refresh();
+                }
+                $this->apiKey = $clinic->api_key;
+            } catch (\Exception $e) {
+                // Migration not yet run — show placeholder
+                $this->apiKey = 'Run php artisan migrate to generate your API key';
             }
-            $this->apiKey = $clinic->api_key;
             $this->webhookUrl = url('/api/leads');
         }
     }
