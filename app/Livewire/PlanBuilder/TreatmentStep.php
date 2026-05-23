@@ -103,7 +103,9 @@ class TreatmentStep extends Component
         $priceListItem = PriceListItem::whereHas('priceList', fn ($q) => $q
                 ->where('clinic_id', $this->plan->clinic_id)
                 ->where('is_default', true))
-            ->where('treatment_template_id', $template->id)
+            ->where(fn ($q) => $q
+                ->where('treatment_template_id', $template->id)
+                ->orWhere('variant_name', $template->name))
             ->first();
 
         $unitPrice = $priceListItem?->unit_price ?? 0;
@@ -356,15 +358,21 @@ class TreatmentStep extends Component
     private function attachPrices($templates): array
     {
         $templateIds = $templates->pluck('id');
+        $templateNames = $templates->pluck('name');
 
-        $prices = PriceListItem::whereHas('priceList', fn ($q) => $q
+        $priceItems = PriceListItem::whereHas('priceList', fn ($q) => $q
                 ->where('clinic_id', $this->plan->clinic_id)
                 ->where('is_default', true))
-            ->whereIn('treatment_template_id', $templateIds)
-            ->pluck('unit_price', 'treatment_template_id');
+            ->where(fn ($q) => $q
+                ->whereIn('treatment_template_id', $templateIds)
+                ->orWhereIn('variant_name', $templateNames))
+            ->get(['treatment_template_id', 'variant_name', 'unit_price']);
+
+        $byId = $priceItems->whereNotNull('treatment_template_id')->pluck('unit_price', 'treatment_template_id');
+        $byName = $priceItems->pluck('unit_price', 'variant_name');
 
         return $templates->map(fn ($t) => array_merge($t->toArray(), [
-            'price' => $prices[$t->id] ?? null,
+            'price' => $byId[$t->id] ?? $byName[$t->name] ?? null,
         ]))->toArray();
     }
 
