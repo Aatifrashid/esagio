@@ -327,8 +327,8 @@
                     {{-- Table header --}}
                     <div class="grid grid-cols-12 gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-medium text-gray-500 uppercase tracking-wide">
                         <div class="col-span-1"></div>
-                        <div class="col-span-3">Treatment</div>
-                        <div class="col-span-2">Teeth</div>
+                        <div class="col-span-4">Treatment</div>
+                        <div class="col-span-1">Teeth</div>
                         <div class="col-span-2 text-right">Qty</div>
                         <div class="col-span-2 text-right">Price</div>
                         <div class="col-span-1 text-right">Total</div>
@@ -353,7 +353,7 @@
                                 </div>
 
                                 {{-- Name --}}
-                                <div class="col-span-3" @click.stop>
+                                <div class="col-span-4" @click.stop>
                                     <input
                                         type="text"
                                         value="{{ $item->name }}"
@@ -367,7 +367,7 @@
                                 </div>
 
                                 {{-- Teeth --}}
-                                <div class="col-span-2" wire:click.stop="setActiveItem({{ $item->id }})">
+                                <div class="col-span-1" wire:click.stop="setActiveItem({{ $item->id }})">
                                     @if(!empty($item->tooth_positions))
                                         <div class="flex flex-wrap gap-0.5">
                                             @foreach(array_slice($item->tooth_positions, 0, 4) as $tp)
