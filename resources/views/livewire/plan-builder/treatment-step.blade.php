@@ -327,9 +327,9 @@
                     {{-- Table header --}}
                     <div class="grid grid-cols-12 gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100 text-xs font-medium text-gray-500 uppercase tracking-wide">
                         <div class="col-span-1"></div>
-                        <div class="col-span-4">Treatment</div>
+                        <div class="col-span-3">Treatment</div>
                         <div class="col-span-2">Teeth</div>
-                        <div class="col-span-1 text-right">Qty</div>
+                        <div class="col-span-2 text-right">Qty</div>
                         <div class="col-span-2 text-right">Price</div>
                         <div class="col-span-1 text-right">Total</div>
                         <div class="col-span-1"></div>
@@ -353,7 +353,7 @@
                                 </div>
 
                                 {{-- Name --}}
-                                <div class="col-span-4" @click.stop>
+                                <div class="col-span-3" @click.stop>
                                     <input
                                         type="text"
                                         value="{{ $item->name }}"
@@ -385,13 +385,13 @@
                                 </div>
 
                                 {{-- Qty --}}
-                                <div class="col-span-1" @click.stop>
+                                <div class="col-span-2" @click.stop>
                                     <input
                                         type="number"
                                         value="{{ $item->quantity }}"
                                         wire:change="updateItem({{ $item->id }}, 'quantity', $event.target.value)"
                                         min="1"
-                                        class="w-full border border-gray-200 rounded text-sm text-right px-2 py-1 focus:ring-2 focus:ring-clinical/20 focus:border-clinical transition"
+                                        class="w-full border border-gray-200 rounded text-sm text-right px-2 py-1 focus:ring-2 focus:ring-clinical/20 focus:border-clinical transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                     />
                                 </div>
 
