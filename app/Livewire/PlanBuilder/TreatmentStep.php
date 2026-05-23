@@ -2,6 +2,7 @@
 
 namespace App\Livewire\PlanBuilder;
 
+use App\Models\Material;
 use App\Models\PriceListItem;
 use App\Models\TreatmentPlan;
 use App\Models\TreatmentPlanItem;
@@ -119,6 +120,8 @@ class TreatmentStep extends Component
 
         $unitPrice = $priceListItem?->unit_price ?? 0;
 
+        $materialId = $this->resolveMaterial($template);
+
         $nextPosition = ($this->items->max('position') ?? 0) + 1;
 
         $item = TreatmentPlanItem::create([
@@ -130,6 +133,7 @@ class TreatmentStep extends Component
             'unit_price' => $unitPrice,
             'line_total' => $unitPrice,
             'position' => $nextPosition,
+            'material_id' => $materialId,
             'included_animation_clip_ids' => $template->default_animation_clip_ids ?? [],
             'included_before_after_ids' => $template->default_before_after_ids ?? [],
             'is_optional' => false,
@@ -399,6 +403,31 @@ class TreatmentStep extends Component
 
             return array_merge($t->toArray(), ['price' => $price]);
         })->toArray();
+    }
+
+    private function resolveMaterial(TreatmentTemplate $template): ?int
+    {
+        $codePrefix = substr($template->code, 0, 3);
+        $materialCategory = match ($codePrefix) {
+            'IMP' => 'implant',
+            'CRN' => 'crown',
+            'VEN' => 'veneer',
+            'WHT' => 'whitening',
+            default => null,
+        };
+
+        if (! $materialCategory) {
+            return null;
+        }
+
+        $material = Material::where(function ($q) {
+            $q->where('clinic_id', $this->plan->clinic_id)->orWhereNull('clinic_id');
+        })
+            ->where('category', $materialCategory)
+            ->where('is_premium', true)
+            ->first();
+
+        return $material?->id;
     }
 
     private function normalizeName(string $name): string

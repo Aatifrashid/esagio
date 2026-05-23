@@ -358,38 +358,81 @@
                     @endif
                     <div class="space-y-3 mb-6">
                         @foreach($items->sortBy('position') as $item)
-                        <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm
+                        @php $tpl = $item->template; @endphp
+                        <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm
                             {{ $item->is_optional ? 'border-dashed border-slate-200' : '' }}">
-                            <div class="flex flex-wrap items-start gap-4">
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex flex-wrap items-center gap-2 mb-1">
-                                        <span class="font-semibold text-clinic-primary">{{ $item->name }}</span>
-                                        @if($item->is_optional)
-                                            <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Optional</span>
+                            <div class="p-5">
+                                <div class="flex flex-wrap items-start gap-4">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                                            <span class="font-semibold text-clinic-primary">{{ $item->name }}</span>
+                                            @if($item->is_optional)
+                                                <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Optional</span>
+                                            @endif
+                                            @if($item->material)
+                                                <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">{{ $item->material->brand ?? $item->material->name }}</span>
+                                            @endif
+                                            @if($item->variant_name)
+                                                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{{ $item->variant_name }}</span>
+                                            @endif
+                                            @if($tpl?->requires_imaging)
+                                                <span class="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">Imaging required</span>
+                                            @endif
+                                        </div>
+
+                                        @php $desc = $tpl?->description_long ?: ($item->description ?: $tpl?->description_short); @endphp
+                                        @if($desc)
+                                            <p class="text-sm text-slate-600 leading-relaxed mb-2">{{ $desc }}</p>
                                         @endif
-                                        @if($item->material)
-                                            <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">{{ $item->material->brand ?? $item->material->name }}</span>
+
+                                        @if(!empty($item->tooth_positions))
+                                            <div class="flex flex-wrap gap-1 mb-2">
+                                                @foreach($item->tooth_positions as $tooth)
+                                                    <span class="inline-block text-xs bg-clinic-primary text-white/90 px-2 py-0.5 rounded font-mono">T{{ $tooth }}</span>
+                                                @endforeach
+                                            </div>
                                         @endif
-                                        @if($item->variant_name)
-                                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{{ $item->variant_name }}</span>
+
+                                        @if($tpl?->standard_duration_days)
+                                            <p class="text-xs text-slate-400">
+                                                <span class="font-medium">Duration:</span>
+                                                @if($tpl->standard_duration_days < 2) Same day
+                                                @elseif($tpl->standard_duration_days <= 14) ~{{ $tpl->standard_duration_days }} days
+                                                @elseif($tpl->standard_duration_days <= 60) ~{{ round($tpl->standard_duration_days / 7) }} weeks
+                                                @else ~{{ round($tpl->standard_duration_days / 30) }} months
+                                                @endif
+                                            </p>
                                         @endif
                                     </div>
-                                    @if($item->description)
-                                        <p class="text-sm text-slate-600 leading-relaxed mb-2">{{ $item->description }}</p>
-                                    @endif
-                                    @if(!empty($item->tooth_positions))
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach($item->tooth_positions as $tooth)
-                                                <span class="inline-block text-xs bg-clinic-primary text-white/90 px-2 py-0.5 rounded font-mono">T{{ $tooth }}</span>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="flex-shrink-0 text-right">
-                                    <p class="text-xs text-slate-400">{{ $item->quantity }} x {{ number_format($item->unit_price, 2) }}</p>
-                                    <p class="text-lg font-bold text-clinic-primary font-display">{{ $plan->currency }} {{ number_format($item->line_total, 2) }}</p>
+                                    <div class="flex-shrink-0 text-right">
+                                        <p class="text-xs text-slate-400">{{ $item->quantity }} x {{ number_format($item->unit_price, 2) }}</p>
+                                        <p class="text-lg font-bold text-clinic-primary font-display">{{ $plan->currency }} {{ number_format($item->line_total, 2) }}</p>
+                                    </div>
                                 </div>
                             </div>
+
+                            {{-- Procedure steps from template --}}
+                            @if($tpl?->procedure_steps && is_array($tpl->procedure_steps) && count($tpl->procedure_steps) > 0)
+                                <div class="border-t border-slate-50 bg-slate-50/50 px-5 py-3">
+                                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">How it works</p>
+                                    <ol class="space-y-1.5">
+                                        @foreach($tpl->procedure_steps as $step)
+                                            <li class="flex items-start gap-2 text-xs text-slate-600">
+                                                <span class="flex-shrink-0 w-5 h-5 rounded-full bg-clinic-accent/10 text-clinic-accent text-[10px] font-bold flex items-center justify-center mt-0.5">{{ $loop->iteration }}</span>
+                                                <span>{{ $step }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ol>
+                                </div>
+                            @endif
+
+                            {{-- Recovery info from template --}}
+                            @if($tpl?->recovery_info)
+                                <div class="border-t border-slate-50 bg-amber-50/30 px-5 py-3">
+                                    <p class="text-xs font-semibold text-amber-700 mb-1">Recovery</p>
+                                    <p class="text-xs text-slate-600 leading-relaxed">{{ $tpl->recovery_info }}</p>
+                                </div>
+                            @endif
                         </div>
                         @endforeach
                     </div>
@@ -657,6 +700,41 @@
                     </div>
                 </div>
                 @endif
+            </section>
+            <hr class="border-slate-100" />
+            @endif
+
+            {{-- ================================================================
+                 GUARANTEES (auto-generated from template data)
+            ================================================================ --}}
+            @php
+                $hasExplicitGuarantee = $plan->sections->where('type', 'guarantee')->where('is_visible', true)->isNotEmpty();
+                $templateGuarantees = $hasExplicitGuarantee ? collect() : $plan->items
+                    ->filter(fn($i) => $i->template?->guarantee_text)
+                    ->map(fn($i) => ['name' => $i->name, 'guarantee' => $i->template->guarantee_text])
+                    ->unique('guarantee');
+            @endphp
+            @if($templateGuarantees->isNotEmpty())
+            <section class="py-16 reveal" id="guarantees">
+                <p class="text-xs uppercase tracking-widest text-clinic-accent font-semibold mb-3">Our Promise</p>
+                <h2 class="font-display text-3xl text-clinic-primary font-semibold mb-8">Treatment Guarantees</h2>
+                <div class="space-y-4 max-w-2xl">
+                    @foreach($templateGuarantees as $g)
+                        <div class="bg-gradient-to-br from-green-50 to-white border border-green-100 rounded-2xl p-6 shadow-sm">
+                            <div class="flex items-start gap-3">
+                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-clinic-primary text-sm mb-1">{{ $g['name'] }}</p>
+                                    <p class="text-sm text-slate-600 leading-relaxed">{{ $g['guarantee'] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </section>
             <hr class="border-slate-100" />
             @endif

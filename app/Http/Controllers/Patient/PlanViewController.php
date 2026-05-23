@@ -23,6 +23,7 @@ class PlanViewController extends Controller
                 'patient',
                 'clinic',
                 'items.material',
+                'items.template',
                 'phases',
                 'sections',
                 'options.items.material',
