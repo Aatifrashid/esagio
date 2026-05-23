@@ -228,6 +228,14 @@ class PlanViewController extends Controller
     {
         $plan = TreatmentPlan::withoutGlobalScopes()
             ->where('public_token', $publicToken)
+            ->with([
+                'patient',
+                'clinic',
+                'items.material',
+                'items.template',
+                'phases',
+                'sections',
+            ])
             ->firstOrFail();
 
         TreatmentPlanEvent::create([
@@ -240,8 +248,31 @@ class PlanViewController extends Controller
             'created_at' => now(),
         ]);
 
-        // PDF generation placeholder
-        return response('PDF generation coming soon. Plan: '.$plan->reference_number, 200)
-            ->header('Content-Type', 'text/plain');
+        $branding = $plan->clinic->branding ?? null;
+        $primaryColour = $branding?->primary_colour ?? '#0A2540';
+        $accentColour = $branding?->accent_colour ?? '#E8663D';
+
+        $html = view('patient.plan-pdf', compact('plan', 'primaryColour', 'accentColour'))->render();
+
+        $mpdf = new \Mpdf\Mpdf([
+            'tempDir' => storage_path('app/mpdf-tmp'),
+            'format' => 'A4',
+            'default_font' => 'helvetica',
+            'margin_top' => 20,
+            'margin_bottom' => 25,
+            'margin_left' => 15,
+            'margin_right' => 15,
+        ]);
+
+        $mpdf->SetTitle($plan->title ?: 'Treatment Plan');
+        $mpdf->SetAuthor($plan->clinic->name);
+        $mpdf->WriteHTML($html);
+
+        $filename = 'Treatment-Plan-'.$plan->reference_number.'.pdf';
+
+        return response($mpdf->Output($filename, \Mpdf\Output\Destination::STRING_RETURN), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
     }
 }
