@@ -63,11 +63,15 @@ class PlanViewController extends Controller
         // Load clinic branding separately (no clinic scope since this is public)
         $branding = $plan->clinic->branding ?? null;
 
-        $teamMembers = ClinicTeamMember::withoutGlobalScopes()
-            ->where('clinic_id', $plan->clinic_id)
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
+        try {
+            $teamMembers = ClinicTeamMember::withoutGlobalScopes()
+                ->where('clinic_id', $plan->clinic_id)
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get();
+        } catch (\Throwable) {
+            $teamMembers = collect();
+        }
 
         $freeTier = in_array($plan->clinic->plan_tier ?? 'free', ['free', null]);
 

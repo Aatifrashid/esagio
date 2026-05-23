@@ -20,9 +20,9 @@
         .border-clinic-accent { border-color: var(--clinic-accent); }
         .ring-clinic-accent   { --tw-ring-color: var(--clinic-accent); }
 
-        /* Scroll reveal */
-        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
+        /* Scroll reveal — JS adds .reveal-ready to enable animations */
+        .reveal-ready .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
+        .reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
 
         /* Tooth chart */
         .tooth { cursor: default; }
@@ -52,7 +52,7 @@
     @endpush
 
 @section('content')
-    <div class="font-body min-h-screen" x-data="planView()" x-init="init()">
+    <div class="font-body min-h-screen">
 
         @auth
             @if(auth()->user()->clinic_id === $plan->clinic_id)
@@ -927,29 +927,23 @@
             </div>
         </footer>
 
-    </div>{{-- end planView --}}
+    </div>
 
     @push('scripts')
     <script>
-        function planView() {
-            return {
-                init() {
-                    this.setupReveal();
-                },
-                setupReveal() {
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(e => {
-                            if (e.isIntersecting) {
-                                e.target.classList.add('visible');
-                                observer.unobserve(e.target);
-                            }
-                        });
-                    }, { threshold: 0.08 });
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.classList.add('reveal-ready');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('visible');
+                        observer.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.08 });
 
-                    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-                }
-            };
-        }
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
 
         // Signature pad placeholder
         (function () {
