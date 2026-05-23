@@ -76,4 +76,10 @@ Route::prefix('api/whatsapp/webhook')->name('whatsapp.webhook.')->middleware(\Ap
     Route::post('/session-status', [WhatsappWebhookController::class, 'sessionStatus'])->name('session');
 });
 
+// Temporary: seed template rich data (remove after use)
+Route::get('/seed-templates-9x7k', function () {
+    \Artisan::call('db:seed', ['--class' => 'DatabaseSeeder', '--force' => true]);
+    return 'Seeded. ' . \Artisan::output();
+});
+
 require __DIR__.'/auth.php';
