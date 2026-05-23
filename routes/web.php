@@ -76,4 +76,20 @@ Route::prefix('api/whatsapp/webhook')->name('whatsapp.webhook.')->middleware(\Ap
     Route::post('/session-status', [WhatsappWebhookController::class, 'sessionStatus'])->name('session');
 });
 
+// Temporary debug route
+Route::get('/debug-plan-items-x8k2', function () {
+    $plan = \App\Models\TreatmentPlan::withoutGlobalScopes()->find(4);
+    $items = $plan->items()->with('template')->get();
+    $templates = \App\Models\TreatmentTemplate::all(['id', 'name', 'code']);
+    $out = "=== PLAN ITEMS ===\n";
+    foreach ($items as $i) {
+        $out .= "{$i->name} => template_id: " . ($i->treatment_template_id ?? 'NULL') . " => " . ($i->template?->name ?? 'NO MATCH') . "\n";
+    }
+    $out .= "\n=== TEMPLATES ===\n";
+    foreach ($templates as $t) {
+        $out .= "{$t->id}: [{$t->code}] {$t->name} | steps: " . (is_array($t->procedure_steps) ? count($t->procedure_steps) : 'null') . "\n";
+    }
+    return response($out, 200, ['Content-Type' => 'text/plain']);
+});
+
 require __DIR__.'/auth.php';
