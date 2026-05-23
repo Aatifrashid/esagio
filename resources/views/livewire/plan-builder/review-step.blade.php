@@ -44,7 +44,7 @@
                                     <div class="text-right flex-none">
                                         <p class="text-sm font-semibold text-gray-800">{{ $plan->currency }} {{ number_format($item->line_total, 2) }}</p>
                                         @if($item->quantity > 1)
-                                            <p class="text-xs text-gray-400">x{{ $item->quantity }}</p>
+                                            <p class="text-xs text-gray-400">{{ $item->quantity }} × {{ $plan->currency }} {{ number_format($item->unit_price, 2) }}</p>
                                         @endif
                                     </div>
                                 </div>

@@ -56,7 +56,16 @@
         {{-- Deposit settings --}}
         <div class="bg-white border border-gray-200 rounded-xl p-5">
             <h3 class="text-sm font-semibold text-gray-700 mb-1">Deposit</h3>
-            <p class="text-xs text-gray-400 mb-4">Set a deposit amount either as a fixed value or percentage of the total.</p>
+            <p class="text-xs text-gray-400 mb-2">Set a deposit amount either as a fixed value or percentage of the total.</p>
+            @if($plan->total_amount > 0)
+                <div class="flex items-center gap-3 mb-4 text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                    <span>Plan total: <strong>{{ $plan->currency }} {{ number_format($plan->total_amount, 2) }}</strong></span>
+                    <span class="text-gray-300">|</span>
+                    <span>10% = {{ $plan->currency }} {{ number_format($plan->total_amount * 0.1, 2) }}</span>
+                    <span class="text-gray-300">|</span>
+                    <span>20% = {{ $plan->currency }} {{ number_format($plan->total_amount * 0.2, 2) }}</span>
+                </div>
+            @endif
 
             <div class="grid grid-cols-2 gap-4">
                 <div>

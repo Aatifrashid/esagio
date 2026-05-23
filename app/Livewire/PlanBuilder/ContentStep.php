@@ -29,7 +29,14 @@ class ContentStep extends Component
         $guarantee = $plan->sections()->where('type', 'guarantee')->first();
         $legal = $plan->sections()->where('type', 'legal_disclaimer')->first();
 
-        $this->introLetter = $intro?->content ?? '';
+        if ($intro) {
+            $this->introLetter = $intro->content;
+        } else {
+            $patientName = $plan->patient
+                ? $plan->patient->first_name.' '.$plan->patient->last_name
+                : '[Patient name]';
+            $this->introLetter = "Dear {$patientName},\n\nThank you for visiting us. Following your consultation, we are pleased to present the following treatment plan for your consideration.\n\nThis plan has been carefully designed to address your specific needs and achieve the best possible outcome. Please review the details below, and don't hesitate to contact us with any questions.";
+        }
         $this->guaranteeText = $guarantee?->content ?? '';
         $this->legalDisclaimer = $legal?->content ?? '';
     }

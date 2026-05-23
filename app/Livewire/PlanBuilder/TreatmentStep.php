@@ -108,6 +108,15 @@ class TreatmentStep extends Component
                 ->orWhere('variant_name', $template->name))
             ->first();
 
+        if (! $priceListItem) {
+            $normalized = $this->normalizeName($template->name);
+            $priceListItem = PriceListItem::whereHas('priceList', fn ($q) => $q
+                    ->where('clinic_id', $this->plan->clinic_id)
+                    ->where('is_default', true))
+                ->get()
+                ->first(fn ($p) => $this->normalizeName($p->variant_name) === $normalized);
+        }
+
         $unitPrice = $priceListItem?->unit_price ?? 0;
 
         $nextPosition = ($this->items->max('position') ?? 0) + 1;
@@ -371,9 +380,35 @@ class TreatmentStep extends Component
         $byId = $priceItems->whereNotNull('treatment_template_id')->pluck('unit_price', 'treatment_template_id');
         $byName = $priceItems->pluck('unit_price', 'variant_name');
 
-        return $templates->map(fn ($t) => array_merge($t->toArray(), [
-            'price' => $byId[$t->id] ?? $byName[$t->name] ?? null,
-        ]))->toArray();
+        $allPriceItems = null;
+
+        return $templates->map(function ($t) use ($byId, $byName, &$allPriceItems) {
+            $price = $byId[$t->id] ?? $byName[$t->name] ?? null;
+
+            if ($price === null) {
+                if ($allPriceItems === null) {
+                    $allPriceItems = PriceListItem::whereHas('priceList', fn ($q) => $q
+                            ->where('clinic_id', $this->plan->clinic_id)
+                            ->where('is_default', true))
+                        ->get(['variant_name', 'unit_price']);
+                }
+                $normalized = $this->normalizeName($t->name);
+                $match = $allPriceItems->first(fn ($p) => $this->normalizeName($p->variant_name) === $normalized);
+                $price = $match?->unit_price;
+            }
+
+            return array_merge($t->toArray(), ['price' => $price]);
+        })->toArray();
+    }
+
+    private function normalizeName(string $name): string
+    {
+        $name = strtolower(trim($name));
+        $name = preg_replace('/\s*\([^)]*\)\s*/', '', $name);
+        $name = str_replace(['-', '–', '—'], '', $name);
+        $name = preg_replace('/\s+/', ' ', $name);
+
+        return trim($name);
     }
 
     public function render()
