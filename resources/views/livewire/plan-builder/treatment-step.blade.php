@@ -75,9 +75,14 @@
                                                 <p class="text-xs text-gray-400 truncate mt-0.5">{{ $template['description_short'] }}</p>
                                             @endif
                                         </div>
-                                        <svg class="h-4 w-4 text-gray-300 group-hover:text-clinical flex-none mt-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
+                                        <div class="flex items-center gap-2 flex-none">
+                                            @if($template['price'] !== null)
+                                                <span class="text-xs font-medium text-gray-500">£{{ number_format($template['price'], 2) }}</span>
+                                            @endif
+                                            <svg class="h-4 w-4 text-gray-300 group-hover:text-clinical mt-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                            </svg>
+                                        </div>
                                     </div>
                                 </button>
                             @endforeach
@@ -94,7 +99,12 @@
                                             wire:click="addFromTemplate({{ $template['id'] }})"
                                             class="w-full text-left px-3 py-2 rounded-lg hover:bg-clinical/5 border border-transparent hover:border-clinical/20 transition group"
                                         >
-                                            <p class="text-sm text-gray-700 group-hover:text-clinical truncate">{{ $template['name'] }}</p>
+                                            <div class="flex items-center justify-between gap-2">
+                                                <p class="text-sm text-gray-700 group-hover:text-clinical truncate">{{ $template['name'] }}</p>
+                                                @if($template['price'] !== null)
+                                                    <span class="text-xs text-gray-400 flex-none">£{{ number_format($template['price'], 2) }}</span>
+                                                @endif
+                                            </div>
                                         </button>
                                     @endforeach
                                 </div>

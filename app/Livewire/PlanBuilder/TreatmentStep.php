@@ -2,6 +2,7 @@
 
 namespace App\Livewire\PlanBuilder;
 
+use App\Models\PriceListItem;
 use App\Models\TreatmentPlan;
 use App\Models\TreatmentPlanItem;
 use App\Models\TreatmentPlanPhase;
@@ -43,11 +44,11 @@ class TreatmentStep extends Component
         $this->plan = $plan;
         $this->items = $plan->items()->orderBy('position')->get();
         $this->phases = $plan->phases()->orderBy('sort_order')->get();
-        $this->recentTemplates = TreatmentTemplate::where('clinic_id', $plan->clinic_id)
+        $recentRaw = TreatmentTemplate::where('clinic_id', $plan->clinic_id)
             ->orderByDesc('usage_count')
             ->limit(10)
-            ->get(['id', 'name', 'description_short', 'code'])
-            ->toArray();
+            ->get(['id', 'name', 'description_short', 'code']);
+        $this->recentTemplates = $this->attachPrices($recentRaw);
 
         $this->loadVisitAssignments();
         $this->refreshSuggestions();
@@ -82,7 +83,7 @@ class TreatmentStep extends Component
 
         $term = '%'.$this->templateSearch.'%';
 
-        $this->templates = TreatmentTemplate::where('clinic_id', $this->plan->clinic_id)
+        $templates = TreatmentTemplate::where('clinic_id', $this->plan->clinic_id)
             ->where('is_active', true)
             ->where(function ($q) use ($term) {
                 $q->where('name', 'like', $term)
@@ -90,24 +91,33 @@ class TreatmentStep extends Component
                     ->orWhere('description_short', 'like', $term);
             })
             ->limit(15)
-            ->get(['id', 'name', 'description_short', 'code'])
-            ->toArray();
+            ->get(['id', 'name', 'description_short', 'code']);
+
+        $this->templates = $this->attachPrices($templates);
     }
 
     public function addFromTemplate(int $templateId): void
     {
         $template = TreatmentTemplate::findOrFail($templateId);
 
+        $priceListItem = PriceListItem::whereHas('priceList', fn ($q) => $q
+                ->where('clinic_id', $this->plan->clinic_id)
+                ->where('is_default', true))
+            ->where('treatment_template_id', $template->id)
+            ->first();
+
+        $unitPrice = $priceListItem?->unit_price ?? 0;
+
         $nextPosition = ($this->items->max('position') ?? 0) + 1;
 
         $item = TreatmentPlanItem::create([
             'treatment_plan_id' => $this->plan->id,
             'treatment_template_id' => $template->id,
-            'name' => $template->name,
+            'name' => $priceListItem?->variant_name ?? $template->name,
             'description' => $template->description_short,
             'quantity' => 1,
-            'unit_price' => 0,
-            'line_total' => 0,
+            'unit_price' => $unitPrice,
+            'line_total' => $unitPrice,
             'position' => $nextPosition,
             'included_animation_clip_ids' => $template->default_animation_clip_ids ?? [],
             'included_before_after_ids' => $template->default_before_after_ids ?? [],
@@ -341,6 +351,21 @@ class TreatmentStep extends Component
 
         $this->phases = $this->plan->phases()->orderBy('sort_order')->get();
         $this->dispatch('plan-updated')->to(Builder::class);
+    }
+
+    private function attachPrices($templates): array
+    {
+        $templateIds = $templates->pluck('id');
+
+        $prices = PriceListItem::whereHas('priceList', fn ($q) => $q
+                ->where('clinic_id', $this->plan->clinic_id)
+                ->where('is_default', true))
+            ->whereIn('treatment_template_id', $templateIds)
+            ->pluck('unit_price', 'treatment_template_id');
+
+        return $templates->map(fn ($t) => array_merge($t->toArray(), [
+            'price' => $prices[$t->id] ?? null,
+        ]))->toArray();
     }
 
     public function render()
