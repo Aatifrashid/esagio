@@ -25,7 +25,11 @@ class VideoStep extends Component
     public function mount(TreatmentPlan $plan): void
     {
         $this->plan = $plan;
-        $this->existingSession = $plan->videoConsultation;
+        try {
+            $this->existingSession = $plan->videoConsultation;
+        } catch (\Throwable) {
+            $this->existingSession = null;
+        }
         $this->conductedBy = auth()->id();
 
         if ($this->existingSession) {
@@ -75,9 +79,13 @@ class VideoStep extends Component
 
     public function render()
     {
-        $teamMembers = ClinicTeamMember::where('clinic_id', $this->plan->clinic_id)
-            ->with('user')
-            ->get();
+        try {
+            $teamMembers = ClinicTeamMember::where('clinic_id', $this->plan->clinic_id)
+                ->with('user')
+                ->get();
+        } catch (\Throwable) {
+            $teamMembers = collect();
+        }
 
         return view('livewire.plan-builder.video-step', [
             'teamMembers' => $teamMembers,
