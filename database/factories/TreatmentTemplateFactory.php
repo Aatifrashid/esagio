@@ -156,7 +156,7 @@ class TreatmentTemplateFactory extends Factory
         ];
     }
 
-    private function sampleProcedureSteps(string $code): array
+    public function sampleProcedureSteps(string $code): array
     {
         $steps = [
             'IMP-001' => [
@@ -197,7 +197,7 @@ class TreatmentTemplateFactory extends Factory
         ];
     }
 
-    private function sampleRecoveryInfo(string $code): ?string
+    public function sampleRecoveryInfo(string $code): ?string
     {
         $info = [
             'IMP-001' => 'Mild swelling and discomfort for 3 to 5 days after placement. Avoid hard foods for 6 weeks. Maintain excellent oral hygiene around the implant site.',

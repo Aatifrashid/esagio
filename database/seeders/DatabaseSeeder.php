@@ -19,6 +19,7 @@ use App\Models\PriceListItem;
 use App\Models\TreatmentCategory;
 use App\Models\TreatmentTemplate;
 use App\Models\User;
+use App\Models\TreatmentPlanItem;
 use Database\Factories\CrmPipelineStageFactory;
 use Database\Factories\LegalBlockFactory;
 use Database\Factories\TreatmentCategoryFactory;
@@ -91,9 +92,9 @@ class DatabaseSeeder extends Seeder
     private function seedSharedTreatmentTemplates(): void
     {
         $categories = TreatmentCategory::whereNull('clinic_id')->get()->keyBy('slug');
+        $factory = new TreatmentTemplateFactory();
 
         foreach (TreatmentTemplateFactory::$treatments as $treatment) {
-            // Determine category by treatment code prefix
             $categorySlug = match (true) {
                 str_starts_with($treatment['code'], 'IMP') => 'implants',
                 str_starts_with($treatment['code'], 'CRN') => 'crowns-and-bridges',
@@ -108,21 +109,51 @@ class DatabaseSeeder extends Seeder
 
             $category = $categories->get($categorySlug);
 
-            TreatmentTemplate::firstOrCreate(
+            $procedureSteps = $factory->sampleProcedureSteps($treatment['code']);
+            $recoveryInfo = $factory->sampleRecoveryInfo($treatment['code']);
+
+            TreatmentTemplate::updateOrCreate(
                 ['code' => $treatment['code'], 'clinic_id' => null],
                 [
                     'category_id' => $category?->id,
                     'name' => $treatment['name'],
                     'description_short' => $treatment['description_short'],
                     'description_long' => $treatment['description_long'],
+                    'procedure_steps' => $procedureSteps,
+                    'recovery_info' => $recoveryInfo,
+                    'guarantee_text' => match (true) {
+                        str_starts_with($treatment['code'], 'IMP') => 'This implant carries a lifetime guarantee against implant failure subject to annual review appointments.',
+                        str_starts_with($treatment['code'], 'CRN') => 'Crown and bridge work carries a 5-year guarantee against material failure.',
+                        str_starts_with($treatment['code'], 'VEN') => 'Porcelain veneers carry a 5-year aesthetic guarantee.',
+                        str_starts_with($treatment['code'], 'WHT') => 'Whitening results guaranteed for a minimum of 12 months with the use of the provided maintenance trays.',
+                        default => null,
+                    },
                     'standard_duration_days' => $treatment['standard_duration_days'],
                     'requires_imaging' => $treatment['requires_imaging'],
                     'legal_disclaimer' => 'Results may vary between patients. All treatment is subject to a full clinical assessment.',
                     'is_active' => true,
-                    'usage_count' => 0,
                 ]
             );
         }
+
+        $this->backfillPlanItemTemplates();
+    }
+
+    private function backfillPlanItemTemplates(): void
+    {
+        $templates = TreatmentTemplate::all()->keyBy(fn ($t) => strtolower(trim($t->name)));
+
+        TreatmentPlanItem::whereNull('treatment_template_id')->chunk(100, function ($items) use ($templates) {
+            foreach ($items as $item) {
+                $key = strtolower(trim(
+                    preg_replace('/\s*\([^)]*\)\s*/', '', str_replace(['-', '–', '—'], '', $item->name))
+                ));
+                $match = $templates->get($key);
+                if ($match) {
+                    $item->update(['treatment_template_id' => $match->id]);
+                }
+            }
+        });
     }
 
     private function seedSharedMaterials(): void
