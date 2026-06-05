@@ -8,7 +8,7 @@
     <meta name="description" content="{{ $description ?? 'The clinical software for modern dental clinics. Built by clinic operators, priced for clinic budgets.' }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=fraunces:400,500,600,700|inter:400,500,600,700" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/marketing.js'])
     @stack('head')
 </head>
 <body class="font-sans antialiased bg-white text-gray-900">
