@@ -1,19 +1,20 @@
 <x-layouts.marketing :title="'Pricing'">
 
+<div x-data="{annual: false}">
 <section class="bg-[#0A2540] text-white py-20">
     <div class="max-w-3xl mx-auto px-4 text-center">
         <h1 class="font-['Fraunces'] text-5xl font-bold mb-4">Honest pricing</h1>
         <p class="text-gray-300 text-lg">No per-seat fees. No surprise invoices. One flat monthly rate.</p>
 
         {{-- Monthly/annual toggle --}}
-        <div class="mt-8 inline-flex items-center bg-white/10 rounded-full p-1" x-data="{annual: false}">
+        <div class="mt-8 inline-flex items-center bg-white/10 rounded-full p-1">
             <button @click="annual = false" :class="!annual ? 'bg-white text-[#0A2540]' : 'text-white'" class="px-4 py-2 rounded-full text-sm font-medium transition">Monthly</button>
             <button @click="annual = true" :class="annual ? 'bg-white text-[#0A2540]' : 'text-white'" class="px-4 py-2 rounded-full text-sm font-medium transition">Annual <span class="text-[#E8663D] font-semibold">-20%</span></button>
         </div>
     </div>
 </section>
 
-<section class="py-20 bg-gray-50" x-data="{annual: false}">
+<section class="py-20 bg-gray-50">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Tier cards --}}
@@ -34,7 +35,7 @@
                 <p class="text-xs text-gray-500 mb-4 leading-relaxed">{{ $tier['desc'] }}</p>
                 <div class="mb-6">
                     <span x-show="!annual" class="text-4xl font-bold text-[#0A2540]">£{{ $tier['monthly'] }}</span>
-                    <span x-show="annual" class="text-4xl font-bold text-[#0A2540]">£{{ $tier['annual'] }}</span>
+                    <span x-show="annual" x-cloak class="text-4xl font-bold text-[#0A2540]">£{{ $tier['annual'] }}</span>
                     <span class="text-gray-400 text-sm">/mo</span>
                 </div>
                 <a href="/register" class="block w-full text-center py-2.5 rounded-xl font-medium text-sm transition
@@ -109,11 +110,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div x-show="open === {{ $i }}" x-collapse class="px-6 pb-4 text-gray-600 text-sm">{{ $faq['a'] }}</div>
+                <div x-show="open === {{ $i }}" x-cloak x-collapse class="px-6 pb-4 text-gray-600 text-sm">{{ $faq['a'] }}</div>
             </div>
             @endforeach
         </div>
     </div>
 </section>
+
+</div>
 
 </x-layouts.marketing>

@@ -12,7 +12,7 @@
     @stack('head')
 </head>
 <body class="font-sans antialiased bg-white text-gray-900">
-    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
+    <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100" x-data="{mobileOpen: false}">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <a href="/" class="flex items-center gap-2">
@@ -25,8 +25,25 @@
                     <a href="/blog" class="hover:text-gray-900 transition">Blog</a>
                     <a href="/demo" class="hover:text-gray-900 transition">Demo</a>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-4">
                     <a href="/login" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition">Log in</a>
+                    <a href="/register" class="inline-flex items-center px-4 py-2 bg-[#0A2540] text-white text-sm font-medium rounded-lg hover:bg-[#0A2540]/90 transition">Start Free</a>
+                </div>
+                <button @click="mobileOpen = !mobileOpen" class="md:hidden p-2 text-gray-600 hover:text-gray-900">
+                    <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <svg x-show="mobileOpen" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+        <div x-show="mobileOpen" x-cloak x-collapse class="md:hidden border-t border-gray-100 bg-white">
+            <div class="px-4 py-4 space-y-3">
+                <a href="/features" class="block text-sm font-medium text-gray-600 hover:text-gray-900">Features</a>
+                <a href="/pricing" class="block text-sm font-medium text-gray-600 hover:text-gray-900">Pricing</a>
+                <a href="/vs-brightplans" class="block text-sm font-medium text-gray-600 hover:text-gray-900">vs BrightPlans</a>
+                <a href="/blog" class="block text-sm font-medium text-gray-600 hover:text-gray-900">Blog</a>
+                <a href="/demo" class="block text-sm font-medium text-gray-600 hover:text-gray-900">Demo</a>
+                <div class="pt-3 border-t border-gray-100 flex items-center gap-4">
+                    <a href="/login" class="text-sm font-medium text-gray-600 hover:text-gray-900">Log in</a>
                     <a href="/register" class="inline-flex items-center px-4 py-2 bg-[#0A2540] text-white text-sm font-medium rounded-lg hover:bg-[#0A2540]/90 transition">Start Free</a>
                 </div>
             </div>

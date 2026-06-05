@@ -50,6 +50,7 @@ Route::get('/pricing', [PageController::class, 'pricing'])->name('pricing');
 Route::get('/vs-brightplans', [PageController::class, 'vsBrightplans'])->name('vs-brightplans');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [PageController::class, 'contactSubmit'])->name('contact.submit');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');

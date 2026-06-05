@@ -9,20 +9,29 @@
 
 <section class="py-20 bg-gray-50">
     <div class="max-w-xl mx-auto px-4">
+        @if(session('success'))
+        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm">
+            {{ session('success') }}
+        </div>
+        @endif
+
         <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-            <form class="space-y-5">
+            <form method="POST" action="{{ route('contact.submit') }}" class="space-y-5">
                 @csrf
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Your name</label>
-                    <input type="text" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0A2540] text-sm" placeholder="Dr. Jane Smith">
+                    <input type="text" name="name" required value="{{ old('name') }}" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0A2540] text-sm @error('name') border-red-500 @enderror" placeholder="Dr. Jane Smith">
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0A2540] text-sm" placeholder="jane@yourclinic.com">
+                    <input type="email" name="email" required value="{{ old('email') }}" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0A2540] text-sm @error('email') border-red-500 @enderror" placeholder="jane@yourclinic.com">
+                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                    <textarea rows="5" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0A2540] text-sm" placeholder="Tell us what you need..."></textarea>
+                    <textarea rows="5" name="message" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#0A2540] text-sm @error('message') border-red-500 @enderror" placeholder="Tell us what you need...">{{ old('message') }}</textarea>
+                    @error('message') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <button type="submit" class="w-full py-3 px-6 bg-[#0A2540] text-white font-medium rounded-xl hover:bg-[#0A2540]/90 transition">
                     Send message

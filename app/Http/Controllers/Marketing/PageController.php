@@ -39,6 +39,22 @@ class PageController extends Controller
         return view('marketing.contact');
     }
 
+    public function contactSubmit(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        \Illuminate\Support\Facades\Mail::raw(
+            "Name: {$validated['name']}\nEmail: {$validated['email']}\n\n{$validated['message']}",
+            fn ($m) => $m->to('hello@esagio.com')->subject('Contact form: ' . $validated['name'])->replyTo($validated['email'])
+        );
+
+        return back()->with('success', 'Message sent. We will reply within one business day.');
+    }
+
     public function privacy(): View
     {
         return view('marketing.privacy');

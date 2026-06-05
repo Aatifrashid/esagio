@@ -22,7 +22,7 @@
             </p>
             <div class="flex flex-col sm:flex-row gap-4">
                 <a href="/register" class="inline-flex justify-center items-center px-8 py-4 bg-[#E8663D] text-white font-semibold rounded-xl hover:bg-[#E8663D]/90 transition text-lg">
-                    Start Free &mdash; No Card Required
+                    Start Free - No Card Required
                 </a>
                 <a href="/demo" class="inline-flex justify-center items-center px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition text-lg">
                     Try Interactive Demo
@@ -165,7 +165,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div x-show="open === {{ $i }}" x-collapse class="px-6 pb-4 text-gray-600 text-sm leading-relaxed">
+                <div x-show="open === {{ $i }}" x-cloak x-collapse class="px-6 pb-4 text-gray-600 text-sm leading-relaxed">
                     {{ $faq['a'] }}
                 </div>
             </div>

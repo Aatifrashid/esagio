@@ -72,8 +72,11 @@ $features = [
                     @endforeach
                 </ul>
             </div>
-            <div class="{{ $i % 2 !== 0 ? 'lg:order-1' : '' }} bg-gray-100 rounded-2xl aspect-video flex items-center justify-center text-gray-400">
-                <span class="text-sm">Feature screenshot</span>
+            <div class="{{ $i % 2 !== 0 ? 'lg:order-1' : '' }} bg-gradient-to-br from-[#0A2540]/5 to-[#E8663D]/5 rounded-2xl aspect-video flex flex-col items-center justify-center text-gray-400 border border-gray-200">
+                <svg class="w-12 h-12 text-[#0A2540]/20 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $feature['icon'] }}"/>
+                </svg>
+                <span class="text-xs text-gray-300">{{ $feature['title'] }}</span>
             </div>
         </div>
     </div>
