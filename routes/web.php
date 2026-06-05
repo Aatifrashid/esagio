@@ -78,4 +78,12 @@ Route::prefix('api/whatsapp/webhook')->name('whatsapp.webhook.')->middleware(\Ap
 });
 
 
+// Temporary cache clear route - remove after deploy
+Route::get('/_cc', function () {
+    if (function_exists('opcache_reset')) { opcache_reset(); }
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    return 'caches cleared';
+});
+
 require __DIR__.'/auth.php';
