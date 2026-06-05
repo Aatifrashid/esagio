@@ -9,9 +9,15 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-B4ha9kao.js",
+    "file": "assets/app-CzZ-6OqX.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/marketing.js": {
+    "file": "assets/marketing-DXr1gash.js",
+    "name": "marketing",
+    "src": "resources/js/marketing.js",
     "isEntry": true
   }
 }
