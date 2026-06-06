@@ -28,7 +28,7 @@
                 </div>
                 <div class="hidden md:flex items-center gap-4">
                     @auth
-                        <a href="/admin" class="btn btn-dark btn-sm">Dashboard</a>
+                        <a href="/dashboard" class="btn btn-dark btn-sm">Dashboard</a>
                     @else
                         <a href="/login" class="text-sm font-semibold text-[#51607A] hover:text-navy transition">Log in</a>
                         <a href="/register" class="btn btn-dark btn-sm">Start Free</a>
@@ -49,7 +49,7 @@
                 <a href="/demo" class="block text-sm font-semibold text-[#51607A] hover:text-navy">Demo</a>
                 <div class="pt-3 border-t border-gray-100 flex items-center gap-4">
                     @auth
-                        <a href="/admin" class="btn btn-dark btn-sm">Dashboard</a>
+                        <a href="/dashboard" class="btn btn-dark btn-sm">Dashboard</a>
                     @else
                         <a href="/login" class="text-sm font-semibold text-[#51607A] hover:text-navy">Log in</a>
                         <a href="/register" class="btn btn-dark btn-sm">Start Free</a>
