@@ -27,8 +27,12 @@
                     <a href="/demo" class="hover:text-navy transition">Demo</a>
                 </div>
                 <div class="hidden md:flex items-center gap-4">
-                    <a href="/login" class="text-sm font-semibold text-[#51607A] hover:text-navy transition">Log in</a>
-                    <a href="/register" class="btn btn-dark btn-sm">Start Free</a>
+                    @auth
+                        <a href="/admin" class="btn btn-dark btn-sm">Dashboard</a>
+                    @else
+                        <a href="/login" class="text-sm font-semibold text-[#51607A] hover:text-navy transition">Log in</a>
+                        <a href="/register" class="btn btn-dark btn-sm">Start Free</a>
+                    @endauth
                 </div>
                 <button @click="mobileOpen = !mobileOpen" class="md:hidden p-2 text-gray-600 hover:text-gray-900">
                     <svg x-show="!mobileOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -44,8 +48,12 @@
                 <a href="/blog" class="block text-sm font-semibold text-[#51607A] hover:text-navy">Blog</a>
                 <a href="/demo" class="block text-sm font-semibold text-[#51607A] hover:text-navy">Demo</a>
                 <div class="pt-3 border-t border-gray-100 flex items-center gap-4">
-                    <a href="/login" class="text-sm font-semibold text-[#51607A] hover:text-navy">Log in</a>
-                    <a href="/register" class="btn btn-dark btn-sm">Start Free</a>
+                    @auth
+                        <a href="/admin" class="btn btn-dark btn-sm">Dashboard</a>
+                    @else
+                        <a href="/login" class="text-sm font-semibold text-[#51607A] hover:text-navy">Log in</a>
+                        <a href="/register" class="btn btn-dark btn-sm">Start Free</a>
+                    @endauth
                 </div>
             </div>
         </div>
