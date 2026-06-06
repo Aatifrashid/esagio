@@ -9,15 +9,19 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=fraunces:400,500,600,700|inter:400,500,600,700" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=hanken-grotesk:400,500,600,700,800|space-mono:400,700" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script>
+            // Prevent Livewire navigate from restoring cached page state on auth pages
+            try { Object.keys(localStorage).filter(k => k.startsWith('livewire:')).forEach(k => localStorage.removeItem(k)); } catch(e) {}
+        </script>
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-50">
             <div class="mb-4">
-                <a href="/" wire:navigate>
+                <a href="/">
                     <img src="{{ asset('svg/logo.svg') }}" alt="Esagio" class="h-10">
                 </a>
             </div>
