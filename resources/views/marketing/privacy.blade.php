@@ -1,15 +1,15 @@
 <x-layouts.marketing :title="'Privacy Policy'">
 
-<section class="bg-[#0A2540] text-white py-16">
+<section class="bg-navy text-white py-16">
     <div class="max-w-3xl mx-auto px-4 text-center">
-        <h1 class="font-['Fraunces'] text-4xl font-bold">Privacy Policy</h1>
-        <p class="text-gray-400 mt-2 text-sm">Last updated: January 2025</p>
+        <h1 class="font-display text-4xl font-extrabold tracking-tight">Privacy Policy</h1>
+        <p class="text-gray-400 mt-2 text-sm font-mono">Last updated: January 2025</p>
     </div>
 </section>
 
 <section class="py-16 bg-white">
     <div class="max-w-3xl mx-auto px-4">
-        <div class="prose prose-lg max-w-none prose-headings:font-['Fraunces'] prose-headings:text-[#0A2540]">
+        <div class="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-navy prose-a:text-accent">
             <h2>What data we collect</h2>
             <p>We collect information you provide directly (name, email, clinic details) and data generated through use of the platform (treatment plans, patient records, usage analytics).</p>
 

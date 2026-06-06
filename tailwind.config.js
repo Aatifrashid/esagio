@@ -12,12 +12,13 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Inter', ...defaultTheme.fontFamily.sans],
-                serif: ['Fraunces', ...defaultTheme.fontFamily.serif],
+                sans: ['Hanken Grotesk', ...defaultTheme.fontFamily.sans],
+                display: ['Hanken Grotesk', ...defaultTheme.fontFamily.sans],
+                mono: ['Space Mono', ...defaultTheme.fontFamily.mono],
             },
             colors: {
-                clinical: {
-                    DEFAULT: '#0A2540',
+                navy: {
+                    DEFAULT: '#0A2640',
                     50: '#E8EDF2',
                     100: '#D1DBE5',
                     200: '#A3B7CB',
@@ -26,7 +27,7 @@ export default {
                     500: '#1A4B7D',
                     600: '#143D66',
                     700: '#0F2F4F',
-                    800: '#0A2540',
+                    800: '#0A2640',
                     900: '#061829',
                 },
                 accent: {
@@ -42,6 +43,22 @@ export default {
                     800: '#762C15',
                     900: '#491B0D',
                 },
+                slate: {
+                    DEFAULT: '#2C3F54',
+                    400: '#8693A8',
+                    500: '#51607A',
+                    700: '#2C3F54',
+                },
+                clinical: '#42A070',
+            },
+            borderRadius: {
+                DEFAULT: '5px',
+                sm: '3px',
+                md: '5px',
+                lg: '8px',
+                xl: '5px',
+                '2xl': '5px',
+                'pill': '9999px',
             },
         },
     },

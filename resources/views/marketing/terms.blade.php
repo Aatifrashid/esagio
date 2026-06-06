@@ -1,15 +1,15 @@
 <x-layouts.marketing :title="'Terms of Service'">
 
-<section class="bg-[#0A2540] text-white py-16">
+<section class="bg-navy text-white py-16">
     <div class="max-w-3xl mx-auto px-4 text-center">
-        <h1 class="font-['Fraunces'] text-4xl font-bold">Terms of Service</h1>
-        <p class="text-gray-400 mt-2 text-sm">Last updated: January 2025</p>
+        <h1 class="font-display text-4xl font-extrabold tracking-tight">Terms of Service</h1>
+        <p class="text-gray-400 mt-2 text-sm font-mono">Last updated: January 2025</p>
     </div>
 </section>
 
 <section class="py-16 bg-white">
     <div class="max-w-3xl mx-auto px-4">
-        <div class="prose prose-lg max-w-none prose-headings:font-['Fraunces'] prose-headings:text-[#0A2540]">
+        <div class="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-navy prose-a:text-accent">
             <h2>1. Acceptance</h2>
             <p>By creating an account, you agree to these terms. These terms form a contract between you and Esagio Ltd.</p>
 

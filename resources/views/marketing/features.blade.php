@@ -1,8 +1,8 @@
 <x-layouts.marketing :title="'Features'">
 
-<section class="bg-[#0A2540] text-white py-20">
+<section class="bg-navy text-white py-20">
     <div class="max-w-3xl mx-auto px-4 text-center">
-        <h1 class="font-['Fraunces'] text-5xl font-bold mb-4">Everything, included</h1>
+        <h1 class="font-display text-5xl font-extrabold tracking-tight mb-4">Everything, included</h1>
         <p class="text-gray-300 text-lg">One platform. No bolt-ons. No per-feature pricing.</p>
     </div>
 </section>
@@ -53,13 +53,13 @@ $features = [
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center {{ $i % 2 !== 0 ? 'lg:flex-row-reverse' : '' }}">
             <div class="{{ $i % 2 !== 0 ? 'lg:order-2' : '' }}">
-                <div class="inline-flex items-center justify-center w-12 h-12 bg-[#0A2540]/10 rounded-xl mb-4">
-                    <svg class="w-6 h-6 text-[#0A2540]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-accent-50 rounded-[5px] mb-4">
+                    <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $feature['icon'] }}"/>
                     </svg>
                 </div>
-                <p class="text-[#E8663D] font-semibold text-sm mb-1">{{ $feature['subtitle'] }}</p>
-                <h2 class="font-['Fraunces'] text-3xl font-bold text-[#0A2540] mb-4">{{ $feature['title'] }}</h2>
+                <p class="text-accent font-semibold text-sm mb-1">{{ $feature['subtitle'] }}</p>
+                <h2 class="font-display text-3xl font-bold text-navy tracking-tight mb-4">{{ $feature['title'] }}</h2>
                 <p class="text-gray-600 leading-relaxed mb-6">{{ $feature['description'] }}</p>
                 <ul class="space-y-2">
                     @foreach($feature['points'] as $point)
@@ -72,8 +72,8 @@ $features = [
                     @endforeach
                 </ul>
             </div>
-            <div class="{{ $i % 2 !== 0 ? 'lg:order-1' : '' }} bg-gradient-to-br from-[#0A2540]/5 to-[#E8663D]/5 rounded-2xl aspect-video flex flex-col items-center justify-center text-gray-400 border border-gray-200">
-                <svg class="w-12 h-12 text-[#0A2540]/20 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="{{ $i % 2 !== 0 ? 'lg:order-1' : '' }} bg-gradient-to-br from-navy/5 to-accent/5 rounded-[5px] aspect-video flex flex-col items-center justify-center text-gray-400 border border-gray-200">
+                <svg class="w-12 h-12 text-navy/20 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $feature['icon'] }}"/>
                 </svg>
                 <span class="text-xs text-gray-300">{{ $feature['title'] }}</span>
@@ -83,17 +83,13 @@ $features = [
 </section>
 @endforeach
 
-<section class="bg-[#0A2540] text-white py-20">
+<section class="bg-navy text-white py-20">
     <div class="max-w-3xl mx-auto px-4 text-center">
-        <h2 class="font-['Fraunces'] text-4xl font-bold mb-4">See it for yourself</h2>
+        <h2 class="font-display text-4xl font-extrabold tracking-tight mb-4">See it for yourself</h2>
         <p class="text-gray-300 mb-8">Try the interactive demo. No sign-up required.</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/demo" class="inline-flex justify-center items-center px-8 py-4 bg-[#E8663D] text-white font-semibold rounded-xl hover:bg-[#E8663D]/90 transition">
-                Try interactive demo
-            </a>
-            <a href="/register" class="inline-flex justify-center items-center px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition">
-                Start free account
-            </a>
+            <a href="/demo" class="btn btn-primary btn-lg">Try interactive demo</a>
+            <a href="/register" class="btn btn-slate btn-lg">Start free account</a>
         </div>
     </div>
 </section>
